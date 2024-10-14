@@ -21,13 +21,6 @@ public class RobotCore extends OpMode {
 
     @Override
     public void init(){
-
-        // if this works imma punch jordan in the gizards
-    }
-
-    @Override
-    public void loop()
-    {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -38,6 +31,11 @@ public class RobotCore extends OpMode {
         yClaw = hardwareMap.get(Servo.class, "yClaw");
         xClaw = hardwareMap.get(Servo.class, "xClaw");
         claw = hardwareMap.get(Servo.class, "claw");
+    }
+
+    @Override
+    public void loop()
+    {
 
     }
 
