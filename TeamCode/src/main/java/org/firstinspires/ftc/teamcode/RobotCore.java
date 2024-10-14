@@ -22,7 +22,7 @@ public class RobotCore extends OpMode {
     @Override
     public void init(){
 
-        ///commit testt
+        ///commit test
     }
 
     @Override
