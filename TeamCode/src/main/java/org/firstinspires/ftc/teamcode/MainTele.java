@@ -54,6 +54,10 @@ public class MainTele extends RobotCore{
         telemetry.addLine("----Controller Inputs----");
         telemetry.addData("Axel", axelMotor.getCurrentPosition());
         telemetry.addData("Slide", slideMotor.getCurrentPosition());
+        telemetry.addData("yClaw", yClaw.getPosition());
+        telemetry.addData("xClaw", xClaw.getPosition());
+        telemetry.addData("claw", claw.getPosition());
+
     }
 
 }
