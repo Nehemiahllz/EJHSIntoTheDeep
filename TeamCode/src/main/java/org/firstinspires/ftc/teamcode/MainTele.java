@@ -46,8 +46,18 @@ public class MainTele extends RobotCore{
             backLeft.setPower(0);
             backRight.setPower(0);
 
+
+
         }
 
+        //Arm
+
+        if(gamepad1.a){
+            claw.getPosition(.7);
+        }
+        if(gamepad1.b){
+            claw.getPosition(0);
+        }
     }
 
     private void printDebugData() {
