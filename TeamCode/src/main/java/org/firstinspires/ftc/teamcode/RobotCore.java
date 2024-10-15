@@ -24,7 +24,6 @@ public class RobotCore extends OpMode {
     @Override
     public void init(){
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backLeft.setDirection((DcMotor.Direction.REVERSE));
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
@@ -32,16 +31,33 @@ public class RobotCore extends OpMode {
         axelMotor = hardwareMap.get(DcMotor.class, "axelMotor");
 
         yClaw = hardwareMap.get(Servo.class, "yClaw");
+        yClaw.setDirection(Servo.Direction.FORWARD);
+
         xClaw = hardwareMap.get(Servo.class, "xClaw");
+        xClaw.setDirection(Servo.Direction.REVERSE);
+
         claw = hardwareMap.get(Servo.class, "claw");
 
+        claw.setDirection(Servo.Direction.FORWARD);
+
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection((DcMotor.Direction.REVERSE));
+    }
+
+    //These methods are to be overridden in the classes
+    @Override
+    public void start(){
+
     }
 
     @Override
-    public void loop()
-    {
+    public void loop(){
 
     }
 
-}
+    @Override
+    public void stop(){
+
+    }
+
+    }
