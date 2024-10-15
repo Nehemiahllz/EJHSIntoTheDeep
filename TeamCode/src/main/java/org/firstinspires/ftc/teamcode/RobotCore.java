@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 //RobotCore
@@ -32,6 +33,8 @@ public class RobotCore extends OpMode {
         yClaw = hardwareMap.get(Servo.class, "yClaw");
         xClaw = hardwareMap.get(Servo.class, "xClaw");
         claw = hardwareMap.get(Servo.class, "claw");
+
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
