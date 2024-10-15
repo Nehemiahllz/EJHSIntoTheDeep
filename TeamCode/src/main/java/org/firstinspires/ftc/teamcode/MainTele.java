@@ -15,6 +15,7 @@ public class MainTele extends RobotCore{
     double backLeftPower;
     double backRightPower;
 
+
     public void init()
     {
         super.init();
@@ -22,8 +23,10 @@ public class MainTele extends RobotCore{
 
     public void loop() {
 
+        printDebugData();
+
         moveX = gamepad1.left_stick_x;
-        moveY = gamepad1.left_stick_y;
+        moveY = -gamepad1.left_stick_y;
         turnX = gamepad1.right_stick_x;
 
         frontLeftPower = moveY + moveX + turnX;
@@ -33,10 +36,10 @@ public class MainTele extends RobotCore{
 
         //Drivetrain
         if(Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1){
-            frontLeft.setPower(frontLeftPower);
-            frontRight.setPower(frontRightPower);
-            backLeft.setPower(backLeftPower);
-            backRight.setPower(backRightPower);
+            frontLeft.setPower(frontLeftPower * 0.5);
+            frontRight.setPower(frontRightPower * 0.5);
+            backLeft.setPower(backLeftPower * 0.5);
+            backRight.setPower(backRightPower * 0.5);
         } else{
             frontLeft.setPower(0);
             frontRight.setPower(0);
@@ -47,7 +50,10 @@ public class MainTele extends RobotCore{
 
     }
 
-
-
+    private void printDebugData() {
+        telemetry.addLine("----Controller Inputs----");
+        telemetry.addData("Axel", axelMotor.getCurrentPosition());
+        telemetry.addData("Slide", slideMotor.getCurrentPosition());
+    }
 
 }

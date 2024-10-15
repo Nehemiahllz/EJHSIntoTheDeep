@@ -24,6 +24,7 @@ public class RobotCore extends OpMode {
     @Override
     public void init(){
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backLeft.setDirection((DcMotor.Direction.REVERSE));
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
