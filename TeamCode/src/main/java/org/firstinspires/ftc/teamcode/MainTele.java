@@ -65,12 +65,47 @@ public class MainTele extends RobotCore{
             slideMotor.setTargetPosition(40);
         }
 
-        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slideMotor.setPower(1);
 
         axelMotor.setTargetPosition(-250);
         axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         axelMotor.setPower(1);
+
+        //Driver #2 controls
+
+        if(gamepad2.a){
+            slideMotor.setTargetPosition();
+            axelMotor.setTargetPosition();
+            yClaw.setPosition();
+        }
+
+        if(gamepad2.b){
+            slideMotor.setTargetPosition(3160);
+            axelMotor.setTargetPosition();
+            yClaw.setPosition();
+        }
+
+        if(gamepad2.dpad_up){
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 50);
+        }
+
+        if(gamepad2.dpad_down){
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 50);
+        }
+
+        if(gamepad2.left_bumper > 0.1 || gamepad2.right_bumper > 0.1) {
+            if (gamepad2.left_bumper > 0.1) {
+                slideMotor.setTargetPosition(3160);
+                axelMotor.setTargetPosition();
+            }
+            if (gamepad2.right_bumper > 0.1) {
+                slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                slideMotor.setPower(-1);
+                axelMotor.setTargetPosition();
+            }
+        }else{
+            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slideMotor.setPower(1);
+        }
 
     }
 
