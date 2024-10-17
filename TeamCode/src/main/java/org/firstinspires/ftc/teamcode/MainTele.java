@@ -60,20 +60,6 @@ public class MainTele extends RobotCore{
             backRight.setPower(0);
         }
 
-
-        if(gamepad1.dpad_up) {
-            slideMotor.setTargetPosition(3160);
-        }
-
-        if(gamepad1.dpad_down) {
-            slideMotor.setTargetPosition(40);
-        }
-
-
-        axelMotor.setTargetPosition(-250);
-        axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        axelMotor.setPower(1);
-
         //Driver #1 controls
         if(gamepad1.left_bumper){
             claw.setPosition();
