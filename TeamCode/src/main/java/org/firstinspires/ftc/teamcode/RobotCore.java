@@ -30,6 +30,7 @@ public class RobotCore extends OpMode {
         slideMotor = hardwareMap.get(DcMotor.class, "slideMotor");
         axelMotor = hardwareMap.get(DcMotor.class, "axelMotor");
 
+
         yClaw = hardwareMap.get(Servo.class, "yClaw");
         yClaw.setDirection(Servo.Direction.FORWARD);
 

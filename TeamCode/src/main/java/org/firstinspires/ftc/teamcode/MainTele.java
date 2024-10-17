@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "MainTeleOp", group = "Main")
 
@@ -15,12 +16,19 @@ public class MainTele extends RobotCore{
     double backLeftPower;
     double backRightPower;
 
+    /*Slide:
+    0 = no power
+    1 = move down
+    2 = hold
+    3 = move up
+     */
+
+    int slide = 0;
 
     public void init()
     {
         super.init();
-//        xClaw.setPosition(0);
-//        yClaw.setPosition(0);
+        slideMotor.setTargetPosition(slideMotor.getCurrentPosition());
     }
 
     public void loop() {
@@ -49,32 +57,22 @@ public class MainTele extends RobotCore{
             backRight.setPower(0);
         }
 
-        if(gamepad1.left_bumper)
-            yClaw.setPosition(0);
-        else if(gamepad1.right_bumper)
-            yClaw.setPosition(1);
-
-        if(gamepad1.left_trigger > 0.1)
-            xClaw.setPosition(0);
-        else if(gamepad1.right_trigger > 0.1)
-            xClaw.setPosition(1);
-
-        //Arm
-        if(gamepad1.a) {
-            yClaw.setPosition(0);
-            xClaw.setPosition(0);
-        }
-        else if(gamepad1.b){
-            yClaw.setPosition(1);
-            xClaw.setPosition(1);
+        if(gamepad1.dpad_up) {
+            slideMotor.setTargetPosition(3160);
         }
 
-        if(gamepad1.x)
-            claw.setPosition(0);
-        else if(gamepad1.y){
-            claw.setPosition(0.75);
+        if(gamepad1.dpad_down) {
+            slideMotor.setTargetPosition(40);
+        }
 
-    }}
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideMotor.setPower(1);
+
+        axelMotor.setTargetPosition(-250);
+        axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        axelMotor.setPower(1);
+
+    }
 
     private void printDebugData() {
             telemetry.addLine("----Controller Inputs----");
@@ -84,8 +82,7 @@ public class MainTele extends RobotCore{
             telemetry.addData("xClaw", xClaw.getPosition());
             telemetry.addData("claw", claw.getPosition());
 
-
-
     }
+
 
 }
