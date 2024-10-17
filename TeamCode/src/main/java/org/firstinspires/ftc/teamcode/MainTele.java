@@ -16,25 +16,15 @@ public class MainTele extends RobotCore{
     double backLeftPower;
     double backRightPower;
 
-    /*Slide:
-    0 = no power
-    1 = move down
-    2 = hold
-    3 = move up
-     */
-
-    int slide = 0;
-
-    public void init()
-    {
+    public void init() {
         super.init();
         slideMotor.setTargetPosition(slideMotor.getCurrentPosition());
     }
 
     public void loop() {
 
-       printDebugData();
-
+        printDebugData();
+        //Drivetrain
         moveX = gamepad1.left_stick_x;
         moveY = -gamepad1.left_stick_y;
         turnX = gamepad1.right_stick_x;
@@ -44,18 +34,32 @@ public class MainTele extends RobotCore{
         backLeftPower = moveY - moveX + turnX;
         backRightPower = moveY + moveX - turnX;
 
-        //Drivetrain
-        if(Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1){
-            frontLeft.setPower(frontLeftPower * 0.5);
-            frontRight.setPower(frontRightPower * 0.5);
-            backLeft.setPower(backLeftPower * 0.5);
-            backRight.setPower(backRightPower * 0.5);
-        } else{
+        //Drivetrain Driver Controls
+        if (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
+
+            if (gamepad1.right_trigger > 0.1) {
+                frontLeft.setPower(frontLeftPower * 0.8);
+                frontRight.setPower(frontRightPower * 0.8);
+                backLeft.setPower(backLeftPower * 0.8);
+                backRight.setPower(backRightPower * 0.8);
+            } else if (gamepad1.left_trigger > 0.1) {
+                frontLeft.setPower(frontLeftPower * 0.25);
+                frontRight.setPower(frontRightPower * 0.25);
+                backLeft.setPower(backLeftPower * 0.25);
+                backRight.setPower(backRightPower * 0.25);
+            } else {
+                frontLeft.setPower(frontLeftPower * 0.55);
+                frontRight.setPower(frontRightPower * 0.55);
+                backLeft.setPower(backLeftPower * 0.55);
+                backRight.setPower(backRightPower * 0.55);
+            }
+        } else {
             frontLeft.setPower(0);
             frontRight.setPower(0);
             backLeft.setPower(0);
             backRight.setPower(0);
         }
+
 
         if(gamepad1.dpad_up) {
             slideMotor.setTargetPosition(3160);
@@ -70,6 +74,15 @@ public class MainTele extends RobotCore{
         axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         axelMotor.setPower(1);
 
+        //Driver #1 controls
+        if(gamepad1.left_bumper){
+            claw.setPosition();
+        }
+
+        if(gamepad1.right_bumper){
+            claw.setPosition();
+        }
+
         //Driver #2 controls
 
         if(gamepad2.a){
@@ -79,6 +92,12 @@ public class MainTele extends RobotCore{
         }
 
         if(gamepad2.b){
+            slideMotor.setTargetPosition(40);
+            axelMotor.setTargetPosition();
+            yClaw.setPosition();
+        }
+
+        if(gamepad2.x){
             slideMotor.setTargetPosition(3160);
             axelMotor.setTargetPosition();
             yClaw.setPosition();
@@ -92,17 +111,15 @@ public class MainTele extends RobotCore{
             slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 50);
         }
 
-        if(gamepad2.left_bumper > 0.1 || gamepad2.right_bumper > 0.1) {
-            if (gamepad2.left_bumper > 0.1) {
+            if (gamepad2.left_bumper) {
                 slideMotor.setTargetPosition(3160);
                 axelMotor.setTargetPosition();
             }
-            if (gamepad2.right_bumper > 0.1) {
+            if (gamepad2.right_bumper) {
                 slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 slideMotor.setPower(-1);
                 axelMotor.setTargetPosition();
-            }
-        }else{
+            } else{
             slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slideMotor.setPower(1);
         }
