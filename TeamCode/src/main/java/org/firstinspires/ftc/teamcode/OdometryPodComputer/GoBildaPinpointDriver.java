@@ -386,8 +386,8 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
      * @param pos a Pose2D describing the robot's new position.
      */
     public Pose2D setPosition(Pose2D pos){
-        writeByteArray(Register.X_POSITION,(floatToByteArray((float) pos.getX(DistanceUnit.MM), ByteOrder.LITTLE_ENDIAN)));
-        writeByteArray(Register.Y_POSITION,(floatToByteArray((float) pos.getY(DistanceUnit.MM),ByteOrder.LITTLE_ENDIAN)));
+        writeByteArray(Register.X_POSITION,(floatToByteArray((float) pos.getX(DistanceUnit.INCH), ByteOrder.LITTLE_ENDIAN)));
+        writeByteArray(Register.Y_POSITION,(floatToByteArray((float) pos.getY(DistanceUnit.INCH),ByteOrder.LITTLE_ENDIAN)));
         writeByteArray(Register.H_ORIENTATION,(floatToByteArray((float) pos.getHeading(AngleUnit.RADIANS),ByteOrder.LITTLE_ENDIAN)));
         return pos;
     }
@@ -451,12 +451,12 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
     /**
      * @return the estimated X (forward) position of the robot in mm
      */
-    public double getPosX(){return xPosition; }
+    public double getPosX(){return toInches(xPosition); }
 
     /**
      * @return the estimated Y (Strafe) position of the robot in mm
      */
-    public double getPosY(){return yPosition; }
+    public double getPosY(){return toInches(yPosition); }
 
     /**
      * @return the estimated H (heading) position of the robot in Radians
@@ -466,12 +466,12 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
     /**
      * @return the estimated X (forward) velocity of the robot in mm/sec
      */
-    public double getVelX(){return xVelocity; }
+    public double getVelX(){return toInches(xVelocity); }
 
     /**
      * @return the estimated Y (strafe) velocity of the robot in mm/sec
      */
-    public double getVelY(){return yVelocity; }
+    public double getVelY(){return toInches(yVelocity); }
 
     /**
      * @return the estimated H (heading) velocity of the robot in radians/sec
@@ -494,9 +494,9 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
      * @return a Pose2D containing the estimated position of the robot
      */
     public Pose2D getPosition(){
-        return new Pose2D(DistanceUnit.MM,
-                xPosition,
-                yPosition,
+        return new Pose2D(DistanceUnit.INCH,
+                toInches(xPosition),
+                toInches(yPosition),
                 AngleUnit.RADIANS,
                 hOrientation);
     }
@@ -507,11 +507,22 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
      * @return a Pose2D containing the estimated velocity of the robot, velocity is unit per second
      */
     public Pose2D getVelocity(){
-        return new Pose2D(DistanceUnit.MM,
-                xVelocity,
-                yVelocity,
+        return new Pose2D(DistanceUnit.INCH,
+                toInches(xVelocity),
+                toInches(yVelocity),
                 AngleUnit.RADIANS,
                 hVelocity);
+    }
+
+    public double toInches(double mm)
+    {
+        return mm/25.4;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Robot is at, " + (int)this.getPosX() + " inches x, and " + (int)this.getPosY() + " inches y with a heading of, " + (int)this.getHeading();
     }
 
 

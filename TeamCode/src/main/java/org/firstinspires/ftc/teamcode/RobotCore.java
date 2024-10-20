@@ -1,26 +1,33 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.OdometryPodComputer.GoBildaPinpointDriver;
+
+import java.util.Arrays;
+import java.util.List;
+
+@TeleOp(name = "RobotCore", group = "Core")
 public class RobotCore extends OpMode
 {
-    DcMotor frontLeft;
-    DcMotor frontRight;
-    DcMotor backLeft;
-    DcMotor backRight;
+    DcMotor frontLeft, frontRight, backRight, backLeft, leftSlide, rightSlide;
 
-    DcMotor rightSlide;
-    DcMotor leftSlide;
+    Servo horizontal, pivot;
 
-    Servo horizontal;
-    Servo pivot;
+    CRServo leftClaw, rightClaw;
 
-    CRServo leftClaw;
-    CRServo rightClaw;
+    GoBildaPinpointDriver computer;
+
+    List<DcMotor> motors;
+
 
     public void init()
     {
@@ -38,21 +45,45 @@ public class RobotCore extends OpMode
         leftClaw = hardwareMap.get(CRServo.class, "leftClaw");
         rightClaw = hardwareMap.get(CRServo.class, "rightClaw");
 
+        computer = hardwareMap.get(GoBildaPinpointDriver.class, "Computer");
+
+        computer.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+        motors = Arrays.asList(frontLeft, backLeft, frontRight, backRight, leftSlide, rightSlide);
+
 
         //Reversing
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        //Setting modes
+        horizontal.setDirection(Servo.Direction.REVERSE);
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
+
+        //Slide Settings
+
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        for(DcMotor motor: motors)
+        {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+
+    }
+
+    @Override
+    public void loop() {
 
     }
 
 
-    public void loop()
-    {
-
+    public Pose2d getComputerPos() {
+        Pose2d curPos = new Pose2d(computer.getPosX(), computer.getPosY(), Math.toRadians(computer.getHeading()));
+        return curPos;
     }
+
+
 }

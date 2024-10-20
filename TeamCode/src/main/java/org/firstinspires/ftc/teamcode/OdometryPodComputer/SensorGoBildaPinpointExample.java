@@ -22,6 +22,7 @@
 
 package org.firstinspires.ftc.teamcode.OdometryPodComputer;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -57,6 +58,7 @@ For support, contact tech@gobilda.com
 -Ethan Doak
  */
 
+@Disabled
 @TeleOp(name="goBILDA® PinPoint Odometry Example", group="Linear OpMode")
 //@Disabled
 
