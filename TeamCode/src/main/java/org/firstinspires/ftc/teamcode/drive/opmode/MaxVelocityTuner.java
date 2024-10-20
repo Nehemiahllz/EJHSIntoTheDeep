@@ -42,6 +42,9 @@ public class MaxVelocityTuner extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         computer = hardwareMap.get(GoBildaPinpointDriver.class, "Computer");
 
+        computer.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        computer.setOffsets(-158.75, -190.5);
+
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
