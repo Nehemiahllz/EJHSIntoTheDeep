@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -15,7 +16,8 @@ public class RobotCore extends OpMode {
     DcMotor frontLeft;
     DcMotor frontRight;
     DcMotor slideMotor;
-    DcMotor axelMotor;
+    DcMotorEx axelMotor;
+    DcMotorEx axelMotor2;
 
     Servo yClaw;
     Servo xClaw;
@@ -28,8 +30,8 @@ public class RobotCore extends OpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         slideMotor = hardwareMap.get(DcMotor.class, "slideMotor");
-        axelMotor = hardwareMap.get(DcMotor.class, "axelMotor");
-
+        axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
+        axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
 
         yClaw = hardwareMap.get(Servo.class, "yClaw");
         yClaw.setDirection(Servo.Direction.FORWARD);
@@ -43,6 +45,9 @@ public class RobotCore extends OpMode {
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection((DcMotor.Direction.REVERSE));
+
+        axelMotor2.setDirection(DcMotor.Direction.REVERSE);
+
     }
 
     //These methods are to be overridden in the classes
