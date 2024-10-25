@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.OdometryPodComputer.GoBildaPinpointDriver;
 
 import java.util.Arrays;
 import java.util.List;
-
+@Disabled
 @TeleOp(name = "RobotCore", group = "Core")
 public class RobotCore extends OpMode
 {
@@ -77,12 +77,6 @@ public class RobotCore extends OpMode
     @Override
     public void loop() {
 
-    }
-
-
-    public Pose2d getComputerPos() {
-        Pose2d curPos = new Pose2d(computer.getPosX(), computer.getPosY(), Math.toRadians(computer.getHeading()));
-        return curPos;
     }
 
 

@@ -5,14 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
-@TeleOp(name = "MainTele", group = "Main")
-public class MainTeleOp extends RobotCore
+@TeleOp(name = "SoloTele", group = "Main")
+public class SoloTeleOp extends RobotCore
 {
 
     double y = 0;
     double x = 0;
     double rx = 0;
-
 
     double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
     double frontLeftPower = (y + x + rx) / denominator;
@@ -79,19 +78,19 @@ public class MainTeleOp extends RobotCore
         if (gamepad1.right_stick_y < -0.5)
             horizontal.setPosition(0.35);
 
-        if (gamepad1.dpad_down)
+        if (gamepad1.a)
             pivot.setPosition(0);
-        if (gamepad1.dpad_up)
+        if (gamepad1.y)
             pivot.setPosition(0.75);
-        if(gamepad1.dpad_right)
+        if(gamepad1.x)
             pivot.setPosition(0.47);
 
         //Taking In Sample
-        if (gamepad2.left_bumper) {
+        if (gamepad1.left_bumper) {
             leftClaw.setPower(1);
             rightClaw.setPower(-1);
         //Pushing Out Sample
-        } else if (gamepad2.right_bumper) {
+        } else if (gamepad1.right_bumper) {
             leftClaw.setPower(-1);
             rightClaw.setPower(1);
         } else {
@@ -101,15 +100,25 @@ public class MainTeleOp extends RobotCore
 
 
         //SLIDE CONTROLS-----------------------------------------------------------
-        if (gamepad2.dpad_up && limitHeight("<", 4000)) {
+        if (gamepad1.dpad_up && limitHeight("<", 4000)) {
             leftSlide.setPower(1);
             rightSlide.setPower(1);
-        } else if (gamepad2.dpad_down && limitHeight(">=", 0)) {
+        } else if (gamepad1.dpad_down && limitHeight(">=", 0)) {
             leftSlide.setPower(-0.5);
             rightSlide.setPower(-0.5);
         } else {
             leftSlide.setPower(0.002);
             rightSlide.setPower(0.002);
+        }
+        if(gamepad1.right_trigger > 0.5) {
+            setBothSlideModes("RUN_WITHOUT_ENCODER");
+            while(gamepad1.right_trigger > 0.5)
+            {
+                leftSlide.setPower(-0.5);
+                rightSlide.setPower(-0.5);
+            }
+            setBothSlideModes("STOP_AND_RESET_ENCODER");
+            setBothSlideModes("RUN_USING_ENCODER");
         }
 
         //Slide L 4088 R 4060
@@ -120,6 +129,8 @@ public class MainTeleOp extends RobotCore
         telemetry.update();
 
     }
+
+    //METHODS---------------------------------------------------------
 
     public boolean limitHeight(String modifier, int targetPosition)
     {
@@ -160,6 +171,30 @@ public class MainTeleOp extends RobotCore
 
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setBothSlideModes(String mode)
+    {
+        if(mode.equals("RUN_USING_ENCODER"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else if(mode.equals("RUN_WITHOUT_ENCODER"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        else if(mode.equals("RUN_TO_POSITION"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+        else if(mode.equals("STOP_AND_RESET_ENCODER"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
 
 }

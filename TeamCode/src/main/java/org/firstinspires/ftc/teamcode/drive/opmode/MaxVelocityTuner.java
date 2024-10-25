@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.OdometryPodComputer.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -35,15 +34,9 @@ public class MaxVelocityTuner extends LinearOpMode {
 
     private VoltageSensor batteryVoltageSensor;
 
-    private GoBildaPinpointDriver computer;
-
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        computer = hardwareMap.get(GoBildaPinpointDriver.class, "Computer");
-
-        computer.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        computer.setOffsets(-158.75, -190.5);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -61,18 +54,16 @@ public class MaxVelocityTuner extends LinearOpMode {
 
         telemetry.clearAll();
         telemetry.update();
-        computer.resetPosAndIMU();
 
         drive.setDrivePower(new Pose2d(1, 0, 0));
         timer = new ElapsedTime();
 
         while (!isStopRequested() && timer.seconds() < RUNTIME) {
-            //drive.updatePoseEstimate();
-            computer.update();
+            drive.updatePoseEstimate();
 
-            //Pose2d poseVelo = Objects.requireNonNull(drive.getPoseVelocity(), "poseVelocity() must not be null. Ensure that the getWheelVelocities() method has been overridden in your localizer.");
+            Pose2d poseVelo = Objects.requireNonNull(drive.getPoseVelocity(), "poseVelocity() must not be null. Ensure that the getWheelVelocities() method has been overridden in your localizer.");
 
-            maxVelocity = Math.max(computer.getVelX(), maxVelocity);
+            maxVelocity = Math.max(poseVelo.vec().norm(), maxVelocity);
         }
 
         drive.setDrivePower(new Pose2d());
