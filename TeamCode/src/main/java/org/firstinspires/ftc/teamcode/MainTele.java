@@ -38,11 +38,11 @@ public class MainTele extends RobotCore {
         axelMotor.setPower(0.8);
         axelMotor2.setPower(0.8);
 
-        slideMotor.setPower(0.6);
+        slideMotor.setPower(0);
         slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slideMotor.setTargetPosition(slideMotor.getCurrentPosition());
+        slideMotor.setTargetPosition(0);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMin = slideMotor.getCurrentPosition();
 
@@ -96,12 +96,30 @@ public class MainTele extends RobotCore {
 
         //Claw open
         if(gamepad1.left_trigger > 0.1){
-            claw.setPosition(0.25);
+            claw.setPosition(0.12);
         }
 
         //Claw close
         if(gamepad1.right_trigger > 0.1){
-            claw.setPosition(0.41);
+            claw.setPosition(0.39);
+        }
+
+        if(gamepad1.x){
+            if(slideMotor.getCurrentPosition() < slideMin + 150) {
+                axelMovingA = false;
+                axelMovingB = false;
+                axelMovingX = false;
+                axelMotor.setTargetPosition(125);
+                axelMotor2.setTargetPosition(125);
+            }
+        } else if(gamepad1.y){
+            if(slideMotor.getCurrentPosition() < slideMin + 150) {
+                axelMovingA = false;
+                axelMovingB = false;
+                axelMovingX = false;
+                axelMotor.setTargetPosition(80);
+                axelMotor2.setTargetPosition(80);
+            }
         }
 
         //Driver #2 controls
@@ -123,18 +141,18 @@ public class MainTele extends RobotCore {
             axelMovingX = false;
             axelMotor.setPower(0.6);
             axelMotor2.setPower(0.6);
-            yClaw.setPosition(0.65);
+            yClaw.setPosition(0.5);
             slideMotor.setTargetPosition(0);
             slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         if(axelMovingA){
             if(slideMotor.getCurrentPosition() < slideMin + 100) {
-                if (axelMotor.getCurrentPosition() == 255) {
-                    axelMotor.setPower(0.8);
-                    axelMotor2.setPower(0.8);
+                if (axelMotor.getCurrentPosition() == 263) {
+                    axelMotor.setPower(0.5);
+                    axelMotor2.setPower(0.5);
                 }  else if(axelMotor.getCurrentPosition() > 235){
-                    axelMotor.setTargetPosition(255);
-                    axelMotor2.setTargetPosition(255);
+                    axelMotor.setTargetPosition(263);
+                    axelMotor2.setTargetPosition(263);
                 } else if(axelMotor.getCurrentPosition() > 180){
                     axelMotor.setTargetPosition(240);
                     axelMotor2.setTargetPosition(240);
@@ -149,7 +167,7 @@ public class MainTele extends RobotCore {
         }
 
         //Picking up samples
-        if(gamepad2.b) {
+        if(gamepad2.y) {
             slideReset = false;
             axelMovingA = false;
             axelMovingB = true;
@@ -223,7 +241,7 @@ public class MainTele extends RobotCore {
         //Fix the slide positions
 
             slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slideMotor.setPower(0.6);
+            slideMotor.setPower(1);
 
         //Manual slide extension with limits
         if (gamepad2.dpad_up) {
@@ -231,18 +249,26 @@ public class MainTele extends RobotCore {
                 if (slideMotor.getCurrentPosition() < slideMax * 0.45) {
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 80);
                 }
+                if (axelMovingB){
+                    yClaw.setPosition(yClaw.getPosition() + 0.00065);
+                }
             } else if(axelMovingX){
                 if (slideMotor.getCurrentPosition() < slideMax - 400){
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 200);
                 }else if (slideMotor.getCurrentPosition() < slideMax){
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 40);
                 }
+            } else{
+                slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 115);
             }
         }
         //Manual slide detraction
         if (gamepad2.dpad_down) {
             if (slideMotor.getCurrentPosition() > 0) {
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 120);
+                if (axelMovingB){
+                    yClaw.setPosition(yClaw.getPosition() - 0.00065);
+                }
             }
         }
 
