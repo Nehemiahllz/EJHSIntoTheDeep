@@ -15,8 +15,7 @@ public class MeepMeepTesting {
                 .build();
 
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(12, 60, Math.toRadians(-90)))
-                //Specimin that thang!
-                .waitSeconds(4)
+                //Specimen that thang!
                 .lineToYSplineHeading(36, Math.toRadians(-90))
                 .waitSeconds(1)
                 //We Are Number 1 (grab that thang!)
@@ -33,7 +32,7 @@ public class MeepMeepTesting {
                 .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
                 .waitSeconds(2)
                 //Is that Number 3 I see? (grab that thang!)
-                .splineToSplineHeading(new Pose2d(55, 28, Math.toRadians(0)), -90)
+                .splineToSplineHeading(new Pose2d(55, 27, Math.toRadians(0)), -90)
                 .waitSeconds(0.5)
                 //Place that thang!
                 .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
