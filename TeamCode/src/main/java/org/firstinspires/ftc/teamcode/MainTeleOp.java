@@ -26,8 +26,6 @@ public class MainTeleOp extends RobotCore
     public void init()
     {
         super.init();
-        horizontal.setPosition(0);
-        pivot.setPosition(0);
     }
 
     public void loop() {
@@ -160,6 +158,30 @@ public class MainTeleOp extends RobotCore
 
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setBothSlideModes(String mode)
+    {
+        if(mode.equals("RUN_USING_ENCODER"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else if(mode.equals("RUN_WITHOUT_ENCODER"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        else if(mode.equals("RUN_TO_POSITION"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+        else if(mode.equals("STOP_AND_RESET_ENCODER"))
+        {
+            leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
 
 }
