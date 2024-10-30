@@ -14,33 +14,66 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(12, 60, Math.toRadians(-90)))
-                //Specimen that thang!
-                .lineToYSplineHeading(36, Math.toRadians(-90))
-                .waitSeconds(1)
-                //We Are Number 1 (grab that thang!)
-                .strafeTo(new Vector2d(50, 40))
-                //.splineToSplineHeading(new Pose2d(35, 25, Math.toRadians(0)), -90)
-                .waitSeconds(0.5)
-                //Place that thang!
-                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
-                .waitSeconds(2)
-                //Lowkey Gotta Take a Numba 2 (grab that thang!)
-                .splineTo(new Vector2d(58, 35), Math.toRadians(-90))
-                .waitSeconds(0.5)
-                //Place that thang!
-                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
-                .waitSeconds(2)
-                //Is that Number 3 I see? (grab that thang!)
-                .splineToSplineHeading(new Pose2d(55, 27, Math.toRadians(0)), -90)
-                .waitSeconds(0.5)
-                //Place that thang!
-                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
-                .waitSeconds(2)
-                //Park the bus...
-                .splineToSplineHeading(new Pose2d(25, 10, Math.toRadians(180)), 90)
-                .waitSeconds(2)
-                .build());
+
+
+//                //Red Left
+//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-12, -61, Math.toRadians(90)))
+//                //Place Specimen
+//                .lineToYSplineHeading(-36, Math.toRadians(90))
+//                        .waitSeconds(1)
+//                //Grab Sample 1
+//                        .strafeTo(new Vector2d(-25, -50))
+//                .splineToSplineHeading(new Pose2d(-35, -25, Math.toRadians(180)), Math.toRadians(90))
+//                .waitSeconds(0.5)
+//                //Place Sample 1
+//                .splineToSplineHeading(new Pose2d(-52, -52, Math.toRadians(-135)), -90)
+//                .waitSeconds(1.5)
+//                //Grab Sample 2
+//                .splineTo(new Vector2d(-58, -35), Math.toRadians(90))
+//                .waitSeconds(0.5)
+//                //Place Sample 2
+//                .splineToSplineHeading(new Pose2d(-52, -52, Math.toRadians(-135)), -90)
+//                .waitSeconds(1.5)
+//                //Is that Number 3 I see? (grab that thang!)
+//                .splineToSplineHeading(new Pose2d(-55, -27, Math.toRadians(-180)), 90)
+//                .waitSeconds(0.5)
+//                //Place Sample 3
+//                .splineToSplineHeading(new Pose2d(-52, -52, Math.toRadians(-135)), -90)
+//                .waitSeconds(1.5)
+//                //Park
+//                .splineToSplineHeading(new Pose2d(-25, -10, Math.toRadians(0)), 0)
+//                        .build());
+//
+//
+//
+
+////Blue Left
+//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(12, 60, Math.toRadians(-90)))
+//                //Specimen that thang!
+//                .lineToYSplineHeading(36, Math.toRadians(-90))
+//                .waitSeconds(1)
+//                //We Are Number 1 (grab that thang!)
+//                .strafeTo(new Vector2d(50, 40))
+//                //.splineToSplineHeading(new Pose2d(35, 25, Math.toRadians(0)), -90)
+//                .waitSeconds(0.5)
+//                //Place that thang!
+//                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
+//                .waitSeconds(2)
+//                //Lowkey Gotta Take a Numba 2 (grab that thang!)
+//                .splineTo(new Vector2d(58, 35), Math.toRadians(-90))
+//                .waitSeconds(0.5)
+//                //Place that thang!
+//                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
+//                .waitSeconds(2)
+//                //Is that Number 3 I see? (grab that thang!)
+//                .splineToSplineHeading(new Pose2d(55, 27, Math.toRadians(0)), -90)
+//                .waitSeconds(0.5)
+//                //Place that thang!
+//                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
+//                .waitSeconds(2)
+//                //Park the bus...
+//                .splineToSplineHeading(new Pose2d(25, 10, Math.toRadians(180)), 90)
+//                .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
                 .setDarkMode(true)
