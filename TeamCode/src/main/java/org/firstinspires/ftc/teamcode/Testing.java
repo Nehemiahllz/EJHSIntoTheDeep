@@ -7,89 +7,69 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class Testing extends RobotCore {
 
-    double moveX;
-    double moveY;
-    double turnX;
-
-    double frontLeftPower;
-    double frontRightPower;
-    double backLeftPower;
-    double backRightPower;
-
-    int slideMax = 4270;
-    int slideMin = 0;
-
-    boolean axelMovingA = false;
-    boolean axelMovingB = false;
-    boolean axelMovingX = false;
-
-    boolean hanging = false;
+    int axelPos;
+    //Fix values, once measured
+    final double grabHeight = 76.2;
+    final double ticksPerSlideMM = 4.468;
+    final double ticksPerDegree = 3.877;
+    final double axelPosLowest = 409;
+    double slideLength;
+    final double slideLengthZero = 317.5;
+    double axelAngle;
 
 
     public void init() {
         super.init();
-
-        axelMotor.setTargetPosition(0);
-        axelMotor2.setTargetPosition(0);
-
-        axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        axelMotor.setPower(0.8);
-        axelMotor2.setPower(0.8);
-
-        slideMotor.setTargetPosition(slideMotor.getCurrentPosition());
-        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slideMotor.setPower(0.7);
-        slideMin = slideMotor.getCurrentPosition();
-
+        axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         printDebugData();
     }
 
     public void loop() {
+        findAxelPos();
         printDebugData();
-        if (gamepad2.dpad_up) {
-                slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 50);
-        }
-        if (gamepad2.dpad_down){
-                slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 50);
-        }
+        slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         if(gamepad1.dpad_up){
-            claw.setPosition(claw.getPosition() - 0.01);
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 50);
         }
         if(gamepad1.dpad_down){
-            claw.setPosition(claw.getPosition() + 0.01);
-        }
-
-        if(gamepad1.dpad_left){
-            yClaw.setPosition(yClaw.getPosition() - 0.01);
-        }
-
-        if(gamepad1.dpad_right){
-            yClaw.setPosition(yClaw.getPosition() + 0.01);
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 50);
         }
 
         if(gamepad1.a){
-            xClaw.setPosition(xClaw.getPosition() - 0.01);
+            axelMotor.setPower(1);
+            axelMotor2.setPower(1);
+            axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            yClaw.setPosition(0.65);
+            if(slideMotor.getCurrentPosition() > 1000) {
+                axelMotor.setTargetPosition(axelPos - 10);
+                axelMotor2.setTargetPosition(axelPos - 10);
+            }else{
+                axelMotor.setTargetPosition(axelPos - 5);
+                axelMotor2.setTargetPosition(axelPos - 5);
+            }
         }
-
-        if(gamepad1.b){
-            xClaw.setPosition(xClaw.getPosition() + 0.01);
-        }
-
-        axelMotor.setTargetPosition(axelMotor.getCurrentPosition());
-        axelMotor2.setTargetPosition(axelMotor.getCurrentPosition());
     }
 
     //Prints different info for debugging
     private void printDebugData() {
         telemetry.addLine("----Controller Inputs----");
         telemetry.addData("Axel", axelMotor.getCurrentPosition());
+        telemetry.addData("Axel2", axelMotor2.getCurrentPosition());
         telemetry.addData("Slide", slideMotor.getCurrentPosition());
         telemetry.addData("claw",  claw.getPosition());
         telemetry.addData("yCLaw", yClaw.getPosition());
         telemetry.addData("xClaw", xClaw.getPosition());
+        telemetry.addData("axelPos", axelPos);
+    }
 
+    private void findAxelPos() {
+        slideLength = (slideMotor.getCurrentPosition() * ticksPerSlideMM) + slideLengthZero;
+        axelAngle = Math.toDegrees(Math.asin(grabHeight/slideLength));
+        axelPos = (int) (axelPosLowest - (axelAngle * ticksPerDegree));
     }
 }
 

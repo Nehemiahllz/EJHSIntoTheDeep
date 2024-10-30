@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import java.util.concurrent.TimeUnit;
-
 @TeleOp(name = "MainTeleOp", group = "Main")
 
 public class MainTele extends RobotCore {
@@ -21,27 +19,31 @@ public class MainTele extends RobotCore {
     int slideMax = 4480;
     int slideMin = 0;
 
-    boolean axelMovingA = false;
-    boolean axelMovingB = false;
-    boolean axelMovingX = false;
+    int axelPos;
+    //Fix values, once measured
+    final int grabHeight = 100;
+    final double ticksPerSlideMM = 4.3908;
+    final double ticksPerDegree = 4.5;
+    final double axelPosLowest = 3;
+    double slideLength;
+    final double slideLengthZero = 234.95;
+    double axelAngle;
 
-    boolean slideReset = false;
-
+    public enum axelMode {GRAB, SUB, BUCKET, RUNG, REST, HANG, HANGING, CLIP}
+    axelMode axelMoving;
 
     public void init() {
         super.init();
-
+        axelMotor.setPower(0);
+        axelMotor2.setPower(0);
         axelMotor.setTargetPosition(0);
         axelMotor2.setTargetPosition(0);
         axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        axelMotor.setPower(0.8);
-        axelMotor2.setPower(0.8);
+        axelMoving = axelMode.REST;
 
         slideMotor.setPower(0);
-        slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideMotor.setTargetPosition(0);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slideMin = slideMotor.getCurrentPosition();
@@ -53,7 +55,10 @@ public class MainTele extends RobotCore {
         printDebugData();
 
         slideMax = slideMin + 3030;
-        xClaw.setPosition(0.35);
+        xClaw.setPosition(0.32);
+        axelMotor.setTargetPosition(axelPos);
+        axelMotor2.setTargetPosition(axelPos);
+        slideMotor.setPower(1);
 
         //Drivetrain
         moveX = gamepad1.left_stick_x;
@@ -65,18 +70,15 @@ public class MainTele extends RobotCore {
         backLeftPower = moveY - moveX + turnX;
         backRightPower = moveY + moveX - turnX;
 
-//        axelMotor.setPositionPIDFCoefficients(0.5);
-//        axelMotor2.setPositionPIDFCoefficients(0.5);
-
         //Drivetrain Driver Controls
         if (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
 
-            if (gamepad1.right_trigger > 0.1) {
+            if (gamepad1.right_bumper) {
                 frontLeft.setPower(frontLeftPower * 0.8);
                 frontRight.setPower(frontRightPower * 0.8);
                 backLeft.setPower(backLeftPower * 0.8);
                 backRight.setPower(backRightPower * 0.8);
-            } else if (gamepad1.left_trigger > 0.1) {
+            } else if (gamepad1.left_bumper) {
                 frontLeft.setPower(frontLeftPower * 0.25);
                 frontRight.setPower(frontRightPower * 0.25);
                 backLeft.setPower(backLeftPower * 0.25);
@@ -94,6 +96,92 @@ public class MainTele extends RobotCore {
             backRight.setPower(0);
         }
 
+
+        if(gamepad1.x || gamepad2.a || gamepad2.x || gamepad2.y){
+            axelMotor.setPower(0.6);
+            axelMotor2.setPower(0.6);
+            slideMotor.setTargetPosition(0);
+
+            if(axelMoving == axelMode.SUB) {
+                if(gamepad2.x){
+                    yClaw.setPosition(0.65);
+                    axelMoving = axelMode.GRAB;
+                }
+            }
+
+            if(gamepad1.x) axelMoving = axelMode.HANG;
+
+            if(gamepad2.a){
+                yClaw.setPosition(0.5);
+                axelMoving = axelMode.SUB;
+            }
+
+            if(gamepad2.y){
+                yClaw.setPosition(0.6);
+                axelMoving = axelMode.BUCKET;
+            }
+
+        }else if(gamepad1.y) axelMoving = axelMode.HANGING;
+
+        if(slideMotor.getCurrentPosition() < slideMin + 150) {
+            switch (axelMoving) {
+                case GRAB:
+                    if (axelMotor.getCurrentPosition() > 320) {
+                        axelMotor.setPower(1);
+                        axelMotor2.setPower(1);
+                    } else if(axelMotor.getCurrentPosition() > 295){
+                        axelPos = 323;
+                    } else {
+                        axelPos = 300;
+                    }
+                    break;
+                case SUB:
+                    if (axelMotor.getCurrentPosition() > 267) {
+                        axelMotor.setPower(1);
+                        axelMotor2.setPower(1);
+                        axelPos = 270;
+                    }  else if(axelMotor.getCurrentPosition() > 235){
+                        axelPos = 270;
+                    } else if(axelMotor.getCurrentPosition() > 180){
+                        axelPos = 240;
+                    } else if (axelMotor.getCurrentPosition() > 90) {
+                        axelPos = 190;
+                    } else{
+                        axelPos = 100;
+                    }
+                    break;
+                case BUCKET:
+                    if (axelMotor.getCurrentPosition() < 10) {
+                        axelPos = 0;
+                    } else if (axelMotor.getCurrentPosition() < 40) {
+                        axelPos = 8;
+                    } else if (axelMotor.getCurrentPosition() < 90) {
+                        axelPos = 30;
+                    } else if (axelMotor.getCurrentPosition() < 180) {
+                        axelPos = 80;
+                    } else if (axelMotor.getCurrentPosition() < 270) {
+                        axelPos = 170;
+                    } else {
+                        axelPos = 260;
+                    }
+                    break;
+                case HANG:
+                    axelMotor.setPower(1);
+                    axelMotor2.setPower(1);
+                    axelPos = 125;
+                    break;
+                default:
+                    axelPos = 0;
+            }
+        }
+
+        if(axelMoving == axelMode.HANGING){
+            axelMotor.setPower(1);
+            axelMotor2.setPower(1);
+            axelMotor.setTargetPosition(80);
+            axelMotor2.setTargetPosition(80);
+        }
+
         //Claw open
         if(gamepad1.left_trigger > 0.1){
             claw.setPosition(0.12);
@@ -104,25 +192,12 @@ public class MainTele extends RobotCore {
             claw.setPosition(0.39);
         }
 
-        if(gamepad1.x){
-            if(slideMotor.getCurrentPosition() < slideMin + 150) {
-                axelMovingA = false;
-                axelMovingB = false;
-                axelMovingX = false;
-                axelMotor.setTargetPosition(125);
-                axelMotor2.setTargetPosition(125);
-            }
-        } else if(gamepad1.y){
-            if(slideMotor.getCurrentPosition() < slideMin + 150) {
-                axelMovingA = false;
-                axelMovingB = false;
-                axelMovingX = false;
-                axelMotor.setTargetPosition(80);
-                axelMotor2.setTargetPosition(80);
-            }
+        //Tilt claw down and reset
+        if(gamepad1.b){
+            yClaw.setPosition(yClaw.getPosition() + 0.004);
+        }else if(gamepad1.dpad_right){
+            yClaw.setPosition(0.65);
         }
-
-        //Driver #2 controls
 
         //Claw tilt out of bucket
         if(gamepad2.left_trigger > 0.1){
@@ -133,126 +208,13 @@ public class MainTele extends RobotCore {
             yClaw.setPosition(0.1);
         }
 
-        //Going in/out of the aquarium
-        if(gamepad2.a) {
-            slideReset = false;
-            axelMovingA = true;
-            axelMovingB = false;
-            axelMovingX = false;
-            axelMotor.setPower(0.6);
-            axelMotor2.setPower(0.6);
-            yClaw.setPosition(0.5);
-            slideMotor.setTargetPosition(0);
-            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        if(axelMovingA){
-            if(slideMotor.getCurrentPosition() < slideMin + 100) {
-                if (axelMotor.getCurrentPosition() == 263) {
-                    axelMotor.setPower(0.5);
-                    axelMotor2.setPower(0.5);
-                }  else if(axelMotor.getCurrentPosition() > 235){
-                    axelMotor.setTargetPosition(263);
-                    axelMotor2.setTargetPosition(263);
-                } else if(axelMotor.getCurrentPosition() > 180){
-                    axelMotor.setTargetPosition(240);
-                    axelMotor2.setTargetPosition(240);
-                } else if (axelMotor.getCurrentPosition() > 90) {
-                    axelMotor.setTargetPosition(190);
-                    axelMotor2.setTargetPosition(190);
-                } else{
-                    axelMotor.setTargetPosition(100);
-                    axelMotor2.setTargetPosition(100);
-                }
-            }
-        }
-
-        //Picking up samples
-        if(gamepad2.y) {
-            slideReset = false;
-            axelMovingA = false;
-            axelMovingB = true;
-            axelMovingX = false;
-            axelMotor.setPower(0.4);
-            axelMotor2.setPower(0.4);
-            yClaw.setPosition(0.65);
-            slideMotor.setTargetPosition(0);
-            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        if(axelMovingB){
-            if(slideMotor.getCurrentPosition() < slideMin + 100) {
-                if (axelMotor.getCurrentPosition() == 323) {
-                    axelMotor.setPower(0.8);
-                    axelMotor2.setPower(0.8);
-                } else if(axelMotor.getCurrentPosition() > 295){
-                    axelMotor.setTargetPosition(323);
-                    axelMotor2.setTargetPosition(323);
-                } else if(axelMotor.getCurrentPosition() > 265){
-                    axelMotor.setTargetPosition(300);
-                    axelMotor2.setTargetPosition(300);
-                } else if(axelMotor.getCurrentPosition() > 180){
-                    axelMotor.setTargetPosition(275);
-                    axelMotor2.setTargetPosition(275);
-                } else if (axelMotor.getCurrentPosition() > 90) {
-                    axelMotor.setTargetPosition(190);
-                    axelMotor2.setTargetPosition(190);
-                } else{
-                    axelMotor.setTargetPosition(100);
-                    axelMotor2.setTargetPosition(100);
-                }
-            }
-        }
-
-        //Going for bucket
-        if(gamepad2.x) {
-            slideReset = false;
-            axelMovingA = false;
-            axelMovingB = false;
-            axelMovingX = true;
-            axelMotor.setPower(0.6);
-            axelMotor2.setPower(0.6);
-            slideMotor.setTargetPosition(0);
-            yClaw.setPosition(0.6);
-            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        if(axelMovingX){
-            if(slideMotor.getCurrentPosition() < slideMin + 50) {
-                if (axelMotor.getCurrentPosition() < 10) {
-                    axelMotor.setTargetPosition(0);
-                    axelMotor2.setTargetPosition(0);
-                } else if (axelMotor.getCurrentPosition() < 40) {
-                    axelMotor.setTargetPosition(8);
-                    axelMotor2.setTargetPosition(8);
-                } else if (axelMotor.getCurrentPosition() < 90) {
-                    axelMotor.setTargetPosition(30);
-                    axelMotor2.setTargetPosition(30);
-                } else if (axelMotor.getCurrentPosition() < 180) {
-                    axelMotor.setTargetPosition(80);
-                    axelMotor2.setTargetPosition(80);
-                } else if (axelMotor.getCurrentPosition() < 270) {
-                    axelMotor.setTargetPosition(170);
-                    axelMotor2.setTargetPosition(170);
-                } else {
-                    axelMotor.setTargetPosition(260);
-                    axelMotor2.setTargetPosition(260);
-                }
-            }
-        }
-
-        //Fix the slide positions
-
-            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slideMotor.setPower(1);
-
         //Manual slide extension with limits
         if (gamepad2.dpad_up) {
-            if (axelMovingA || axelMovingB) {
+            if (axelMoving == axelMode.SUB || axelMoving == axelMode.GRAB) {
                 if (slideMotor.getCurrentPosition() < slideMax * 0.45) {
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 80);
                 }
-                if (axelMovingB){
-                    yClaw.setPosition(yClaw.getPosition() + 0.00065);
-                }
-            } else if(axelMovingX){
+            } else if(axelMoving == axelMode.BUCKET){
                 if (slideMotor.getCurrentPosition() < slideMax - 400){
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 200);
                 }else if (slideMotor.getCurrentPosition() < slideMax){
@@ -266,9 +228,6 @@ public class MainTele extends RobotCore {
         if (gamepad2.dpad_down) {
             if (slideMotor.getCurrentPosition() > 0) {
                     slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 120);
-                if (axelMovingB){
-                    yClaw.setPosition(yClaw.getPosition() - 0.00065);
-                }
             }
         }
 
@@ -285,6 +244,12 @@ public class MainTele extends RobotCore {
         telemetry.addData("yClaw", yClaw.getPosition());
         telemetry.addData("xClaw", xClaw.getPosition());
         telemetry.addData("claw", claw.getPosition());
+    }
+
+    private void findAxelPos() {
+        slideLength = (slideMotor.getCurrentPosition() * ticksPerSlideMM) + slideLengthZero;
+        axelAngle = Math.toDegrees(Math.asin(grabHeight/slideLength));
+        axelPos = (int) (axelPosLowest - (axelAngle * ticksPerDegree));
     }
 
 }
