@@ -58,6 +58,8 @@ public class RobotCore extends OpMode
         horizontal.setDirection(Servo.Direction.REVERSE);
         rightSlide.setDirection(DcMotor.Direction.REVERSE);
 
+        pivot.setDirection(Servo.Direction.REVERSE);
+
         //Slide Settings
 
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -77,6 +79,15 @@ public class RobotCore extends OpMode
     public void loop() {
 
     }
+
+//    public static void setBothSlidePositions(int target)
+//    {
+//        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//        leftSlide.setTargetPosition(target);
+//        rightSlide.setTargetPosition(target);
+//    }
 
 
 }

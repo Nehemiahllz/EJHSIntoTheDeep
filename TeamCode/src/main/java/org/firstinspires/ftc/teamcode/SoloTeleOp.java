@@ -25,8 +25,6 @@ public class SoloTeleOp extends RobotCore
     public void init()
     {
         super.init();
-        horizontal.setPosition(0);
-        pivot.setPosition(0);
     }
 
     public void loop() {
@@ -76,14 +74,14 @@ public class SoloTeleOp extends RobotCore
         if (gamepad1.right_stick_y > 0.5)
             horizontal.setPosition(0);
         if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.35);
+            horizontal.setPosition(0.73);
 
         if (gamepad1.a)
             pivot.setPosition(0);
         if (gamepad1.y)
-            pivot.setPosition(0.75);
+            pivot.setPosition(0.7);
         if(gamepad1.x)
-            pivot.setPosition(0.47);
+            pivot.setPosition(0.36);
 
         //Taking In Sample
         if (gamepad1.left_bumper) {

@@ -75,14 +75,14 @@ public class MainTeleOp extends RobotCore
         if (gamepad1.right_stick_y > 0.5)
             horizontal.setPosition(0);
         if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.35);
+            horizontal.setPosition(0.73);
 
         if (gamepad1.dpad_down)
             pivot.setPosition(0);
         if (gamepad1.dpad_up)
-            pivot.setPosition(0.75);
+            pivot.setPosition(0.7);
         if(gamepad1.dpad_right)
-            pivot.setPosition(0.47);
+            pivot.setPosition(0.36);
 
         //Taking In Sample
         if (gamepad2.left_bumper) {
@@ -146,18 +146,6 @@ public class MainTeleOp extends RobotCore
             else return false;
         }
         else return false;
-    }
-
-    public void setBothSlidePositions(int leftTarget, int rightTarget)
-    {
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftSlide.setTargetPosition(leftTarget);
-        rightSlide.setTargetPosition(rightTarget);
-
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setBothSlideModes(String mode)
