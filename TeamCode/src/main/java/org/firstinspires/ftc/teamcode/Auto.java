@@ -17,9 +17,7 @@ public class Auto extends RobotCore {
     public void init() {
         super.init();
         slideMotor.setPower(0);
-        slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideMotor.setTargetPosition(0);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -39,10 +37,10 @@ public class Auto extends RobotCore {
             axelMotor2.setTargetPosition(0);
 
 
-            backLeft.setPower(-0.3);
-            frontLeft.setPower(0.3);
-            backRight.setPower(0.3);
-            frontRight.setPower(-0.3);
+            leftBack.setPower(-0.3);
+            leftFront.setPower(0.3);
+            rightBack.setPower(0.3);
+            rightFront.setPower(-0.3);
         }
 
     }

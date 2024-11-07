@@ -11,10 +11,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Disabled
 public class RobotCore extends OpMode {
 
-    DcMotor backLeft;
-    DcMotor backRight;
-    DcMotor frontLeft;
-    DcMotor frontRight;
+    DcMotor leftBack;
+    DcMotor rightBack;
+    DcMotor leftFront;
+    DcMotor rightFront;
     DcMotor slideMotor;
     DcMotorEx axelMotor;
     DcMotorEx axelMotor2;
@@ -23,12 +23,14 @@ public class RobotCore extends OpMode {
     Servo xClaw;
     Servo claw;
 
+
+
     @Override
     public void init(){
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        leftBack = hardwareMap.get(DcMotor.class, "leftBack");
+        rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         slideMotor = hardwareMap.get(DcMotor.class, "slideMotor");
         axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
         axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
@@ -43,8 +45,8 @@ public class RobotCore extends OpMode {
 
         claw.setDirection(Servo.Direction.FORWARD);
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection((DcMotor.Direction.REVERSE));
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection((DcMotor.Direction.REVERSE));
 
         axelMotor2.setDirection(DcMotor.Direction.REVERSE);
 
