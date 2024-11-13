@@ -42,7 +42,6 @@ public class RobotCore extends OpMode {
         xClaw.setDirection(Servo.Direction.REVERSE);
 
         claw = hardwareMap.get(Servo.class, "claw");
-
         claw.setDirection(Servo.Direction.FORWARD);
 
         leftFront.setDirection(DcMotor.Direction.REVERSE);

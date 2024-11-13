@@ -131,8 +131,8 @@ public class MainTele extends RobotCore {
             if(axelMoving == axelMode.SUB) {
                 axelMotor.setPower(1);
                 axelMotor2.setPower(1);
-            yClaw.setPosition(0.8644);
-            axelMoving = axelMode.LOW;
+                yClaw.setPosition(0.8644);
+                axelMoving = axelMode.LOW;
             }
         }else if(gamepad1.y) {
             if(axelMoving == axelMode.HANG) {
