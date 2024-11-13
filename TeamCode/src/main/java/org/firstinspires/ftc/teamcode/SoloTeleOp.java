@@ -74,7 +74,7 @@ public class SoloTeleOp extends RobotCore
         if (gamepad1.right_stick_y > 0.5)
             horizontal.setPosition(0);
         if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.73);
+            horizontal.setPosition(0.7);
 
         if (gamepad1.a)
             pivot.setPosition(0);
@@ -102,8 +102,8 @@ public class SoloTeleOp extends RobotCore
             leftSlide.setPower(1);
             rightSlide.setPower(1);
         } else if (gamepad1.dpad_down && limitHeight(">=", 0)) {
-            leftSlide.setPower(-0.5);
-            rightSlide.setPower(-0.5);
+            leftSlide.setPower(-1);
+            rightSlide.setPower(-1);
         } else {
             leftSlide.setPower(0.002);
             rightSlide.setPower(0.002);

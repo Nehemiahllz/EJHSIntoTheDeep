@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import androidx.annotation.NonNull;
@@ -27,49 +29,39 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Other_RoadRunner_Classes.MecanumDrive;
 
 @Config
-@Autonomous(name = "Buckets", group = "Autonomous")
-public class Buckets extends LinearOpMode {
+@Autonomous(name = "Specimens", group = "Autonomous")
+public class Specimens extends LinearOpMode
+{
+
+
+
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        Pose2d startPose = new Pose2d(-12, -61, Math.toRadians(90));
-        MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
-
+    public void runOpMode() throws InterruptedException
+    {
         Slides slides = new Slides(hardwareMap);
-
         Claw claw = new Claw(hardwareMap);
 
+        Pose2d startPose = new Pose2d( -12, 61, Math.toRadians(270));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
+
         TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
-                .waitSeconds(0.2)
-                .lineToY(-32)
-                .waitSeconds(0.5);
+                .lineToY(32)
+                .waitSeconds(0.2);
 
-        TrajectoryActionBuilder toSample1 = drive.actionBuilder(new Pose2d(-12, -32, Math.toRadians(90)))
-                .lineToY(-40)
-                .splineToLinearHeading(new Pose2d(-40,-37,Math.toRadians(120)), Math.toRadians(90));
+        TrajectoryActionBuilder toSample1 = drive.actionBuilder(new Pose2d(-12, 32, Math.toRadians(270)))
+                .lineToY(40)
+                .strafeTo(new Vector2d(-50, 41));
 
-        TrajectoryActionBuilder toBucket1 = drive.actionBuilder(new Pose2d(-40, -37, Math.toRadians(120)))
-                .waitSeconds(0.3)
-                .splineToSplineHeading(new Pose2d(-52, -50, Math.toRadians(-140)), -90);
+        TrajectoryActionBuilder dropOff1 = drive.actionBuilder( new Pose2d(-50, 40, Math.toRadians(270)))
+                //.splineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(90)), Math.toRadians(90));
+                .turn(Math.toRadians(185));
 
-        TrajectoryActionBuilder toSample2 = drive.actionBuilder(new Pose2d(-52, -50, Math.toRadians(-140)))
-                .splineToLinearHeading(new Pose2d(-56,-39, Math.toRadians(90)), Math.toRadians(90));
+        TrajectoryActionBuilder toSample2 = drive.actionBuilder( new Pose2d(-50, 45, Math.toRadians(90)))
+                .splineToLinearHeading(new Pose2d(-60, 40, Math.toRadians(180)), Math.toRadians(90));
 
-        TrajectoryActionBuilder toBucket2 = drive.actionBuilder(new Pose2d(-56, -39, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(-49, -50, Math.toRadians(-140)), -90);
-
-        TrajectoryActionBuilder toSample3 = drive.actionBuilder(new Pose2d(-49, -50, Math.toRadians(-140)))
-                .splineToLinearHeading(new Pose2d(-52,-30, Math.toRadians(160)), Math.toRadians(90));
-
-        TrajectoryActionBuilder toBucket3 = drive.actionBuilder(new Pose2d(-52, -30, Math.toRadians(160)))
-                .splineToLinearHeading(new Pose2d(-49, -50, Math.toRadians(-140)), -90);
-
-        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(-49, -50, Math.toRadians(-140)))
-                .splineToLinearHeading(new Pose2d(-20,-8, Math.toRadians(0)), Math.toRadians(0));
-
-
-
-
+        //TrajectoryActionBuilder dropOff2 = drive.actionBuilder(new Pose2d(-60, 40, Math.toRadians(180)))
+                       // .splineToLinearheading(new Pose2d())
 
         Actions.runBlocking(claw.setPivot(0.7));
         Actions.runBlocking(slides.setHorizontal(0));
@@ -79,110 +71,59 @@ public class Buckets extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-
-
-                        //Specimen
                         new ParallelAction(
-                                slides.setSlidePositions(2250),
+                                slides.setSlidePositions(2170),
                                 claw.setPivot(0.30),
                                 toSpecimenBar.build()
                         ),
                         new ParallelAction(
+
+                                //to Sample 1
                                 toSample1.build(),
-                                slides.setSlidePositions(700),
-                                claw.setPivot(0),
-                                slides.setHorizontal(0.6),
-                                claw.intake()
-                        //to Sample 1
-                        ),
-                        slides.setSlidePositions(0),
-                        new SleepAction(0.5),
-                        slides.setHorizontal(0.07),
-                        new ParallelAction(
-                                claw.off(),
-                                slides.setSlidePositions(4400),
-                                claw.setPivot(0.36),
-                                toBucket1.build()
-                        ),
-                        //new SleepAction(0.2),
-                        slides.setHorizontal(0.50),
-                        new SleepAction(0.3),
-                        claw.eject(1),
-                        new ParallelAction(
-                                claw.setPivot(0.7),
-                                slides.setHorizontal(0)
-                        ),
-                        new SleepAction(0.2),
-                        new ParallelAction(
-                                slides.setSlidePositions(700),
-                                claw.setPivot(0),
-                                toSample2.build()
-                        ),
-
-
-                        //To sample 2
-                        slides.setHorizontal(0.64),
-                        claw.intake(),
-                        new SleepAction(0.2),
-                        slides.setSlidePositions(0),
-                        new SleepAction(0.3),
-                        new ParallelAction(
-                                claw.off(),
-                                slides.setHorizontal(0),
-                                toBucket2.build(),
-                                claw.setPivot(0.37),
-                                slides.setSlidePositions(4300)
-                                ),
-
-                        //Drop sample 2
-                        slides.setHorizontal(0.7),
-                        new SleepAction(0.5),
-                        claw.eject(1),
-                        new ParallelAction(
-                        claw.setPivot(0.7),
-                        slides.setHorizontal(0)
-                        ),
-                        new ParallelAction(
-                                slides.setSlidePositions(0),
+                                slides.setSlidePositions(1300),
+                                slides.setHorizontal(0.73),
                                 claw.setPivot(0)
                         ),
-                        //to Sample 3
                         new ParallelAction(
-                        toSample3.build(),
-                        slides.setHorizontal(0.7),
-                        claw.intake(),
-                        slides.setSlidePositions(700)
-                                ),
-                        slides.setSlidePositions(0),
-                        new SleepAction(0.2),
-                        claw.off(),
-                        //Drop sample 3
-                        new ParallelAction(
-                        toBucket3.build(),
-                        claw.setPivot(0.37),
-                        slides.setSlidePositions(4200),
-                        slides.setHorizontal(0.7)
-                                ),
-                        claw.eject(1),
-                        new ParallelAction(
-                                claw.setPivot(0.7),
-                                slides.setHorizontal(0),
+                                claw.intake(),
                                 slides.setSlidePositions(0)
                         ),
-                        claw.setPivot(0),
-
-                        //Parking
-                        park.build(),
+                        new SleepAction(0.5),
+                        claw.off(),
                         new ParallelAction(
-                                claw.setPivot(0),
-                                slides.setHorizontal(0),
-                                slides.setSlidePositions(0)
-                        )
+                                dropOff1.build(),
+                                slides.setSlidePositions(400)
+                                ),
+                        claw.eject(),
+                        new SleepAction(0.5)
+//                        slides.setSlidePositions(600),
+//                        toSample2.build(),
+//                        new ParallelAction(
+//                                claw.intake(),
+//                                slides.setSlidePositions(0)
+//                        ),
+//                        new SleepAction(1),
+//                        claw.off()
+
+
+
+
+
                 )
         );
-
     }
-    //Accessory moving classes
+
+
+
+
+
+
+
+
+
+
+
+
 
     public class Slides{
         DcMotorEx leftSlide;
@@ -220,21 +161,32 @@ public class Buckets extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
 
-                if(leftSlide.getCurrentPosition() < target && rightSlide.getCurrentPosition() < target) {
-                    leftSlide.setPower(1);
-                    rightSlide.setPower(1);
-                    return true;
-                } else if (leftSlide.getCurrentPosition() > target && rightSlide.getCurrentPosition() > target) {
-                    leftSlide.setPower(-1);
-                    rightSlide.setPower(-1);
-                    return true;
-                }
-                else
-                {
+                if (leftSlide.getCurrentPosition() < target && rightSlide.getCurrentPosition() < target) {
+                    under = true;
+                    while (under) {
+                        if (leftSlide.getCurrentPosition() >= target && rightSlide.getCurrentPosition() >= target)
+                            under = false;
+                        leftSlide.setPower(1);
+                        rightSlide.setPower(1);
+                    }
+
                     leftSlide.setPower(0.002);
                     rightSlide.setPower(0.002);
+
                     return false;
-                }
+                } else if (leftSlide.getCurrentPosition() > target && rightSlide.getCurrentPosition() > target) {
+                    under = false;
+                    while (!under) {
+                        if (leftSlide.getCurrentPosition() <= target && rightSlide.getCurrentPosition() <= target)
+                            under = true;
+                        leftSlide.setPower(-1);
+                        rightSlide.setPower(-1);
+                    }
+                    leftSlide.setPower(0.002);
+                    rightSlide.setPower(0.002);
+
+                    return false;
+                } else return false;
             }
         }
 
@@ -396,8 +348,7 @@ public class Buckets extends LinearOpMode {
         }
 
         public Action off() {
-            return new Off();
+            return new Claw.Off();
         }
     }
 }
-

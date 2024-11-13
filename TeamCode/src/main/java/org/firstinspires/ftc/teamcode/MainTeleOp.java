@@ -73,9 +73,9 @@ public class MainTeleOp extends RobotCore
 
         //INTAKE  CONTROLS------------------------------------------------------
         if (gamepad1.right_stick_y > 0.5)
-            horizontal.setPosition(0);
+            horizontal.setPosition(0.05);
         if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.73);
+            horizontal.setPosition(0.42);
 
         if (gamepad1.dpad_down)
             pivot.setPosition(0);
@@ -103,8 +103,8 @@ public class MainTeleOp extends RobotCore
             leftSlide.setPower(1);
             rightSlide.setPower(1);
         } else if (gamepad2.dpad_down && limitHeight(">=", 0)) {
-            leftSlide.setPower(-0.5);
-            rightSlide.setPower(-0.5);
+            leftSlide.setPower(-0.75);
+            rightSlide.setPower(-0.75);
         } else {
             leftSlide.setPower(0.002);
             rightSlide.setPower(0.002);
