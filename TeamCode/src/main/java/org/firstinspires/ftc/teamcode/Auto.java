@@ -73,6 +73,9 @@ public class Auto extends LinearOpMode {
         TrajectoryActionBuilder postSpecimen2PickUp = drive.actionBuilder(new Pose2d(46, -28, Math.toRadians(270)))
                 .splineToLinearHeading(new Pose2d(5, -27, Math.toRadians(90)), Math.toRadians(90));
 
+        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(40, -32), Math.toRadians(90));
+
 
 
 
@@ -108,6 +111,7 @@ public class Auto extends LinearOpMode {
                         new SleepAction(0.2),
                         axel.setAxelPosition(0, -0.5),
 
+                        //Nothing bellow here actually occurs;
                         postSpecimen2PickUp.build(),
                         specimen.build(),
                         slide.setSlidePosition(1800),
@@ -120,9 +124,7 @@ public class Auto extends LinearOpMode {
                         grabber.setClawPosition(0.6, 0.8644, 0.3683),
                         axel.setAxelPosition(0, -0.5),
                         slide.setSlidePosition(0),
-
-
-                        axel.setAxelPosition(3, 0)
+                        park.build()
 
 
 
