@@ -55,8 +55,8 @@ public class Auto extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(-6,-21), Math.toRadians(90));
 
         TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-6,-21, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(29, -33), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(29,-30), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(29, -34), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(29,-34), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(29,-4), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(40,-4), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(40,-32), Math.toRadians(90));

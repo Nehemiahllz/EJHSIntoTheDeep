@@ -65,6 +65,37 @@ public class Buckets extends LinearOpMode {
         //The last line keeps the rotation the same but moves the robot forward to -40,40
 
 
+        //VERY EXPIREMENTAL GUESTIMATION AUTO PATHS:
+        //FIXING THE POSITIONS IN HERE SHOULD MAKE EVERYTHING WORK UNLESS IT DECIDES TO STOP IN THE MIDDLE AS IT DOES
+
+        TrajectoryActionBuilder sample1PickUp = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
+                //moves the robot away from the sub
+                .splineToConstantHeading(new Vector2d(-6, -34), Math.toRadians(90))
+                //slides the robot left to get even further
+                .splineToConstantHeading(new Vector2d(-28, -34), Math.toRadians(90))
+                //puts the robot in picking position
+                .splineToConstantHeading(new Vector2d(-28, -26), Math.toRadians(90));
+
+        TrajectoryActionBuilder sampleScore = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
+                //twists the robot and moves it to be just before the bucket
+                .splineToLinearHeading(new Pose2d(-31, -34, Math.toRadians(315)), Math.toRadians(90))
+                //moves it closer to the bucket to simulate driving behavior of leaning the side against the bucket for scoring
+                .splineToConstantHeading(new Vector2d(-33, -36), Math.toRadians(315));
+
+        TrajectoryActionBuilder sample2PickUp = drive.actionBuilder(new Pose2d(-33, -36, Math.toRadians(315)))
+                //twists the robot straight and puts it into position to pick sample 2
+                .splineToLinearHeading(new Pose2d(-43, -26, Math.toRadians(90)), Math.toRadians(90));
+
+        TrajectoryActionBuilder sample3PickUp = drive.actionBuilder(new Pose2d(-33, -36, Math.toRadians(315)))
+                //twists the robot be parallel to the sample in order to grab it from the side with a rotated claw, and puts it into pciking position
+                .splineToLinearHeading(new Pose2d(-49, -13, Math.toRadians(360)), Math.toRadians(90));
+
+
+        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(315)))
+                //parks
+                .splineToLinearHeading(new Pose2d(40, -32, Math.toRadians(360)), Math.toRadians(90));
+
+
         //Just closes the claw onto the specimen
         grabber.setClawPosition(0.32, 0.8644, 0.3683);
 
@@ -76,7 +107,7 @@ public class Buckets extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         //Also closing the claw because i have anxiety
-                        grabber.setClawPosition(0.32, 0.8644, 0.3683)
+                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
 
                         //Put everything in here
                         //Put commas between each action
@@ -92,7 +123,106 @@ public class Buckets extends LinearOpMode {
                         //name.build() AND NAME WILL BE WHATEVER THE TRAJECTORY SEQUENCE IS NAMED WHERE YOU MADE IT
 
 
-                )
+                        //VERY EXPIREMENTAL GUESTIMATION AUTO RUN:
+
+                        //scores the first specimen - THIS IS THE SAME FROM BARS AUTO
+                        specimen.build(),
+                        slide.setSlidePosition(1800),
+
+                        new ParallelAction(
+                                slide.setSlidePosition(1800),
+                                axel.setAxelPosition(50, 0.2)
+                        ),
+                        slide.setSlidePosition(600),
+                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+                        axel.setAxelPosition(0, -0.5),
+                        slide.setSlidePosition(0),
+
+                        //Sequence to pick up the first sample
+                        sample1PickUp.build(),
+                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+                        axel.setAxelPosition(300, 0.1),
+                        new SleepAction(0.2),
+                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
+                        new SleepAction(0.2),
+                        axel.setAxelPosition(0, -0.5),
+
+                        //sequence to score the first sample
+                        new ParallelAction(
+                            sampleScore.build(),
+                                axel.setAxelPosition(0,-0.7),
+                                slide.setSlidePosition(3020),
+                                grabber.setClawPosition(0.32, 0.8644, 1)
+                        ),
+                        grabber.setClawPosition(0.32, 0.4406, 1),
+                        new SleepAction(0.4),
+                        grabber.setClawPosition(0.6, 0.4406, 1),
+                        new SleepAction(0.3),
+                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+
+                        //sequence to pick up the second sample and finish reset from scoring
+                        new ParallelAction(
+                                axel.setAxelPosition(0, -0.7),
+                                slide.setSlidePosition(0),
+                                grabber.setClawPosition(0.6, 0.8644, 0.3683),
+                                sample2PickUp.build()
+                        ),
+                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+                        axel.setAxelPosition(300, 0.1),
+                        new SleepAction(0.2),
+                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
+                        new SleepAction(0.2),
+                        axel.setAxelPosition(0, -0.5),
+
+                        //sequence to score the second sample
+                        new ParallelAction(
+                                sampleScore.build(),
+                                axel.setAxelPosition(0,-0.7),
+                                slide.setSlidePosition(3020),
+                                grabber.setClawPosition(0.32, 0.8644, 1)
+                        ),
+                        grabber.setClawPosition(0.32, 0.4406, 1),
+                        new SleepAction(0.4),
+                        grabber.setClawPosition(0.6, 0.4406, 1),
+                        new SleepAction(0.3),
+                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+
+                        //sequence to pick up the third sample and finish reset from scoring
+                        new ParallelAction(
+                                axel.setAxelPosition(0, -0.7),
+                                slide.setSlidePosition(0),
+                                grabber.setClawPosition(0.6, 0.8644, 0.68415),
+                                sample3PickUp.build()
+                        ),
+                        grabber.setClawPosition(0.6, 0.8644, 0.68415),
+                        axel.setAxelPosition(300, 0.1),
+                        new SleepAction(0.2),
+                        grabber.setClawPosition(0.32, 0.8644, 0.68415),
+                        new SleepAction(0.2),
+                        axel.setAxelPosition(0, -0.5),
+
+                        //sequence to score the third sample
+
+                        new ParallelAction(
+                                sampleScore.build(),
+                                axel.setAxelPosition(0,-0.7),
+                                slide.setSlidePosition(3020),
+                                grabber.setClawPosition(0.32, 0.8644, 1)
+                        ),
+                        grabber.setClawPosition(0.32, 0.4406, 1),
+                        new SleepAction(0.4),
+                        grabber.setClawPosition(0.6, 0.4406, 1),
+                        new SleepAction(0.3),
+                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+
+                        //sequence to park and finish reset from scoring
+                        new ParallelAction(
+                                axel.setAxelPosition(0, -0.7),
+                                slide.setSlidePosition(0),
+                                grabber.setClawPosition(0.6, 0.8644, 0.68415),
+                                park.build()
+                        )
+                        )
         );
 
     }
