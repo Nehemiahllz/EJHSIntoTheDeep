@@ -1,46 +1,37 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import androidx.annotation.NonNull;
 
-// RR-specific imports
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-
-// Non-RR imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.MecanumDrive;
+import java.util.Vector;
 
-
-import java.util.concurrent.TimeUnit;
-
-@Autonomous(name = "Bars", group = "Auto")
+@Autonomous(name = "Buckets", group = "Auto")
 
 //Red Bucket Corner is -60,-60
 //Blue Bucket Corner is 60,60
 
-public class Auto extends LinearOpMode {
+public class Buckets extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException
     {
+        //Change StartPos
         Pose2d start = new Pose2d(6,-50,Math.toRadians(90));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, start);
@@ -51,88 +42,64 @@ public class Auto extends LinearOpMode {
 
         Grabber grabber = new Grabber(hardwareMap);
 
+
+        //This top line will have the position the robot is currently in, but the bottom is where the robot will go
+        //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
         TrajectoryActionBuilder specimen = drive.actionBuilder(start)
                 .splineToConstantHeading(new Vector2d(-6,-21), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-6,-21, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(29, -33), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(29,-30), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(29,-4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(40,-4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(40,-32), Math.toRadians(90));
+        //This above is the first one, but most will look like the one bellow
+        //The first line previous position must be Pose2d even though you prolly made it with a vector
+        //The vector2d is the pose2d without any turning and you will just put the degrees your at
+        //For the pose2d you will do the same as vector but the third parameter is the the position you want to end up in
+        //For the pose2d fourth parameter, KEEP THE NUMBER AT 90, THIS IS THE TANGENT AND WE DONT KNOW WHAT IT DOES
 
-        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(40,-35, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(40, -4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48,-4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48,-33), Math.toRadians(90));
+        //EX based off right after the specimen sequence
 
-        TrajectoryActionBuilder specimen2PickUp = drive.actionBuilder(new Pose2d(48, -35, Math.toRadians(90)))
-                        .splineToLinearHeading(new Pose2d(48, -15, Math.toRadians(270)), Math.toRadians(90))
-                                .splineToConstantHeading(new Vector2d(46, -28), Math.toRadians(270));
+        //TrajectoryActionBuilder specimen2PickUp = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
+        //        .splineToLinearHeading(new Pose2d(-40, -20, Math.toRadians(270)), Math.toRadians(90))
+        //        .splineToConstantHeading(new Vector2d(-40, 40), Math.toRadians(270));
 
-        TrajectoryActionBuilder postSpecimen2PickUp = drive.actionBuilder(new Pose2d(46, -28, Math.toRadians(270)))
-                .splineToLinearHeading(new Pose2d(5, -27, Math.toRadians(90)), Math.toRadians(90));
+        //First it is taking the position of the specimen movement
+        //The next line moves the robot to -40, -20 and rotates it 180 degrees to be 270 degrees
+        //The last line keeps the rotation the same but moves the robot forward to -40,40
 
 
-
-
-
-
+        //Just closes the claw onto the specimen
         grabber.setClawPosition(0.32, 0.8644, 0.3683);
 
+        //Where it starts when you press go, before this is basically init
         waitForStart();
         if(isStopRequested()) return;
 
+        //The actual running stuff:
         Actions.runBlocking(
                 new SequentialAction(
-                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
+                        //Also closing the claw because i have anxiety
+                        grabber.setClawPosition(0.32, 0.8644, 0.3683)
 
-                        specimen.build(),
-                        slide.setSlidePosition(1800),
+                        //Put everything in here
+                        //Put commas between each action
+                        //grabber.setClawPosition(clawPos, yClawPos, xClawPos) CHANGES THE CLAW
+                        //slide.setSlidePosition(TargetPos) CHANGES THE SLIDE
+                        //axel.setAxelPosition(TargetPos, Power) CHANGES THE AXEL - negative power is back and vise versa
+                        //The final action doesnt have a comma, and watch out for parenthasese cause there are about 50 of em
 
-                        new ParallelAction(
-                                slide.setSlidePosition(1800),
-                                axel.setAxelPosition(50, 0.2)
-                        ),
-                        slide.setSlidePosition(600),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-                        axel.setAxelPosition(0, -0.5),
-                        slide.setSlidePosition(0),
-                        sample2.build(),
-                        sample3.build(),
-                        specimen2PickUp.build(),
-                        grabber.setClawPosition(0.6, 0.7, 0.3683),
-                        axel.setAxelPosition(300, 0.1),
-                        new SleepAction(0.2),
-                        grabber.setClawPosition(0.32, 0.7, 0.3683),
-                        new SleepAction(0.2),
-                        axel.setAxelPosition(0, -0.5),
+                        //If you want to run things at the same time use:
+                        //new ParallelAction() AND THE STUFF THAT YOU WANT TO RUN SIMULTANEOUSLY WILL GO INSIDE THE ()
 
-                        postSpecimen2PickUp.build(),
-                        specimen.build(),
-                        slide.setSlidePosition(1800),
-
-                        new ParallelAction(
-                                slide.setSlidePosition(1800),
-                                axel.setAxelPosition(50, 0.2)
-                        ),
-                        slide.setSlidePosition(600),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-                        axel.setAxelPosition(0, -0.5),
-                        slide.setSlidePosition(0),
-
-
-                        axel.setAxelPosition(3, 0)
-
+                        //To call you movement stuff just go:
+                        //name.build() AND NAME WILL BE WHATEVER THE TRAJECTORY SEQUENCE IS NAMED WHERE YOU MADE IT
 
 
                 )
-
         );
+
     }
 
 
 
+    //DONT MESS WITH ANYTHING BELLOW HERE - Unless your Jacob and tryna fix something :)
 
     public class Slide
     {
