@@ -42,29 +42,36 @@ public class Specimens extends LinearOpMode
         Slides slides = new Slides(hardwareMap);
         Claw claw = new Claw(hardwareMap);
 
-        Pose2d startPose = new Pose2d( -12, 61, Math.toRadians(270));
+        Pose2d startPose = new Pose2d( 12, 61, Math.toRadians(270));
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
 
         TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
+                .waitSeconds(0.3)
                 .lineToY(32)
                 .waitSeconds(0.2);
 
         TrajectoryActionBuilder toSample1 = drive.actionBuilder(new Pose2d(-12, 32, Math.toRadians(270)))
-                .lineToY(40)
-                .strafeTo(new Vector2d(-50, 41));
+                .lineToY(45)
+                .strafeTo(new Vector2d(-50, 39));
 
-        TrajectoryActionBuilder dropOff1 = drive.actionBuilder( new Pose2d(-50, 40, Math.toRadians(270)))
+
+
+        TrajectoryActionBuilder dropOff = drive.actionBuilder( new Pose2d(-50, 39, Math.toRadians(270)))
                 //.splineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(90)), Math.toRadians(90));
-                .turn(Math.toRadians(185));
+                .turn(Math.toRadians(185))
+                .lineToY(46);
+
+
 
         TrajectoryActionBuilder toSample2 = drive.actionBuilder( new Pose2d(-50, 45, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(-60, 40, Math.toRadians(180)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(-60, 41, Math.toRadians(270)), Math.toRadians(0));
 
-        //TrajectoryActionBuilder dropOff2 = drive.actionBuilder(new Pose2d(-60, 40, Math.toRadians(180)))
-                       // .splineToLinearheading(new Pose2d())
+        TrajectoryActionBuilder dropOff2 = drive.actionBuilder(new Pose2d(-60, 40, Math.toRadians(180)))
+                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(95))
+                .lineToY(46);
 
-        Actions.runBlocking(claw.setPivot(0.7));
-        Actions.runBlocking(slides.setHorizontal(0));
+
         Actions.runBlocking(slides.resetEncoders());
         waitForStart();
         if(isStopRequested()) return;
@@ -72,8 +79,8 @@ public class Specimens extends LinearOpMode
         Actions.runBlocking(
                 new SequentialAction(
                         new ParallelAction(
-                                slides.setSlidePositions(2170),
-                                claw.setPivot(0.30),
+                                slides.setSlidePositions(2300),
+                                claw.setPivot(0.6),
                                 toSpecimenBar.build()
                         ),
                         new ParallelAction(
@@ -81,29 +88,34 @@ public class Specimens extends LinearOpMode
                                 //to Sample 1
                                 toSample1.build(),
                                 slides.setSlidePositions(1300),
-                                slides.setHorizontal(0.73),
-                                claw.setPivot(0)
+                                slides.setHorizontal(0.5),
+                                 claw.setPivot(0)
                         ),
                         new ParallelAction(
+                                //slides.setHorizontal(0),
                                 claw.intake(),
                                 slides.setSlidePositions(0)
                         ),
                         new SleepAction(0.5),
                         claw.off(),
                         new ParallelAction(
-                                dropOff1.build(),
+                                dropOff.build(),
                                 slides.setSlidePositions(400)
                                 ),
                         claw.eject(),
-                        new SleepAction(0.5)
-//                        slides.setSlidePositions(600),
-//                        toSample2.build(),
-//                        new ParallelAction(
-//                                claw.intake(),
-//                                slides.setSlidePositions(0)
-//                        ),
-//                        new SleepAction(1),
-//                        claw.off()
+                        new SleepAction(0.5),
+                        new ParallelAction(
+                        claw.intake(),
+                        slides.setSlidePositions(600),
+                        toSample2.build()
+                                ),
+                        slides.setSlidePositions(0),
+                        new SleepAction(1),
+                        new ParallelAction(
+                                claw.off(),
+                                slides.setSlidePositions(600),
+                                dropOff2.build()
+                        )
 
 
 
@@ -160,33 +172,22 @@ public class Specimens extends LinearOpMode
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-
-                if (leftSlide.getCurrentPosition() < target && rightSlide.getCurrentPosition() < target) {
-                    under = true;
-                    while (under) {
-                        if (leftSlide.getCurrentPosition() >= target && rightSlide.getCurrentPosition() >= target)
-                            under = false;
-                        leftSlide.setPower(1);
-                        rightSlide.setPower(1);
-                    }
-
-                    leftSlide.setPower(0.002);
-                    rightSlide.setPower(0.002);
-
-                    return false;
+                if(leftSlide.getCurrentPosition() < target && rightSlide.getCurrentPosition() < target) {
+                    leftSlide.setPower(1);
+                    rightSlide.setPower(1);
+                    return true;
                 } else if (leftSlide.getCurrentPosition() > target && rightSlide.getCurrentPosition() > target) {
-                    under = false;
-                    while (!under) {
-                        if (leftSlide.getCurrentPosition() <= target && rightSlide.getCurrentPosition() <= target)
-                            under = true;
-                        leftSlide.setPower(-1);
-                        rightSlide.setPower(-1);
-                    }
+                    leftSlide.setPower(-1);
+                    rightSlide.setPower(-1);
+                    return true;
+                }
+                else
+                {
                     leftSlide.setPower(0.002);
                     rightSlide.setPower(0.002);
-
                     return false;
-                } else return false;
+                }
+
             }
         }
 

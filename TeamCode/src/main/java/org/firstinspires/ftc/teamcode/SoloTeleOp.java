@@ -79,7 +79,7 @@ public class SoloTeleOp extends RobotCore
         if (gamepad1.a)
             pivot.setPosition(0);
         if (gamepad1.y)
-            pivot.setPosition(0.7);
+            pivot.setPosition(1);
         if(gamepad1.x)
             pivot.setPosition(0.36);
 

@@ -73,16 +73,16 @@ public class MainTeleOp extends RobotCore
 
         //INTAKE  CONTROLS------------------------------------------------------
         if (gamepad1.right_stick_y > 0.5)
-            horizontal.setPosition(0.05);
+            horizontal.setPosition(0);
         if (gamepad1.right_stick_y < -0.5)
             horizontal.setPosition(0.42);
 
-        if (gamepad1.dpad_down)
+        if (gamepad1.a)
             pivot.setPosition(0);
-        if (gamepad1.dpad_up)
-            pivot.setPosition(0.7);
-        if(gamepad1.dpad_right)
-            pivot.setPosition(0.36);
+        if (gamepad1.y)
+            pivot.setPosition(1);
+        if(gamepad1.x)
+            pivot.setPosition(0.65);
 
         //Taking In Sample
         if (gamepad2.left_bumper) {
