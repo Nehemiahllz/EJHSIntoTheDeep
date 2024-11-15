@@ -32,7 +32,8 @@ public class Buckets extends LinearOpMode {
     public void runOpMode() throws InterruptedException
     {
         //Change StartPos
-        Pose2d start = new Pose2d(6,-50,Math.toRadians(90));
+        //Left side of robot, beside the vertical bar, vertical part of the side holder, -18 or jacob way of starting, -42 for two tiles
+        Pose2d start = new Pose2d(-6,-50,Math.toRadians(90));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, start);
 
@@ -46,7 +47,7 @@ public class Buckets extends LinearOpMode {
         //This top line will have the position the robot is currently in, but the bottom is where the robot will go
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
         TrajectoryActionBuilder specimen = drive.actionBuilder(start)
-                .splineToConstantHeading(new Vector2d(-6,-21), Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(0,-21), Math.toRadians(90));
 
         //This above is the first one, but most will look like the one bellow
         //The first line previous position must be Pose2d even though you prolly made it with a vector
@@ -74,13 +75,13 @@ public class Buckets extends LinearOpMode {
                 //slides the robot left to get even further
                 .splineToConstantHeading(new Vector2d(-28, -34), Math.toRadians(90))
                 //puts the robot in picking position
-                .splineToConstantHeading(new Vector2d(-28, -26), Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(-43, -26), Math.toRadians(90));
 
-        TrajectoryActionBuilder sampleScore = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
+        TrajectoryActionBuilder sampleScore = drive.actionBuilder(new Pose2d(-43, -26, Math.toRadians(90)))
                 //twists the robot and moves it to be just before the bucket
-                .splineToLinearHeading(new Pose2d(-31, -34, Math.toRadians(315)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-50, -34, Math.toRadians(120)), Math.toRadians(90));
                 //moves it closer to the bucket to simulate driving behavior of leaning the side against the bucket for scoring
-                .splineToConstantHeading(new Vector2d(-33, -36), Math.toRadians(315));
+                //.splineToConstantHeading(new Vector2d(-33, -36), Math.toRadians(120));
 
         TrajectoryActionBuilder sample2PickUp = drive.actionBuilder(new Pose2d(-33, -36, Math.toRadians(315)))
                 //twists the robot straight and puts it into position to pick sample 2
@@ -127,12 +128,13 @@ public class Buckets extends LinearOpMode {
 
                         //scores the first specimen - THIS IS THE SAME FROM BARS AUTO
                         specimen.build(),
-                        slide.setSlidePosition(1800),
+                        slide.setSlidePosition(1450),
+                        axel.setAxelPosition(50, 0.2),
 
-                        new ParallelAction(
-                                slide.setSlidePosition(1800),
-                                axel.setAxelPosition(50, 0.2)
-                        ),
+//                        new ParallelAction(
+//                                slide.setSlidePosition(1800),
+//                                axel.setAxelPosition(50, 0.2)
+//                        ),
                         slide.setSlidePosition(600),
                         grabber.setClawPosition(0.6, 0.8644, 0.3683),
                         axel.setAxelPosition(0, -0.5),
@@ -145,83 +147,83 @@ public class Buckets extends LinearOpMode {
                         new SleepAction(0.2),
                         grabber.setClawPosition(0.32, 0.8644, 0.3683),
                         new SleepAction(0.2),
-                        axel.setAxelPosition(0, -0.5),
+                        axel.setAxelPosition(50, -0.5),
 
                         //sequence to score the first sample
                         new ParallelAction(
-                            sampleScore.build(),
-                                axel.setAxelPosition(0,-0.7),
-                                slide.setSlidePosition(3020),
-                                grabber.setClawPosition(0.32, 0.8644, 1)
-                        ),
-                        grabber.setClawPosition(0.32, 0.4406, 1),
-                        new SleepAction(0.4),
-                        grabber.setClawPosition(0.6, 0.4406, 1),
-                        new SleepAction(0.3),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-
-                        //sequence to pick up the second sample and finish reset from scoring
-                        new ParallelAction(
-                                axel.setAxelPosition(0, -0.7),
-                                slide.setSlidePosition(0),
-                                grabber.setClawPosition(0.6, 0.8644, 0.3683),
-                                sample2PickUp.build()
-                        ),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-                        axel.setAxelPosition(300, 0.1),
-                        new SleepAction(0.2),
-                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
-                        new SleepAction(0.2),
-                        axel.setAxelPosition(0, -0.5),
-
-                        //sequence to score the second sample
-                        new ParallelAction(
-                                sampleScore.build(),
-                                axel.setAxelPosition(0,-0.7),
-                                slide.setSlidePosition(3020),
-                                grabber.setClawPosition(0.32, 0.8644, 1)
-                        ),
-                        grabber.setClawPosition(0.32, 0.4406, 1),
-                        new SleepAction(0.4),
-                        grabber.setClawPosition(0.6, 0.4406, 1),
-                        new SleepAction(0.3),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-
-                        //sequence to pick up the third sample and finish reset from scoring
-                        new ParallelAction(
-                                axel.setAxelPosition(0, -0.7),
-                                slide.setSlidePosition(0),
-                                grabber.setClawPosition(0.6, 0.8644, 0.68415),
-                                sample3PickUp.build()
-                        ),
-                        grabber.setClawPosition(0.6, 0.8644, 0.68415),
-                        axel.setAxelPosition(300, 0.1),
-                        new SleepAction(0.2),
-                        grabber.setClawPosition(0.32, 0.8644, 0.68415),
-                        new SleepAction(0.2),
-                        axel.setAxelPosition(0, -0.5),
-
-                        //sequence to score the third sample
-
-                        new ParallelAction(
-                                sampleScore.build(),
-                                axel.setAxelPosition(0,-0.7),
-                                slide.setSlidePosition(3020),
-                                grabber.setClawPosition(0.32, 0.8644, 1)
-                        ),
-                        grabber.setClawPosition(0.32, 0.4406, 1),
-                        new SleepAction(0.4),
-                        grabber.setClawPosition(0.6, 0.4406, 1),
-                        new SleepAction(0.3),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-
-                        //sequence to park and finish reset from scoring
-                        new ParallelAction(
-                                axel.setAxelPosition(0, -0.7),
-                                slide.setSlidePosition(0),
-                                grabber.setClawPosition(0.6, 0.8644, 0.68415),
-                                park.build()
+                            sampleScore.build()
+//                                axel.setAxelPosition(0,-0.7),
+//                                slide.setSlidePosition(3020),
+//                                grabber.setClawPosition(0.32, 0.8644, 1)
                         )
+//                        grabber.setClawPosition(0.32, 0.4406, 1),
+//                        new SleepAction(0.4),
+//                        grabber.setClawPosition(0.6, 0.4406, 1),
+//                        new SleepAction(0.3),
+//                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+//
+//                        //sequence to pick up the second sample and finish reset from scoring
+//                        new ParallelAction(
+//                                axel.setAxelPosition(0, -0.7),
+//                                slide.setSlidePosition(0),
+//                                grabber.setClawPosition(0.6, 0.8644, 0.3683),
+//                                sample2PickUp.build()
+//                        ),
+//                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+//                        axel.setAxelPosition(300, 0.1),
+//                        new SleepAction(0.2),
+//                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
+//                        new SleepAction(0.2),
+//                        axel.setAxelPosition(0, -0.5),
+//
+//                        //sequence to score the second sample
+//                        new ParallelAction(
+//                                sampleScore.build(),
+//                                axel.setAxelPosition(0,-0.7),
+//                                slide.setSlidePosition(3020),
+//                                grabber.setClawPosition(0.32, 0.8644, 1)
+//                        ),
+//                        grabber.setClawPosition(0.32, 0.4406, 1),
+//                        new SleepAction(0.4),
+//                        grabber.setClawPosition(0.6, 0.4406, 1),
+//                        new SleepAction(0.3),
+//                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+//
+//                        //sequence to pick up the third sample and finish reset from scoring
+//                        new ParallelAction(
+//                                axel.setAxelPosition(0, -0.7),
+//                                slide.setSlidePosition(0),
+//                                grabber.setClawPosition(0.6, 0.8644, 0.68415),
+//                                sample3PickUp.build()
+//                        ),
+//                        grabber.setClawPosition(0.6, 0.8644, 0.68415),
+//                        axel.setAxelPosition(300, 0.1),
+//                        new SleepAction(0.2),
+//                        grabber.setClawPosition(0.32, 0.8644, 0.68415),
+//                        new SleepAction(0.2),
+//                        axel.setAxelPosition(0, -0.5),
+//
+//                        //sequence to score the third sample
+//
+//                        new ParallelAction(
+//                                sampleScore.build(),
+//                                axel.setAxelPosition(0,-0.7),
+//                                slide.setSlidePosition(3020),
+//                                grabber.setClawPosition(0.32, 0.8644, 1)
+//                        ),
+//                        grabber.setClawPosition(0.32, 0.4406, 1),
+//                        new SleepAction(0.4),
+//                        grabber.setClawPosition(0.6, 0.4406, 1),
+//                        new SleepAction(0.3),
+//                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
+//
+//                        //sequence to park and finish reset from scoring
+//                        new ParallelAction(
+//                                axel.setAxelPosition(0, -0.7),
+//                                slide.setSlidePosition(0),
+//                                grabber.setClawPosition(0.6, 0.8644, 0.68415),
+//                                park.build()
+//                        )
                         )
         );
 
@@ -309,15 +311,46 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                if (axelMotor.getCurrentPosition() < axelTarget + 5 && axelMotor.getCurrentPosition() > axelTarget - 5) {
-                    axelMotor.setPower(0.005);
-                    axelMotor2.setPower(0.005);
-                    return false;
-                }else{
-                    axelMotor.setPower(axelPower);
-                    axelMotor2.setPower(axelPower);
-                    return true;
+                if(axelMotor.getCurrentPosition() < axelTarget)
+                {
+                    if(axelMotor.getCurrentPosition() > axelTarget - 5)
+                    {
+                        axelMotor.setPower(0.005);
+                        axelMotor2.setPower(0.005);
+                        return true;
+                    }
+                    else
+                    {
+                        axelMotor.setPower(axelPower);
+                        axelMotor2.setPower(axelPower);
+                        return true;
+                    }
                 }
+                else if(axelMotor.getCurrentPosition()  > axelTarget)
+                {
+                    if(axelMotor.getCurrentPosition() < axelTarget +5)
+                    {
+                        axelMotor.setPower(-0.005);
+                        axelMotor2.setPower(-0.005);
+                        return true;
+                    }
+                    else
+                    {
+                        axelMotor.setPower(axelPower);
+                        axelMotor2.setPower(axelPower);
+                        return true;
+                    }
+                }else return false;
+//
+//                if (axelMotor.getCurrentPosition() < axelTarget + 5 || axelMotor.getCurrentPosition() > axelTarget - 5) {
+//                    axelMotor.setPower(0.005);
+//                    axelMotor2.setPower(0.005);
+//                    return false;
+//                }else{
+//                    axelMotor.setPower(axelPower);
+//                    axelMotor2.setPower(axelPower);
+//                    return true;
+//                }
             }
         }
         public Action setAxelPosition(int axelTar, double power){ return new SetAxelPosition(axelTar, power);}
