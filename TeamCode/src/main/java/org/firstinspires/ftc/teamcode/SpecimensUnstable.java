@@ -29,8 +29,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Other_RoadRunner_Classes.MecanumDrive;
 
 @Config
-@Autonomous(name = "Specimens", group = "Autonomous")
-public class Specimens extends LinearOpMode
+@Autonomous(name = "SpecimensUnstable", group = "Autonomous")
+public class SpecimensUnstable extends LinearOpMode
 {
 
 
@@ -46,39 +46,38 @@ public class Specimens extends LinearOpMode
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
 
         TrajectoryActionBuilder samples = drive.actionBuilder(new Pose2d(12, -32, Math.toRadians(90)))
-                        //Place Specimen
+                //Place Specimen
                 .lineToY(-45)
-                        .strafeTo(new Vector2d(35,-42))
-                        .strafeTo(new Vector2d(40, -5))
-                        //Grab and Deposit Sample 1
-                        .strafeTo(new Vector2d(48,-5))
-                        .strafeTo(new Vector2d(48,-58))
-                        //Grab and Deposit Sample 2
-                        .strafeTo(new Vector2d(48,-5))
-                        .strafeTo(new Vector2d(58,-5))
-                        .strafeTo(new Vector2d(58,-58))
+                .strafeTo(new Vector2d(35,-42))
+                .strafeTo(new Vector2d(40, -5))
+                //Grab and Deposit Sample 1
+                .strafeTo(new Vector2d(48,-5))
+                .strafeTo(new Vector2d(48,-58))
+                //Grab and Deposit Sample 2
+                .strafeTo(new Vector2d(48,-5))
+                .strafeTo(new Vector2d(56,-5))
+                .strafeTo(new Vector2d(56,-58))
 
-                        //Grab and Deposit Sample 3
-                        .strafeToLinearHeading(new Vector2d(62, -23), Math.toRadians(0));
-//                        .strafeTo(new Vector2d(62,-5))
-//                        .strafeTo(new Vector2d(62,-58))
-//                .lineToY(-50);
-
+                //Grab and Deposit Sample 3
+                .strafeToLinearHeading(new Vector2d(52, -5), Math.toRadians(-90))
+                .strafeTo(new Vector2d(62,-5))
+                .strafeTo(new Vector2d(62,-58));
 
         TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
                 .waitSeconds(0.3)
                 .lineToY(-32)
                 .waitSeconds(0.2);
 
-        TrajectoryActionBuilder toSample3 = drive.actionBuilder(new Pose2d(62, -23, Math.toRadians(0)))
-                .waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(55, -58, Math.toRadians(-90)), Math.toRadians(0));
+        TrajectoryActionBuilder toSample1 = drive.actionBuilder(new Pose2d(-12, 32, Math.toRadians(270)))
+                .lineToY(45)
+                .strafeTo(new Vector2d(-50, 39));
 
 
 
-        TrajectoryActionBuilder park = drive.actionBuilder( new Pose2d(50, -58, Math.toRadians(270)))
+        TrajectoryActionBuilder dropOff = drive.actionBuilder( new Pose2d(-50, 39, Math.toRadians(270)))
                 //.splineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(90)), Math.toRadians(90));
-                .lineToY(-45);
+                .turn(Math.toRadians(185))
+                .lineToY(46);
 
 
 
@@ -108,25 +107,12 @@ public class Specimens extends LinearOpMode
 
                                 //to Sample 1
                                 samples.build(),
-                                slides.setSlidePositions(600),
+                                slides.setSlidePositions(0),
                                 slides.setHorizontal(0),
-                                 claw.setPivot(0)
-                        ),
-                        new ParallelAction(
-                                claw.intake(),
-                                slides.setSlidePositions(0)
-                        ),
-                        new SleepAction(1),
-                        new ParallelAction(
-                        claw.off(),
-                        slides.setSlidePositions(300),
-                        toSample3.build()
-                        ),
-                        claw.eject(2),
-                        slides.setSlidePositions(0),
-                        park.build()
+                                claw.setPivot(0)
+                        )
 //                        new ParallelAction(
-//                         .strafeToLinearHeading(new Vector2d(55, -32), Math.toRadians(180));       //slides.setHorizontal(0),
+//                                //slides.setHorizontal(0),
 //                                claw.intake(),
 //                                slides.setSlidePositions(0)
 //                        ),

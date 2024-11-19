@@ -37,8 +37,8 @@ public class MeepMeepTesting {
                 .strafeTo(new Vector2d(62,-59))
 
                 //Get Specimens
-                .strafeTo(new Vector2d(48,-45))
-                                .strafeTo(new Vector2d(48,-58))
+//                .strafeTo(new Vector2d(48,-45))
+//                                .strafeTo(new Vector2d(48,-58))
                                 //.splineToLinearHeading(new Pose2d(12, -36, Math.toRadians(90)), Math.toRadians(90)))
 
 

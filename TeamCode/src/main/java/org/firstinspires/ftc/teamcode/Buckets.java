@@ -52,7 +52,7 @@ public class Buckets extends LinearOpMode {
 
         TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
                 .waitSeconds(0.3)
-                .lineToY(-34)
+                .lineToY(-32)
                 .waitSeconds(0.5);
 
         Pose2d sampleOnePose = new Pose2d(-44,-30,Math.toRadians(120));
@@ -61,13 +61,13 @@ public class Buckets extends LinearOpMode {
                 .splineToLinearHeading(sampleOnePose, Math.toRadians(90));
 
         /** **************** **/
-        Pose2d bucketPose = new Pose2d(-52, -52, Math.toRadians(-135));
+        Pose2d bucketPose = new Pose2d(-52.5, -52.5, Math.toRadians(-135));
         TrajectoryActionBuilder toBucket1 = drive.actionBuilder(sampleOnePose)
                 .waitSeconds(0.3)
                 .lineToX(-40)
                 .splineToLinearHeading(bucketPose, Math.toRadians(180));
 
-        double sampleTwoX = -50.5, sampleTwoY = -24.5;
+        double sampleTwoX = -51, sampleTwoY = -24.5;
         TrajectoryActionBuilder toSample2 = drive.actionBuilder(bucketPose)
                 .strafeTo(new Vector2d(-47, -45))
                 .splineToLinearHeading(new Pose2d(-40,-25, Math.toRadians(180)), -90)
@@ -177,7 +177,7 @@ public class Buckets extends LinearOpMode {
                                 claw.intake()),
                                 new SleepAction(0.1),
                                 slides.setSlidePositions(0),
-                                new SleepAction(0.5),
+                                new SleepAction(0.675),
                                 new ParallelAction(
                                         claw.off(),
                                         slides.setHorizontal(0),
