@@ -49,83 +49,84 @@ public class Auto extends LinearOpMode {
 
         Axel axel = new Axel(hardwareMap);
 
-        Grabber grabber = new Grabber(hardwareMap);
+        Grab claw = new Grab(hardwareMap);
+        GrabY yClaw = new GrabY(hardwareMap);
+        GrabX xClaw = new GrabX(hardwareMap);
 
         TrajectoryActionBuilder specimen = drive.actionBuilder(start)
-                .splineToConstantHeading(new Vector2d(-6,-21), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(2, -21, Math.toRadians(90)), Math.toRadians(90));
 
         TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-6,-21, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(29, -34), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(2, -34), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(29,-34), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(29,-4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(40,-4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(40,-32), Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(38,-4), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(38,-32), Math.toRadians(90));
 
         TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(40,-35, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(40, -4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48,-4), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48,-33), Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(38, -4), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(47,-4), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(47,-33), Math.toRadians(90));
 
         TrajectoryActionBuilder specimen2PickUp = drive.actionBuilder(new Pose2d(48, -35, Math.toRadians(90)))
                         .splineToLinearHeading(new Pose2d(48, -15, Math.toRadians(270)), Math.toRadians(90))
-                                .splineToConstantHeading(new Vector2d(46, -28), Math.toRadians(270));
+                                .splineToConstantHeading(new Vector2d(45, -26), Math.toRadians(270));
 
-        TrajectoryActionBuilder postSpecimen2PickUp = drive.actionBuilder(new Pose2d(46, -28, Math.toRadians(270)))
-                .splineToLinearHeading(new Pose2d(5, -27, Math.toRadians(90)), Math.toRadians(90));
+        TrajectoryActionBuilder postSpecimen2PickUp = drive.actionBuilder(new Pose2d(45, -26, Math.toRadians(270)))
+                .splineToLinearHeading(new Pose2d(5, -27, Math.toRadians(90)), Math.toRadians(90))
+        .splineToConstantHeading(new Vector2d(-1, -21), Math.toRadians(90));
 
-        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(40, -32), Math.toRadians(90));
-
-
-
+        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(2, -21, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(40, -42), Math.toRadians(90));
 
 
 
-        grabber.setClawPosition(0.32, 0.8644, 0.3683);
+
+
+        claw.setClawPosition(0.32);
+        yClaw.setClawYPosition(0.8644);
+        xClaw.setClawXPosition(0.3683);
 
         waitForStart();
         if(isStopRequested()) return;
 
         Actions.runBlocking(
                 new SequentialAction(
-                        grabber.setClawPosition(0.32, 0.8644, 0.3683),
-
-                        specimen.build(),
-                        slide.setSlidePosition(1800),
-
                         new ParallelAction(
-                                slide.setSlidePosition(1800),
-                                axel.setAxelPosition(50, 0.2)
+                                specimen.build(),
+                                slide.setSlidePosition(1520),
+                                claw.setClawPosition(0.32),
+                                yClaw.setClawYPosition(0.8644)
                         ),
-                        slide.setSlidePosition(600),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-                        axel.setAxelPosition(0, -0.5),
-                        slide.setSlidePosition(0),
-                        sample2.build(),
-                        sample3.build(),
-                        specimen2PickUp.build(),
-                        grabber.setClawPosition(0.6, 0.7, 0.3683),
-                        axel.setAxelPosition(300, 0.1),
-                        new SleepAction(0.2),
-                        grabber.setClawPosition(0.32, 0.7, 0.3683),
-                        new SleepAction(0.2),
-                        axel.setAxelPosition(0, -0.5),
 
-                        //Nothing bellow here actually occurs;
+                            axel.setAxelPosition(65, 0.6),
+                            slide.setSlidePosition(600),
+                            new SleepAction(0.15),
+                            axel.setAxelPosition(0, -0.7),
+
+                            sample2.build(),
+                            sample3.build(),
+                            specimen2PickUp.build(),
+                            claw.setClawPosition(0.6),
+                            yClaw.setClawYPosition(0.7),
+                            axel.setAxelPosition(300, 0.1),
+                            new SleepAction(0.2),
+                            claw.setClawPosition(0.32),
+                            new SleepAction(0.3),
+                            axel.setAxelPosition(10, -0.5),
+
                         postSpecimen2PickUp.build(),
-                        specimen.build(),
-                        slide.setSlidePosition(1800),
 
                         new ParallelAction(
-                                slide.setSlidePosition(1800),
-                                axel.setAxelPosition(50, 0.2)
+                                slide.setSlidePosition(1520),
+                                yClaw.setClawYPosition(0.8644)
                         ),
-                        slide.setSlidePosition(600),
-                        grabber.setClawPosition(0.6, 0.8644, 0.3683),
-                        axel.setAxelPosition(0, -0.5),
-                        slide.setSlidePosition(0),
-                        park.build()
 
+                                axel.setAxelPosition(65, 0.6),
+                                slide.setSlidePosition(0),
+                                new SleepAction(0.15),
+                                axel.setAxelPosition(0, -0.7),
+                        park.build()
 
 
                 )
@@ -230,46 +231,88 @@ public class Auto extends LinearOpMode {
     }
 
 
-    public class Grabber {
-        Servo yClaw;
-        Servo xClaw;
+    public class Grab {
         Servo claw;
 
-        public Grabber(HardwareMap hardwareMap) {
-            yClaw = hardwareMap.get(Servo.class, "yClaw");
-            yClaw.setDirection(Servo.Direction.FORWARD);
-
-            xClaw = hardwareMap.get(Servo.class, "xClaw");
-            xClaw.setDirection(Servo.Direction.REVERSE);
-
+        public Grab(HardwareMap hardwareMap) {
             claw = hardwareMap.get(Servo.class, "claw");
             claw.setDirection(Servo.Direction.FORWARD);
         }
 
         public class SetClawPosition implements Action {
-            double yClawPosition;
             double clawPosition;
-            double xClawPosition;
 
-            public SetClawPosition(double clawPos, double yClawPos, double xClawPos) { clawPosition = clawPos; yClawPosition = yClawPos; xClawPosition = xClawPos;
+            public SetClawPosition(double clawPos) {
+                clawPosition = clawPos;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 claw.setPosition(clawPosition);
-                yClaw.setPosition(yClawPosition);
-                xClaw.setPosition(xClawPosition);
-
                 return false;
             }
 
         }
 
-        public Action setClawPosition(double clawPos, double yClawPos, double xClawPos) {
-            return new SetClawPosition(clawPos, yClawPos, xClawPos);
+        public Action setClawPosition(double clawPos) {
+            return new Auto.Grab.SetClawPosition(clawPos);
         }
-
     }
 
+    public class GrabY {
+        Servo yClaw;
+
+        public GrabY(HardwareMap hardwareMap) {
+            yClaw = hardwareMap.get(Servo.class, "yClaw");
+            yClaw.setDirection(Servo.Direction.FORWARD);
+        }
+
+        public class SetClawYPosition implements Action {
+            double clawYPosition;
+
+            public SetClawYPosition(double clawYPos) {
+                clawYPosition = clawYPos;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                yClaw.setPosition(clawYPosition);
+                return false;
+            }
+
+        }
+
+        public Action setClawYPosition(double clawYPos) {
+            return new Auto.GrabY.SetClawYPosition(clawYPos);
+        }
+    }
+
+    public class GrabX {
+        Servo xClaw;
+
+        public GrabX(HardwareMap hardwareMap) {
+            xClaw = hardwareMap.get(Servo.class, "xClaw");
+            xClaw.setDirection(Servo.Direction.REVERSE);
+        }
+
+        public class SetClawXPosition implements Action {
+            double clawXPosition;
+
+            public SetClawXPosition(double clawXPos) {
+                clawXPosition = clawXPos;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                xClaw.setPosition(clawXPosition);
+                return false;
+            }
+
+        }
+            public Action setClawXPosition(double clawXPos) {
+                return new Auto.GrabX.SetClawXPosition(clawXPos);
+            }
+
+    }
 
 }

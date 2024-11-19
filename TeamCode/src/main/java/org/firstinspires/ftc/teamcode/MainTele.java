@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "MainTeleOp", group = "Main")
 
@@ -20,24 +25,29 @@ public class MainTele extends RobotCore {
     int slideMax = 4480;
     int slideMin = 0;
 
-    int axelPos;
-    //Fix values, once measured
-    final double grabHeight = 15.2;
-    final double ticksPerSlideMM = 4.468;
-    final double ticksPerDegree = 3.877;
-    final double axelPosLowest = 409;
-    double slideLength;
-    final double slideLengthZero = 317.5;
-    double axelAngle;
+    int axelTarPos;
 
-    public enum axelMode {GRAB, SUB, BUCKET, RUNG, REST, HANG, HANGING, CLIP, LOW}
+    public enum axelMode {GRAB, SUB, BUCKET, RUNG, REST, HANG, HANGING, CLIP, LOW, RESET, grab2nd, pull2nd}
     axelMode axelMoving;
 
     ElapsedTime timer = new ElapsedTime();
     boolean timeTrue = true;
 
+    private PIDController controller;
+
+    public static double p = 0, i = 0, d = 0;
+    public static double f = 0;
+
+    public static int axelTarget = 0;
+
+    private final double ticks_in_degree = 700 / 180.0;
+
     public void init() {
         super.init();
+
+        controller  = new PIDController(p, i, d);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         axelMotor.setPower(0);
         axelMotor2.setPower(0);
         axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -60,9 +70,49 @@ public class MainTele extends RobotCore {
     public void loop() {
         printDebugData();
 
+        controller.setPID(p, i , d);
+        int axelPos = axelMotor.getCurrentPosition();
+        double pid = controller.calculate(axelPos, axelTarget);
+        double ff = Math.cos(Math.toRadians(axelTarget / ticks_in_degree)) * f;
+
+        double power = pid + ff;
+
+        axelMotor.setPower(power);
+        axelMotor2.setPower(power);
+
+        if(gamepad2.dpad_right){
+            axelTarget += 10;
+        }
+        if(gamepad2.dpad_left){
+            axelTarget -= 10;
+        }
+
+
+        if(gamepad2.right_bumper){
+            axelMoving = axelMode.RESET;
+            axelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            axelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slideMotor.setTargetPosition(-3000);
+        }
+
+        if(axelMoving == axelMode.RESET) {
+            axelMotor.setPower(-0.7);
+            axelMotor2.setPower(-0.7);
+
+            if(gamepad2.left_bumper){
+                axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+        }else{
+            axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
         slideMax = slideMin + 3030;
-        axelMotor.setTargetPosition(axelPos);
-        axelMotor2.setTargetPosition(axelPos);
+        axelMotor.setTargetPosition(axelTarPos);
+        axelMotor2.setTargetPosition(axelTarPos);
         slideMotor.setPower(1);
 
         //Drivetrain
@@ -103,6 +153,7 @@ public class MainTele extends RobotCore {
 
 
         if(gamepad1.x || gamepad2.a || gamepad2.y){
+
             axelMotor.setPower(1);
             axelMotor2.setPower(1);
             slideMotor.setTargetPosition(0);
@@ -112,6 +163,7 @@ public class MainTele extends RobotCore {
 
             if(gamepad2.a){
                 yClaw.setPosition(0.8644);
+                xClaw.setPosition(0.3);
                 axelMoving = axelMode.SUB;
             }
 
@@ -135,7 +187,9 @@ public class MainTele extends RobotCore {
                 axelMoving = axelMode.LOW;
             }
         }else if(gamepad1.y) {
-            if(axelMoving == axelMode.HANG) {
+            if (axelMoving == axelMode.HANG) {
+                axelMotor.setPower(1);
+                axelMotor2.setPower(1);
                 axelMoving = axelMode.HANGING;
             }
         }
@@ -144,41 +198,38 @@ public class MainTele extends RobotCore {
             switch (axelMoving) {
                 case SUB:
                     if(slideMotor.getCurrentPosition() > 300) {
-                        axelPos = 330;
+                        axelTarPos = 330;
                     }else if (axelMotor.getCurrentPosition() > 267) {
-                        axelPos = 285;
+                        axelTarPos = 285;
                     }else if(axelMotor.getCurrentPosition() > 235){
-                        axelPos = 270;
+                        axelTarPos = 270;
                     } else if(axelMotor.getCurrentPosition() > 180){
-                        axelPos = 240;
+                        axelTarPos = 240;
                     } else if (axelMotor.getCurrentPosition() > 90) {
-                        axelPos = 190;
+                        axelTarPos = 190;
                     } else{
-                        axelPos = 100;
+                        axelTarPos = 100;
                     }
                     break;
                 case BUCKET:
-                    axelPos = 0;
+                    axelTarPos = 0;
                     break;
                 case HANG:
                     axelMotor.setPower(1);
                     axelMotor2.setPower(1);
-                    axelPos = 125;
+                    axelTarPos = 125;
                     break;
                 default:
-                    axelPos = 0;
+                    axelTarPos = 0;
             }
         }
 
         if(axelMoving == axelMode.LOW){
-            axelPos = 330;
+            axelTarPos = 330;
         }
 
         if(axelMoving == axelMode.HANGING){
-            axelMotor.setPower(1);
-            axelMotor2.setPower(1);
-            axelMotor.setTargetPosition(0);
-            axelMotor2.setTargetPosition(0);
+            axelTarPos = 0;
         }
 
         //Claw open
@@ -189,11 +240,14 @@ public class MainTele extends RobotCore {
             claw.setPosition(0.36);
         }
 
-        //Tilt claw down and reset
-        if(gamepad1.dpad_left){
-            xClaw.setPosition(xClaw.getPosition() + 0.025);
-        }else if(gamepad1.dpad_right){
-            xClaw.setPosition(xClaw.getPosition() - 0.025);
+        if(timer.time(TimeUnit.MILLISECONDS) > 200){
+            if(gamepad1.dpad_left){
+                xClaw.setPosition(xClaw.getPosition() + 0.11);
+                timer.reset();
+            }else if(gamepad1.dpad_right){
+                xClaw.setPosition(xClaw.getPosition() - 0.11);
+                timer.reset();
+            }
         }
 
         //Claw tilt out of bucket
@@ -241,13 +295,7 @@ public class MainTele extends RobotCore {
         telemetry.addData("yClaw", yClaw.getPosition());
         telemetry.addData("xClaw", xClaw.getPosition());
         telemetry.addData("claw", claw.getPosition());
-        telemetry.addData("axelPos", axelPos);
-    }
-
-    private void findAxelPos() {
-        slideLength = (slideMotor.getCurrentPosition() * ticksPerSlideMM) + slideLengthZero;
-        axelAngle = Math.toDegrees(Math.asin(grabHeight/slideLength));
-        axelPos = (int) (axelPosLowest - (axelAngle * ticksPerDegree));
+        telemetry.addData("axelPos", axelTarPos);
     }
 
 }

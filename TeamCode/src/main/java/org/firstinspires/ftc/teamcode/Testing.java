@@ -24,41 +24,73 @@ public class Testing extends RobotCore {
         axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slideMotor.setTargetPosition(0);
+        axelMotor.setTargetPosition(0);
+        axelMotor2.setTargetPosition(0);
         slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        axelMotor.setPower(1);
+        axelMotor2.setPower(1);
+        slideMotor.setPower(1);
         printDebugData();
     }
 
     public void loop() {
-        findAxelPos();
         printDebugData();
 
         if(gamepad1.dpad_up){
-            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 10);
+            slideMotor.setPower(1);
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 200);
         }
         if(gamepad1.dpad_down){
-            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 10);
+            slideMotor.setPower(1);
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 200);
         }
 
-        if(gamepad2.dpad_up){
-            claw.setPosition(claw.getPosition() + 0.002);
+        if(gamepad1.dpad_left){
+            axelMotor.setPower(1);
+            axelMotor2.setPower(1);
+            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() - 15);
+            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() - 15);
         }
+
+        if(gamepad1.dpad_right){
+            axelMotor.setPower(1);
+            axelMotor2.setPower(1);
+            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() + 15);
+            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() + 15);
+        }
+
         if(gamepad2.dpad_down){
-            claw.setPosition(claw.getPosition() - 0.002);
+            slideMotor.setPower(0);
         }
 
         if(gamepad2.dpad_left){
-            yClaw.setPosition(yClaw.getPosition() - 0.002);
-        }
-        if(gamepad2.dpad_right){
-            yClaw.setPosition(yClaw.getPosition() + 0.002);
+            axelMotor.setPower(0);
+            axelMotor2.setPower(0);
         }
 
-        if(gamepad2.a){
-            xClaw.setPosition(xClaw.getPosition() + 0.002);
-        }
-        if(gamepad2.b){
-            xClaw.setPosition(xClaw.getPosition() - 0.002);
-        }
+//        if(gamepad2.dpad_up){
+//            claw.setPosition(claw.getPosition() + 0.002);
+//        }
+//        if(gamepad2.dpad_down){
+//            claw.setPosition(claw.getPosition() - 0.002);
+//        }
+//
+//        if(gamepad2.dpad_left){
+//            yClaw.setPosition(yClaw.getPosition() - 0.002);
+//        }
+//        if(gamepad2.dpad_right){
+//            yClaw.setPosition(yClaw.getPosition() + 0.002);
+//        }
+//
+//        if(gamepad2.a){
+//            xClaw.setPosition(xClaw.getPosition() + 0.002);
+//        }
+//        if(gamepad2.b){
+//            xClaw.setPosition(xClaw.getPosition() - 0.002);
+//        }
     }
 
     //Prints different info for debugging
