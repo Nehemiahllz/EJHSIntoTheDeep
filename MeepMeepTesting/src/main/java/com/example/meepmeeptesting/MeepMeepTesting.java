@@ -7,74 +7,110 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(800);
+        MeepMeep meepMeep = new MeepMeep(600);
         System.setProperty("sun.java2d.opengl", "true");
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(80, 80, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
+//        //Samples Without Turn
+//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(12, -61, Math.toRadians(90)))
+//                //Place Specimen
+//                .lineToY(-36)
+//                .waitSeconds(.5)
+//                .strafeTo(new Vector2d(35,-42))
+//                .strafeTo(new Vector2d(40, -5))
+//                //Grab and Deposit Sample 1
+//                .strafeTo(new Vector2d(48,-5))
+//                .strafeTo(new Vector2d(48,-55))
+//                //Grab and Deposit Sample 2
+//                .strafeTo(new Vector2d(48,-5))
+//                .strafeTo(new Vector2d(60,-5))
+//                //.strafeTo(new Vector2d(55,-40))
+//
+//                //Grab Specimen 1
+//                .strafeTo(new Vector2d(48, -57))
+//                .waitSeconds(.5)
+//                .strafeTo(new Vector2d(12,-45))
+//                .strafeTo(new Vector2d(12, -36))
+//                .waitSeconds(.5)
+//
+//
+//                //Grab Specimen 2
+//                .strafeTo(new Vector2d(48,-40))
+//                .strafeTo(new Vector2d(48, -57))
+//                .waitSeconds(.5)
+//                .strafeTo(new Vector2d(12,-45))
+//                .strafeTo(new Vector2d(12, -36))
+//                .waitSeconds(.5)
+//
+//                //Sample 3
+//                                .strafeTo(new Vector2d(25, -45))
+//                                .strafeToLinearHeading(new Vector2d(60, -25), Math.toRadians(180))
+//                                .strafeTo(new Vector2d(60, -60))
+//
+//                //Specimen 3
+//                                .strafeToLinearHeading(new Vector2d(48, -40), Math.toRadians(90))
+//                                .strafeTo(new Vector2d(48,-57))
+//                .waitSeconds(.5)
+//                .strafeTo(new Vector2d(12,-45))
+//                .strafeTo(new Vector2d(12, -36))
+//                .waitSeconds(2)
+//                                .strafeTo(new Vector2d(12,-37))
+////
+//                .build());
+//
 
-
-                //Red Left
+                //Samples With Turn
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(12, -61, Math.toRadians(90)))
                 //Place Specimen
                 .lineToY(-36)
-                        .waitSeconds(1)
+                        .waitSeconds(.5)
                                 .strafeTo(new Vector2d(35,-42))
                                 .strafeTo(new Vector2d(40, -5))
                 //Grab and Deposit Sample 1
                         .strafeTo(new Vector2d(48,-5))
-                                .strafeTo(new Vector2d(48,-59))
+                                .strafeTo(new Vector2d(48,-55))
                 //Grab and Deposit Sample 2
-                .strafeTo(new Vector2d(48,-5))
-                .strafeTo(new Vector2d(56,-5))
-                .strafeTo(new Vector2d(56,-59))
+                .strafeTo(new Vector2d(43,-5))
+                        .strafeTo(new Vector2d(43,-5))
+                .strafeTo(new Vector2d(63,-5))
+                .strafeTo(new Vector2d(48,-40))
 
-                //Grab and Deposit Sample 3
-                .strafeToLinearHeading(new Vector2d(52, -5), Math.toRadians(-90))
-                .strafeTo(new Vector2d(62,-5))
-                .strafeTo(new Vector2d(62,-59))
-
-                //Get Specimens
-//                .strafeTo(new Vector2d(48,-45))
-//                                .strafeTo(new Vector2d(48,-58))
-                                //.splineToLinearHeading(new Pose2d(12, -36, Math.toRadians(90)), Math.toRadians(90)))
+                //Grab Specimen 1
+                                .strafeToLinearHeading(new Vector2d(48, -57),Math.toRadians(-90))
+                        .waitSeconds(1)
+                                .strafeToLinearHeading(new Vector2d(12,-45), Math.toRadians(90))
+                                .strafeTo(new Vector2d(12, -36))
+                                .waitSeconds(.5)
 
 
-                //Grab Sample 1
+                //Grab Specimen 2
+                                .strafeToLinearHeading(new Vector2d(48,-40),Math.toRadians(-90))
+                .strafeTo(new Vector2d(48, -57))
+                        .waitSeconds(1)
+                .strafeToLinearHeading(new Vector2d(12,-45), Math.toRadians(90))
+                .strafeTo(new Vector2d(12, -36))
+                                .waitSeconds(.5)
+                //Sample 3
+//                        .splineToLinearHeading(new Pose2d(60,-25,Math.toRadians(180)), Math.toRadians(90))
+                                .strafeTo(new Vector2d(25, -45))
+                                .strafeToLinearHeading(new Vector2d(60, -25), Math.toRadians(180))
+                                .strafeTo(new Vector2d(60, -60))
+
+                //Specimen 3
+                                .strafeToLinearHeading(new Vector2d(48, -40), Math.toRadians(-90))
+                                .strafeTo(new Vector2d(48,-57))
+                .waitSeconds(.5)
+                .strafeToLinearHeading(new Vector2d(12,-45),Math.toRadians(90))
+                .strafeTo(new Vector2d(12, -36))
+                .waitSeconds(2)
+                                .strafeTo(new Vector2d(12,-37))
+
+                //Park
                         .build());
-//
-//
-//
 
-////Blue Left
-//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(12, 60, Math.toRadians(-90)))
-//                //Specimen that thang!
-//                .lineToYSplineHeading(36, Math.toRadians(-90))
-//                .waitSeconds(1)
-//                //We Are Number 1 (grab that thang!)
-//                .strafeTo(new Vector2d(50, 40))
-//                //.splineToSplineHeading(new Pose2d(35, 25, Math.toRadians(0)), -90)
-//                .waitSeconds(0.5)
-//                //Place that thang!
-//                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
-//                .waitSeconds(2)
-//                //Lowkey Gotta Take a Numba 2 (grab that thang!)
-//                .splineTo(new Vector2d(58, 35), Math.toRadians(-90))
-//                .waitSeconds(0.5)
-//                //Place that thang!
-//                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
-//                .waitSeconds(2)
-//                //Is that Number 3 I see? (grab that thang!)
-//                .splineToSplineHeading(new Pose2d(55, 27, Math.toRadians(0)), -90)
-//                .waitSeconds(0.5)
-//                //Place that thang!
-//                .splineToSplineHeading(new Pose2d(52, 52, Math.toRadians(45)), 90)
-//                .waitSeconds(2)
-//                //Park the bus...
-//                .splineToSplineHeading(new Pose2d(25, 10, Math.toRadians(180)), 90)
-//                .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
                 .setDarkMode(true)
