@@ -18,6 +18,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 
 // Non-RR imports
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -28,6 +29,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Other_RoadRunner_Classes.MecanumDrive;
 
+@Disabled
 @Config
 @Autonomous(name = "Specimens", group = "Autonomous")
 public class Specimens extends LinearOpMode
@@ -125,31 +127,7 @@ public class Specimens extends LinearOpMode
                         claw.eject(2),
                         slides.setSlidePositions(0),
                         park.build()
-//                        new ParallelAction(
-//                         .strafeToLinearHeading(new Vector2d(55, -32), Math.toRadians(180));       //slides.setHorizontal(0),
-//                                claw.intake(),
-//                                slides.setSlidePositions(0)
-//                        ),
-//                        new SleepAction(0.5),
-//                        claw.off(),
-//                        new ParallelAction(
-//                                dropOff.build(),
-//                                slides.setSlidePositions(400)
-//                                ),
-//                        claw.eject(),
-//                        new SleepAction(0.5),
-//                        new ParallelAction(
-//                        claw.intake(),
-//                        slides.setSlidePositions(600),
-//                        toSample2.build()
-//                                ),
-//                        slides.setSlidePositions(0),
-//                        new SleepAction(1),
-//                        new ParallelAction(
-//                                claw.off(),
-//                                slides.setSlidePositions(600),
-//                                dropOff2.build()
-//                        )
+
 
 
 

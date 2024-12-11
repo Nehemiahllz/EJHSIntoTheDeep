@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import androidx.annotation.NonNull;
@@ -17,9 +18,11 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 
 // Non-RR imports
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -27,59 +30,71 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Other_RoadRunner_Classes.MecanumDrive;
 
+@Disabled
 @Config
-@Autonomous(name = "Buckets", group = "Autonomous")
-public class Buckets extends LinearOpMode {
+@Autonomous(name = "Conference Auto", group = "Autonomous")
+public class ConferenceAuto extends LinearOpMode {
+
+    public int readCamera()
+
+    {
+        HuskyLens camera = hardwareMap.get(HuskyLens.class, "camera");
+        if (camera.blocks(1).length > 0)
+            return 2200;
+        else if (camera.blocks(2).length > 0)
+            return 300;
+        else if (camera.blocks(3).length > 0)
+            return 3900;
+        else return 100;
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d startPose = new Pose2d(-12, -61, Math.toRadians(90));
 
-        //Change the X and Y values for picking up samples 2 and 3
 
-       // Pose2d sampleTwoPose = new Pose2d(sampleTwoX,sampleTwoY,Math.toRadians(120));
-
-
-        //Pose2d sampleThreePose = new Pose2d(sampleThreeX,sampleThreeY,Math.toRadians(120));
-
-
-
+        //MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0, Math.toRadians(0)));
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
+
 
         Slides slides = new Slides(hardwareMap);
 
         Claw claw = new Claw(hardwareMap);
 
+
+        TrajectoryActionBuilder firstPickup = drive.actionBuilder(new Pose2d(0,0, Math.toRadians(0)))
+                .splineToLinearHeading(new Pose2d(0, 15, Math.toRadians(90)), Math.toRadians(90));
+
+
         TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
                 .waitSeconds(0.3)
                 .lineToY(-32)
-                .waitSeconds(0.3);
+                .waitSeconds(0.5);
 
         Pose2d sampleOnePose = new Pose2d(-44,-30,Math.toRadians(120));
-        TrajectoryActionBuilder toSample1 = drive.actionBuilder(new Pose2d(-12, -32, Math.toRadians(90)))
+        TrajectoryActionBuilder toSample1 = drive.actionBuilder(startPose)
                 .lineToY(-40)
                 .splineToLinearHeading(sampleOnePose, Math.toRadians(90));
 
         /** **************** **/
-        Pose2d bucketPose = new Pose2d(-52.5, -52.5, Math.toRadians(-135));
+        Pose2d bucketPose = new Pose2d(-52.5, -54.5, Math.toRadians(-135));
         TrajectoryActionBuilder toBucket1 = drive.actionBuilder(sampleOnePose)
                 .waitSeconds(0.3)
                 .lineToX(-40)
                 .splineToLinearHeading(bucketPose, Math.toRadians(180));
 
-        double sampleTwoX = -58, sampleTwoY = -40;
+        double sampleTwoX = -52, sampleTwoY = -24.5;
         TrajectoryActionBuilder toSample2 = drive.actionBuilder(bucketPose)
-//                .strafeTo(new Vector2d(-47, -45))
-//                .splineToLinearHeading(new Pose2d(-40,-25, Math.toRadians(180)), -90)
+                .strafeTo(new Vector2d(-47, -45))
+                .splineToLinearHeading(new Pose2d(-40,-25, Math.toRadians(180)), -90)
 
-                .splineToLinearHeading(new Pose2d(sampleTwoX, sampleTwoY, Math.toRadians(90)), Math.toRadians(90));
 
-//                .strafeTo(new Vector2d(sampleTwoX,sampleTwoY));
+                .strafeTo(new Vector2d(sampleTwoX,sampleTwoY));
 
         TrajectoryActionBuilder toBucket2 = drive.actionBuilder(new Pose2d(sampleTwoX, sampleTwoY, Math.toRadians(90)))
-                .splineToLinearHeading(bucketPose, Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(-45.5, -52.5, Math.toRadians(-135)), Math.toRadians(-90));
 
-        double sampleThreeX = -60.5, sampleThreeY = -23;
+        double sampleThreeX = -61.5, sampleThreeY = -23;
         TrajectoryActionBuilder toSample3 = drive.actionBuilder(bucketPose)
                 .strafeTo(new Vector2d(-47, -45))
                 .splineToLinearHeading(new Pose2d(-48,-30, Math.toRadians(180)), 0)
@@ -87,7 +102,7 @@ public class Buckets extends LinearOpMode {
 
         TrajectoryActionBuilder toBucket3 = drive.actionBuilder(new Pose2d(sampleThreeX, sampleThreeY, Math.toRadians(180)))
                 .lineToX(-55)
-                .splineToLinearHeading(new Pose2d(-53, -51.5, Math.toRadians(-140)), Math.toRadians(90));
+                .splineToLinearHeading(bucketPose, Math.toRadians(-90));
 
         TrajectoryActionBuilder practicePark = drive.actionBuilder(bucketPose)
                 .splineToSplineHeading(startPose, Math.toRadians(-90));
@@ -98,21 +113,34 @@ public class Buckets extends LinearOpMode {
 
 
 
-
+        Actions.runBlocking(slides.setHorizontal(0));
+        Actions.runBlocking(claw.setPivot(0));
         Actions.runBlocking(slides.resetEncoders());
         waitForStart();
         if(isStopRequested()) return;
 
         Actions.runBlocking(
                 new SequentialAction(
-                        //to specimen
-                        new ParallelAction(
-                                slides.setHorizontal(0),
-                                slides.setSlidePositions(2300),
-                                claw.setPivot(0.35),
-                                toSpecimenBar.build()
-                        ),
-                        //to sample 1
+//                        new ParallelAction(
+//                        firstPickup.build(),
+//                        slides.setSlidePositions(300)
+//                                ),
+//                        new SleepAction(1),
+//                        new ParallelAction(
+//                        claw.intake(),
+//                        slides.setSlidePositions(0)
+//                        ),
+//                        new SleepAction(2),
+//                        claw.off(),
+//                        slides.setSlidePositions(100)
+
+                        //Specimen
+//                        new ParallelAction(
+//                                slides.setHorizontal(0),
+//                                slides.setSlidePositions(2300),
+//                                claw.setPivot(0.6),
+//                                toSpecimenBar.build()
+//                        ),
                         new ParallelAction(
                                 toSample1.build(),
                                 slides.setSlidePositions(700),
@@ -121,77 +149,87 @@ public class Buckets extends LinearOpMode {
                         ),
                         slides.setSlidePositions(0),
                         new SleepAction(0.7),
-                        //to bucket 1
                         new ParallelAction(
                                 claw.off(),
-                                slides.setSlidePositions(4200),
-                                claw.setPivot(0.4),
-                                toBucket1.build()
+                                slides.setSlidePositions(300),
+                                slides.setHorizontal(0.2)
+                        ),
+                        new SleepAction(2),
+
+                        slides.setSlidePositionsWithCamera(),
+                        new ParallelAction(
+                        toBucket1.build(),
+                        slides.setHorizontal(0),
+                        claw.setPivot(0.74)
                         ),
                         new SleepAction(0.3),
-                        claw.eject(0.5, 0.5),
+                        claw.eject(1),
                         new ParallelAction(
-                                claw.setPivot(0.7),
+                                claw.setPivot(1),
                                 slides.setHorizontal(0)
                         ),
                         new SleepAction(0.2),
-
-                        //to sample 2
                         new ParallelAction(
                                 toSample2.build(),
-                                claw.setPivot(0),
                                 slides.setSlidePositions(700),
-                                slides.setHorizontal(0.6),
-                                claw.intake()
-
+                                claw.intake(),
+                                claw.setPivot(0)
                         ),
-                        new SleepAction(0.2),
-                        slides.setSlidePositions(0),
-                        new SleepAction(0.6),
 
-                        //to bucket 2
+                        //To sample 2
+                        //slides.setHorizontal(0.64),
+                        //claw.setPivot(0),
+                        new SleepAction(0.1),
+                        //new SleepAction(0.4),
+                        slides.setSlidePositions(0),
+                        new SleepAction(0.5),
                         new ParallelAction(
                                 claw.off(),
-                                slides.setHorizontal(0),
-                                toBucket2.build(),
-                                claw.setPivot(0.4),
-                                slides.setSlidePositions(4200)
-                                ),
-
-                        new SleepAction(0.5),
-                        claw.eject(0.5,0.5),
-                        new ParallelAction(
-                        claw.setPivot(0.7),
-                        slides.setHorizontal(0)
+                                slides.setHorizontal(0.2),
+                                slides.setSlidePositions(300)
                         ),
-
-                        //to sample 3
+                        new SleepAction(2),
+                        new ParallelAction(
+                                slides.setSlidePositionsWithCamera(),
+                                claw.setPivot(0.785),
+                                toBucket2.build()
+                        ),
+                        new SleepAction(0.5),
+                        claw.eject(0.5),
+                        new ParallelAction(
+                                claw.setPivot(1),
+                                slides.setHorizontal(0)
+                        ),
                         new ParallelAction(
                                 toSample3.build(),
                                 slides.setSlidePositions(700),
                                 claw.setPivot(0)
                         ),
+                        //to Sample 3
                         new ParallelAction(
-                                claw.intake()),
-                                new SleepAction(0.1),
-                                slides.setSlidePositions(0),
-                                new SleepAction(0.675),
 
-                                //to bucket 3
-                                new ParallelAction(
-                                        claw.off(),
-                                        slides.setHorizontal(0),
-                                        toBucket3.build(),
-                                        claw.setPivot(0.4),
-                                        slides.setSlidePositions(4200),
-                                        slides.setHorizontal(0)
-                                ),
-                        claw.eject(0.5,0.5),
+                                claw.intake()),
+                        new SleepAction(0.1),
+                        slides.setSlidePositions(0),
+                        new SleepAction(0.675),
                         new ParallelAction(
-                                claw.setPivot(0.7),
+                                claw.off(),
+                                slides.setHorizontal(0.2),
+                                slides.setSlidePositions(300)
+                        ),
+                        new SleepAction(2),
+                        slides.setSlidePositionsWithCamera(),
+                        new SleepAction(1),
+                        new ParallelAction(
+                                toBucket3.build(),
+                                slides.setHorizontal(0),
+                                claw.setPivot(0.74)
+                        ),
+                        claw.eject(1),
+                        new ParallelAction(
+                                claw.setPivot(1),
                                 slides.setHorizontal(0)
                         ),
-
                         //Parking
                         new ParallelAction(
                                 claw.setPivot(0),
@@ -208,15 +246,24 @@ public class Buckets extends LinearOpMode {
     }
     //Accessory moving classes
 
+
+
+
+
+
     public class Slides{
         DcMotorEx leftSlide;
         DcMotorEx rightSlide;
         Servo horizontal;
+        HuskyLens camera;
 
         public Slides(HardwareMap hardwareMap) {
             leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
             rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
             horizontal = hardwareMap.get(Servo.class, "horizontal");
+
+            camera = hardwareMap.get(HuskyLens.class, "camera");
+            camera.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
 
             leftSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             rightSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -230,10 +277,81 @@ public class Buckets extends LinearOpMode {
         }
 
 
+        public class SetSlidePositionsWithCamera implements Action
+        {
+            int target = leftSlide.getCurrentPosition();
+
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//                if(camera.blocks().length > 0) {
+                    if (camera.blocks(3).length > 0)
+                        target = 4200;
+
+                    else if (camera.blocks(1).length > 0)
+                        target = 2500;
+
+                     else if (camera.blocks(2).length > 0)
+                        target = 300;
+            //}
+//                if(camera.blocks().length > 0) {
+//                    if (camera.blocks(1).length > camera.blocks(2).length && camera.blocks(1).length > camera.blocks(3).length)
+//                        target = 2200;
+//                    if (camera.blocks(2).length > camera.blocks(1).length && camera.blocks(1).length > camera.blocks(3).length)
+//                        target = 300;
+//                    if (camera.blocks(3).length > camera.blocks(2).length && camera.blocks(1).length > camera.blocks(1).length)
+//                        target = 3900;
+//                }
+//                else return true;
+
+
+                if(target == 2500)
+                    telemetry.addLine("Color seen blue");
+                else if(target == 300)
+                    telemetry.addLine("Color seen Yellow");
+                else if(target == 4200)
+                    telemetry.addLine("Color seen red");
+
+                telemetry.update();
+
+                leftSlide.setPower(1);
+                rightSlide.setPower(1);
+
+                leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                leftSlide.setTargetPosition(target);
+                rightSlide.setTargetPosition(target);
+
+//                if(leftSlide.getCurrentPosition() < target && rightSlide.getCurrentPosition() < target) {
+//                    leftSlide.setPower(1);
+//                    rightSlide.setPower(1);
+//                    return true;
+//                } else if (leftSlide.getCurrentPosition() > target && rightSlide.getCurrentPosition() > target) {
+//                    leftSlide.setPower(-1);
+//                    rightSlide.setPower(-1);
+//                    return true;
+//                }
+//                else
+//                {
+//                    leftSlide.setPower(0.002);
+//                    rightSlide.setPower(0.002);
+//                    return false;
+//                }
+                return false;
+
+            }
+        }
+
+        public Action setSlidePositionsWithCamera()
+        {
+            return new SetSlidePositionsWithCamera();
+        }
+
+
         public class SetSlidePositions implements Action {
 
             int target;
-            boolean under;
 
             public SetSlidePositions(int tar) {
                 target = tar;
@@ -243,6 +361,8 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
+                leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
                 if(leftSlide.getCurrentPosition() < target && rightSlide.getCurrentPosition() < target) {
                     leftSlide.setPower(1);
@@ -313,6 +433,8 @@ public class Buckets extends LinearOpMode {
 
 
         public class SetPivot implements Action {
+            ElapsedTime runtime = new ElapsedTime();
+            double targetTime = 0;
             double targetPos;
 
             public SetPivot(double target)
@@ -320,20 +442,33 @@ public class Buckets extends LinearOpMode {
                 targetPos = target;
             }
 
+            public SetPivot(double target, double time)
+            {
+                targetPos = target;
+                targetTime = time;
+
+            }
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket)
             {
+                if(runtime.seconds() < targetTime)
+                    return true;
+                else
+                {
                     pivot.setPosition(targetPos);
                     return false;
+                }
             }
         }
         public Action setPivot(double target){ return new SetPivot(target);}
+        public Action setPivot(double target, double time){return new SetPivot(target, time);}
+
+
 
 
         public class Eject implements Action {
             ElapsedTime timer = new ElapsedTime();
             double runTime = 0.0;
-            double ejectPower = 0.5;
             public Eject(){
                 runTime = 0.0;
             };
@@ -341,27 +476,21 @@ public class Buckets extends LinearOpMode {
             {
                 runTime = time;
             }
-
-            public Eject(double time, double power)
-            {
-                runTime = time;
-                ejectPower = power;
-            }
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if(runTime > 0.0) {
                     timer.reset();
                     while(timer.seconds() < runTime) {
-                        leftClaw.setPower(-ejectPower);
-                        rightClaw.setPower(ejectPower);
+                        leftClaw.setPower(-0.5);
+                        rightClaw.setPower(0.5);
                     }
                     leftClaw.setPower(0);
                     rightClaw.setPower(0);
                 }
                 else
                 {
-                    leftClaw.setPower(-ejectPower);
-                    rightClaw.setPower(ejectPower);
+                    leftClaw.setPower(-0.5);
+                    rightClaw.setPower(0.5);
                 }
                 return false;
             }
@@ -371,7 +500,6 @@ public class Buckets extends LinearOpMode {
             return new Eject();
         }
         public Action eject(double time){ return new Eject(time);}
-        public Action eject(double time, double power){return new Eject(time, power);}
 
 
         public class Intake implements Action {

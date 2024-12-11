@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
-@TeleOp(name = "MainTele", group = "Main")
+@TeleOp(name = "MainTele", group = "A")
 public class MainTeleOp extends RobotCore
 {
 
@@ -49,8 +49,8 @@ public class MainTeleOp extends RobotCore
         if (max > 1.0) {
             frontLeftPower  /= max;
             frontRightPower /= max;
-            backLeftPower   /= max / 2;
-            backRightPower  /= max / 2;
+            backLeftPower   /= max / 2.5;
+            backRightPower  /= max / 2.5;
         }
 
         if (gamepad1.b && (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1)) {
@@ -80,9 +80,9 @@ public class MainTeleOp extends RobotCore
         if (gamepad1.a)
             pivot.setPosition(0);
         if (gamepad1.y)
-            pivot.setPosition(1);
+            pivot.setPosition(0.7);
         if(gamepad1.x)
-            pivot.setPosition(0.65);
+            pivot.setPosition(0.35);
 
         //Taking In Sample
         if (gamepad2.left_bumper) {
@@ -99,7 +99,7 @@ public class MainTeleOp extends RobotCore
 
 
         //SLIDE CONTROLS-----------------------------------------------------------
-        if (gamepad2.dpad_up && limitHeight("<", 4000)) {
+        if (gamepad2.dpad_up && limitHeight("<", 4400)) {
             leftSlide.setPower(1);
             rightSlide.setPower(1);
         } else if (gamepad2.dpad_down && limitHeight(">=", 0)) {
@@ -110,36 +110,54 @@ public class MainTeleOp extends RobotCore
             rightSlide.setPower(0.002);
         }
 
+        if(gamepad1.dpad_up  && leftHang.getCurrentPosition() < 1500)
+        {
+            leftHang.setPower(1);
+            rightHang.setPower(1);
+        }
+        else if(gamepad1.dpad_down  && leftHang.getCurrentPosition() > 0)
+        {
+            leftHang.setPower(-1);
+            rightHang.setPower(-1);
+        }
+        else
+        {
+            leftHang.setPower(0);
+            rightHang.setPower(0);
+        }
+
         //Slide L 4088 R 4060
 
         //TELEMETRY----------------------------------------------------------------------
         telemetry.addData("Left Slide pos: ", leftSlide.getCurrentPosition());
         telemetry.addData("Right Slide Pos: ", rightSlide.getCurrentPosition());
+        telemetry.addData("Left Hang pos: ", leftHang.getCurrentPosition());
+        telemetry.addData("Right Hang Pos: ", rightHang.getCurrentPosition());
         telemetry.update();
 
     }
 
     public boolean limitHeight(String modifier, int targetPosition)
     {
-        if(modifier == ">")
+        if(modifier.equals( ">"))
         {
             if(leftSlide.getCurrentPosition() > targetPosition  && rightSlide.getCurrentPosition() > targetPosition)
                 return true;
             else return false;
         }
-        else if (modifier == "<")
+        else if (modifier.equals( "<"))
         {
             if(leftSlide.getCurrentPosition() < targetPosition  && rightSlide.getCurrentPosition() < targetPosition)
                 return true;
             else return false;
         }
-        else if (modifier == "<=")
+        else if (modifier.equals( "<="))
         {
             if(leftSlide.getCurrentPosition() <= targetPosition && rightSlide.getCurrentPosition() <= targetPosition)
                 return true;
             else return false;
         }
-        else if(modifier == ">=")
+        else if(modifier.equals( ">="))
         {
             if(leftSlide.getCurrentPosition() >= targetPosition && rightSlide.getCurrentPosition() >= targetPosition)
                 return true;

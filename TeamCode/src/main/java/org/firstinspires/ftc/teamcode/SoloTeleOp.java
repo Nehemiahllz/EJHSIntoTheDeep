@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
-@TeleOp(name = "SoloTele", group = "Main")
+@TeleOp(name = "SoloTele", group = "A")
 public class SoloTeleOp extends RobotCore
 {
 
@@ -48,8 +48,8 @@ public class SoloTeleOp extends RobotCore
         if (max > 1.0) {
             frontLeftPower  /= max;
             frontRightPower /= max;
-            backLeftPower   /= max / 2;
-            backRightPower  /= max / 2;
+            backLeftPower   /= max / 2.5;
+            backRightPower  /= max / 2.5;
         }
 
         if (gamepad1.b && (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1)) {
@@ -74,14 +74,14 @@ public class SoloTeleOp extends RobotCore
         if (gamepad1.right_stick_y > 0.5)
             horizontal.setPosition(0);
         if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.7);
+            horizontal.setPosition(0.6);
 
         if (gamepad1.a)
             pivot.setPosition(0);
         if (gamepad1.y)
-            pivot.setPosition(1);
+            pivot.setPosition(0.7);
         if(gamepad1.x)
-            pivot.setPosition(0.65);
+            pivot.setPosition(0.35);
 
         //Taking In Sample
         if (gamepad1.left_bumper) {
@@ -98,7 +98,7 @@ public class SoloTeleOp extends RobotCore
 
 
         //SLIDE CONTROLS-----------------------------------------------------------
-        if (gamepad1.dpad_up && limitHeight("<", 4000)) {
+        if (gamepad1.dpad_up && limitHeight("<", 4400)) {
             leftSlide.setPower(1);
             rightSlide.setPower(1);
         } else if (gamepad1.dpad_down && limitHeight(">=", 0)) {
@@ -108,6 +108,24 @@ public class SoloTeleOp extends RobotCore
             leftSlide.setPower(0.002);
             rightSlide.setPower(0.002);
         }
+
+
+        if(gamepad1.dpad_right  && leftHang.getCurrentPosition() < 1500)
+        {
+            leftHang.setPower(1);
+            rightHang.setPower(1);
+        }
+        else if(gamepad1.dpad_left  && leftHang.getCurrentPosition() > 0)
+        {
+            leftHang.setPower(-1);
+            rightHang.setPower(-1);
+        }
+        else
+        {
+            leftHang.setPower(0);
+            rightHang.setPower(0);
+        }
+
         if(gamepad1.right_trigger > 0.5) {
             setBothSlideModes("RUN_WITHOUT_ENCODER");
             while(gamepad1.right_trigger > 0.5)

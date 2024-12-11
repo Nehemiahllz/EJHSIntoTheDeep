@@ -17,7 +17,7 @@ import java.util.List;
 @TeleOp(name = "RobotCore", group = "Core")
 public class RobotCore extends OpMode
 {
-    DcMotor frontLeft, frontRight, backRight, backLeft, leftSlide, rightSlide;
+    DcMotor frontLeft, frontRight, backRight, backLeft, leftSlide, rightSlide, leftHang, rightHang;
 
     Servo horizontal, pivot;
 
@@ -37,6 +37,8 @@ public class RobotCore extends OpMode
 
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
         rightSlide = hardwareMap.get(DcMotor.class, "rightSlide");
+        leftHang = hardwareMap.get(DcMotor.class, "leftHang");
+        rightHang = hardwareMap.get(DcMotor.class, "rightHang");
 
         horizontal = hardwareMap.get(Servo.class, "horizontal");
         pivot = hardwareMap.get(Servo.class, "pivot");
@@ -48,7 +50,7 @@ public class RobotCore extends OpMode
 
         computer.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
-        motors = Arrays.asList(frontLeft, backLeft, frontRight, backRight, leftSlide, rightSlide);
+        motors = Arrays.asList(frontLeft, backLeft, frontRight, backRight, leftSlide, rightSlide, leftHang, rightHang);
 
 
         //Reversing
@@ -56,17 +58,25 @@ public class RobotCore extends OpMode
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         horizontal.setDirection(Servo.Direction.REVERSE);
-        rightSlide.setDirection(DcMotor.Direction.REVERSE);
-
         pivot.setDirection(Servo.Direction.REVERSE);
+
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
+        leftHang.setDirection(DcMotor.Direction.REVERSE);
+
 
         //Slide Settings
 
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         for(DcMotor motor: motors)
         {
@@ -79,15 +89,4 @@ public class RobotCore extends OpMode
     public void loop() {
 
     }
-
-//    public static void setBothSlidePositions(int target)
-//    {
-//        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//        leftSlide.setTargetPosition(target);
-//        rightSlide.setTargetPosition(target);
-//    }
-
-
 }

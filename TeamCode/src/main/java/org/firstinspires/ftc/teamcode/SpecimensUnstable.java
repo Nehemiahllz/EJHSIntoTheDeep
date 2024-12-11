@@ -18,6 +18,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 
 // Non-RR imports
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -42,52 +43,41 @@ public class SpecimensUnstable extends LinearOpMode
         Slides slides = new Slides(hardwareMap);
         Claw claw = new Claw(hardwareMap);
 
-        Pose2d startPose = new Pose2d( 12, -61, Math.toRadians(90));
+        Pose2d startPose = new Pose2d( 12, 61, Math.toRadians(270));
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
 
-        TrajectoryActionBuilder samples = drive.actionBuilder(new Pose2d(12, -32, Math.toRadians(90)))
-                //Place Specimen
-                .lineToY(-45)
-                .strafeTo(new Vector2d(35,-42))
-                .strafeTo(new Vector2d(40, -5))
-                //Grab and Deposit Sample 1
-                .strafeTo(new Vector2d(48,-5))
-                .strafeTo(new Vector2d(48,-58))
-                //Grab and Deposit Sample 2
-                .strafeTo(new Vector2d(48,-5))
-                .strafeTo(new Vector2d(56,-5))
-                .strafeTo(new Vector2d(56,-58))
+        TrajectoryActionBuilder specimen1 = drive.actionBuilder(startPose)
+                .waitSeconds(0.15)
+                .lineToY(32);
 
-                //Grab and Deposit Sample 3
-                .strafeToLinearHeading(new Vector2d(52, -5), Math.toRadians(-90))
-                .strafeTo(new Vector2d(62,-5))
-                .strafeTo(new Vector2d(62,-58));
+        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(12, 32, Math.toRadians(270)))
+                .lineToY(50)
+                .waitSeconds(0.7)
+                .splineToLinearHeading(new Pose2d(-20, 42, Math.toRadians(270)), Math.toRadians(0));
 
-        TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
-                .waitSeconds(0.3)
-                .lineToY(-32)
-                .waitSeconds(0.2);
+        TrajectoryActionBuilder dropOff = drive.actionBuilder( new Pose2d(-20, 42, Math.toRadians(270)))
+                .turn(Math.toRadians(210));
 
-        TrajectoryActionBuilder toSample1 = drive.actionBuilder(new Pose2d(-12, 32, Math.toRadians(270)))
-                .lineToY(45)
-                .strafeTo(new Vector2d(-50, 39));
+        TrajectoryActionBuilder sample2 = drive.actionBuilder( new Pose2d(-20, 42, Math.toRadians(210)))
+                .waitSeconds(1)
+                .splineToLinearHeading(new Pose2d(-33, 42, Math.toRadians(270)), Math.toRadians(0));
 
+        TrajectoryActionBuilder dropOff2 = drive.actionBuilder(new Pose2d(-33, 42, Math.toRadians(270)))
+                .turn(Math.toRadians(180))
+                .strafeTo(new Vector2d(-28, 42))
+                ;
 
+        TrajectoryActionBuilder specimen2 = drive.actionBuilder(new Pose2d(-28, 42, Math.toRadians(90)))
+                .waitSeconds(1)
+                .lineToY(50);
+        TrajectoryActionBuilder toBar = drive.actionBuilder(new Pose2d(-20, 50, Math.toRadians(90)))
+                .splineToLinearHeading(new Pose2d(20, 40, Math.toRadians(270)), Math.toRadians(0))
+                .strafeTo(new Vector2d(20,28));
 
-        TrajectoryActionBuilder dropOff = drive.actionBuilder( new Pose2d(-50, 39, Math.toRadians(270)))
-                //.splineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(90)), Math.toRadians(90));
-                .turn(Math.toRadians(185))
-                .lineToY(46);
+        TrajectoryActionBuilder specimen3 = drive.actionBuilder(new Pose2d(20, 28, Math.toRadians(270)))
+                .lineToY(50)
+                .splineToLinearHeading(new Pose2d(-23, 40, Math.toRadians(90)), Math.toRadians(270));
 
-
-
-        TrajectoryActionBuilder toSample2 = drive.actionBuilder( new Pose2d(-50, 45, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(-60, 41, Math.toRadians(270)), Math.toRadians(0));
-
-        TrajectoryActionBuilder dropOff2 = drive.actionBuilder(new Pose2d(-60, 40, Math.toRadians(180)))
-                .turn(Math.toRadians(90))
-                .turn(Math.toRadians(95))
-                .lineToY(46);
 
 
         Actions.runBlocking(slides.resetEncoders());
@@ -96,66 +86,73 @@ public class SpecimensUnstable extends LinearOpMode
 
         Actions.runBlocking(
                 new SequentialAction(
-                        slides.setHorizontal(0),
                         new ParallelAction(
+                                specimen1.build(),
+                                slides.setHorizontal(0),
                                 slides.setSlidePositions(2300),
-                                claw.setPivot(0.6),
-                                toSpecimenBar.build()
+                                claw.setPivot(0.3)
+
                         ),
+                        //Sample 1
+                        new ParallelAction(
+                                claw.setPivot(0),
+                                new SequentialAction(
+                                slides.setSlidePositions(500),
+                                slides.setHorizontal(0.6)
+                                        ),
+                                claw.intake(),
+                                sample1.build()
+                        ),
+                        slides.setSlidePositions(0),
                         new SleepAction(0.5),
                         new ParallelAction(
+                                claw.off(),
+                                slides.setSlidePositions(500),
+                                claw.setPivot(0.35),
+                                dropOff.build()
 
-                                //to Sample 1
-                                samples.build(),
-                                slides.setSlidePositions(0),
+                        ),
+                        //Sample 2
+
+                        claw.eject(0.5,1),
+                        new ParallelAction(
+                                claw.setPivot(0),
+                                sample2.build(),
+                                claw.intake()
+                        ),
+                        slides.setSlidePositions(0),
+                        new SleepAction(0.3),
+                        new ParallelAction(
+                                claw.off(),
+                                slides.setSlidePositions(500),
+                                dropOff2.build(),
+                                claw.setPivot(0.3)
+                        ),
+                        //Specimen 2
+
+                        claw.eject(1,1),
+                        new ParallelAction(
+                                claw.intake(),
+                                claw.setPivot(0.3),
+                                specimen2.build(),
+                                slides.setSlidePositions(650)
+                        ),
+                        new SleepAction(0.05),
+                        new ParallelAction(
+                                slides.setSlidePositions(2300),
                                 slides.setHorizontal(0),
-                                claw.setPivot(0)
+                                toBar.build(),
+                                claw.off()
+                        ),
+                        new ParallelAction (
+                                slides.setSlidePositions(0),
+                                slides.setHorizontal(0.6),
+                                claw.setPivot(0),
+                                specimen3.build()
                         )
-//                        new ParallelAction(
-//                                //slides.setHorizontal(0),
-//                                claw.intake(),
-//                                slides.setSlidePositions(0)
-//                        ),
-//                        new SleepAction(0.5),
-//                        claw.off(),
-//                        new ParallelAction(
-//                                dropOff.build(),
-//                                slides.setSlidePositions(400)
-//                                ),
-//                        claw.eject(),
-//                        new SleepAction(0.5),
-//                        new ParallelAction(
-//                        claw.intake(),
-//                        slides.setSlidePositions(600),
-//                        toSample2.build()
-//                                ),
-//                        slides.setSlidePositions(0),
-//                        new SleepAction(1),
-//                        new ParallelAction(
-//                                claw.off(),
-//                                slides.setSlidePositions(600),
-//                                dropOff2.build()
-//                        )
-
-
-
-
-
                 )
         );
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public class Slides{
         DcMotorEx leftSlide;
@@ -283,6 +280,7 @@ public class SpecimensUnstable extends LinearOpMode
         public class Eject implements Action {
             ElapsedTime timer = new ElapsedTime();
             double runTime = 0.0;
+            double ejectPower = 0.5;
             public Eject(){
                 runTime = 0.0;
             };
@@ -290,61 +288,72 @@ public class SpecimensUnstable extends LinearOpMode
             {
                 runTime = time;
             }
+
+            public Eject(double time, double power)
+            {
+                runTime = time;
+                ejectPower = power;
+            }
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if(runTime > 0.0) {
                     timer.reset();
                     while(timer.seconds() < runTime) {
-                        leftClaw.setPower(-0.5);
-                        rightClaw.setPower(0.5);
+                        leftClaw.setPower(-ejectPower);
+                        rightClaw.setPower(ejectPower);
                     }
                     leftClaw.setPower(0);
                     rightClaw.setPower(0);
                 }
                 else
                 {
-                    leftClaw.setPower(-0.5);
-                    rightClaw.setPower(0.5);
+                    leftClaw.setPower(-ejectPower);
+                    rightClaw.setPower(ejectPower);
                 }
                 return false;
             }
         }
 
         public Action eject() {
-            return new Eject();
+            return new Claw.Eject();
         }
-        public Action eject(double time){ return new Eject(time);}
+        public Action eject(double time){ return new Claw.Eject(time);}
+        public Action eject(double time, double power){return new Claw.Eject(time, power);}
 
 
         public class Intake implements Action {
-            ElapsedTime timer = new ElapsedTime();
-            double runTime = 0.0;
+            //ElapsedTime timer = new ElapsedTime();
+            //double runTime = 0.0;
 
             public Intake(){
-                runTime = 0.0;
+               // runTime = 0.0;
             }
-            public Intake(double time)
-            {
-                runTime = time;
-            }
+            //public Intake(double time)
+//            {
+//                runTime = time;
+//            }
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if(runTime > 0.0 )
-                {
-                    timer.reset();
-                    while(timer.seconds() < runTime)
-                    {
-                        leftClaw.setPower(1);
-                        rightClaw.setPower(-1);
-                    }
-                    leftClaw.setPower(0);
-                    rightClaw.setPower(0);
-                }
-                else
-                {
-                    leftClaw.setPower(1);
-                    rightClaw.setPower(-1);
-                }
+//                if(runTime > 0.0 )
+//                {
+//                    timer.reset();
+//                    while(timer.seconds() < runTime)
+//                    {
+//                        leftClaw.setPower(1);
+//                        rightClaw.setPower(-1);
+//                    }
+//                    leftClaw.setPower(0);
+//                    rightClaw.setPower(0);
+//                }
+//                else
+//                {
+//                    leftClaw.setPower(1);
+//                    rightClaw.setPower(-1);
+//                }
+//                return false;
+
+                leftClaw.setPower(1);
+                rightClaw.setPower(-1);
                 return false;
             }
         }
@@ -352,9 +361,9 @@ public class SpecimensUnstable extends LinearOpMode
         public Action intake() {
             return new Intake();
         }
-        public Action intake(double time){
-            return new Intake(time);
-        }
+       // public Action intake(double time){
+//            return new Intake(time);
+//        }
 
 
 
