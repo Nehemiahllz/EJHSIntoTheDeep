@@ -2,24 +2,29 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2dDual;
+import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import java.util.Vector;
 
 @Autonomous(name = "Buckets", group = "Auto")
 
@@ -32,7 +37,7 @@ public class Buckets extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         //Change StartPos
         //Left side of robot, beside the vertical bar, vertical part of the side holder, -18 or jacob way of starting, -42 for two tiles
-        Pose2d start = new Pose2d(-6, -50, Math.toRadians(90));
+        Pose2d start = new Pose2d(-6, -50, Math.toRadians(270));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, start);
 
@@ -47,61 +52,44 @@ public class Buckets extends LinearOpMode {
         //This top line will have the position the robot is currently in, but the bottom is where the robot will go
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
         TrajectoryActionBuilder specimen = drive.actionBuilder(start)
-                .splineToConstantHeading(new Vector2d(-4, -21), Math.toRadians(90));
+//                .splineToConstantHeading(new Vector2d(0, -19.5), Math.toRadians(270))
+                .strafeTo(new Vector2d(-2, -19));
 
-        //This above is the first one, but most will look like the one bellow
-        //The first line previous position must be Pose2d even though you prolly made it with a vector
-        //The vector2d is the pose2d without any turning and you will just put the degrees your at
-        //For the pose2d you will do the same as vector but the third parameter is the the position you want to end up in
-        //For the pose2d fourth parameter, KEEP THE NUMBER AT 90, THIS IS THE TANGENT AND WE DONT KNOW WHAT IT DOES
+        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-2, -19, Math.toRadians(270)))
+                .splineToConstantHeading(new Vector2d(-4, -26), Math.toRadians(270))
 
-        //EX based off right after the specimen sequence
+                .splineToLinearHeading(new Pose2d(-42.8, -29, Math.toRadians(90)), Math.toRadians(90));
 
-        //TrajectoryActionBuilder specimen2PickUp = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
-        //        .splineToLinearHeading(new Pose2d(-40, -20, Math.toRadians(270)), Math.toRadians(90))
-        //        .splineToConstantHeading(new Vector2d(-40, 40), Math.toRadians(270));
-
-        //First it is taking the position of the specimen movement
-        //The next line moves the robot to -40, -20 and rotates it 180 degrees to be 270 degrees
-        //The last line keeps the rotation the same but moves the robot forward to -40,40
-
-
-        //VERY EXPIREMENTAL GUESTIMATION AUTO PATHS:
-        //FIXING THE POSITIONS IN HERE SHOULD MAKE EVERYTHING WORK UNLESS IT DECIDES TO STOP IN THE MIDDLE AS IT DOES
-
-        TrajectoryActionBuilder sample1PickUp = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(90)))
-                //moves the robot away from the sub
-                .splineToConstantHeading(new Vector2d(-4, -35), Math.toRadians(90))
-                //puts the robot in picking position
-                .splineToConstantHeading(new Vector2d(-44, -30), Math.toRadians(90));
-
-        TrajectoryActionBuilder sampleScoreClose = drive.actionBuilder(new Pose2d(-44, -29, Math.toRadians(90)))
+        TrajectoryActionBuilder sampleScoreClose = drive.actionBuilder(new Pose2d(-42.8, -29, Math.toRadians(90)))
                 //twists the robot and moves it to be just before the bucket
-                .splineToLinearHeading(new Pose2d(-44, -36, Math.toRadians(45)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(-45, -38.5, Math.toRadians(45)), Math.toRadians(90))
+                .strafeTo(new Vector2d(-51, -45));
 
-                //moves it closer to the bucket to simulate driving behavior of leaning the side against the bucket for scoring
-        TrajectoryActionBuilder sampleScore = drive.actionBuilder(new Pose2d(-47, -39, Math.toRadians(45)))
-                .splineToConstantHeading(new Vector2d(-49, -42), Math.toRadians(45));
+        TrajectoryActionBuilder sample2PickUp = drive.actionBuilder(new Pose2d(-51, -45, Math.toRadians(45)))
+//                .splineToConstantHeading(new Vector2d(-40, -42), Math.toRadians(45))
 
-        TrajectoryActionBuilder sample2PickUp = drive.actionBuilder(new Pose2d(-33, -36, Math.toRadians(45)))
-                .splineToConstantHeading(new Vector2d(-40, -42), Math.toRadians(45))
-                //twists the robot straight and puts it into position to pick sample 2
-                .splineToLinearHeading(new Pose2d(-52, -30, Math.toRadians(90)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(-40, -42, Math.toRadians(90)), Math.toRadians(90))
 
+                .strafeTo(new Vector2d(-53, -28.25));
 
-        TrajectoryActionBuilder sample3PickUp = drive.actionBuilder(new Pose2d(-33, -36, Math.toRadians(45)))
+        TrajectoryActionBuilder sample2ScoreClose = drive.actionBuilder(new Pose2d(-53, -28.25, Math.toRadians(90)))
+                //twists the robot and moves it to be just before the bucket
+                .splineToLinearHeading(new Pose2d(-45, -38.5, Math.toRadians(45)), Math.toRadians(90))
+                .strafeTo(new Vector2d(-51, -45));
+
+        TrajectoryActionBuilder sample3PickUp = drive.actionBuilder(new Pose2d(-51, -45, Math.toRadians(90)))
                 //twists the robot straight and puts it into position to pick sample 3
-                .splineToLinearHeading(new Pose2d(-41, -14, Math.toRadians(180)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(-45, -17.5, Math.toRadians(180)), Math.toRadians(90))
 
-        TrajectoryActionBuilder sample3Post = drive.actionBuilder(new Pose2d(-41, -13, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(-40, -30), Math.toRadians(45));
+                .splineToConstantHeading(new Vector2d(-45, -17.5), Math.toRadians(180));
 
-        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(-6, -21, Math.toRadians(315)))
-                //parks
-                .splineToLinearHeading(new Pose2d(40, -36, Math.toRadians(360)), Math.toRadians(90));
+        TrajectoryActionBuilder sample3ScoreClose = drive.actionBuilder(new Pose2d(-45, -17.5, Math.toRadians(180)))
+                //twists the robot and moves it to be just before the bucket
+                .strafeTo(new Vector2d(-42, -16))
+                .splineToLinearHeading(new Pose2d(-45, -41, Math.toRadians(45)), Math.toRadians(90))
+                .strafeTo(new Vector2d(-51, -45));
 
-
-        //Just closes the claw onto the specimen
+        //Closes the claw onto the specimen
         claw.setClawPosition(0.32);
 
         waitForStart();
@@ -110,127 +98,121 @@ public class Buckets extends LinearOpMode {
         //The actual running stuff:
         Actions.runBlocking(
                 new SequentialAction(
-                        //Also closing the claw
-                        new ParallelAction(
-                        claw.setClawPosition(0.33),
-                        yClaw.setClawYPosition(0.88),
-                        xClaw.setClawXPosition(0.3683)
-                        ),
 
-                        //scores the first specimen
                         new ParallelAction(
                                 specimen.build(),
-                                slide.setSlidePosition(1580)
+                                claw.setClawPosition(0.32),
+                                yClaw.setClawYPosition(0.1911),
+                                slide.setSlidePosition(1100)
                         ),
-                        axel.setAxelPosition(80),
-                        slide.setSlidePosition(600),
+                        slide.setSlidePosition(1850),
 
                         new ParallelAction(
-                                axel.setAxelPosition(0),
-                        claw.setClawPosition(0.6),
-                        yClaw.setClawYPosition(0.8644),
-                        xClaw.setClawXPosition(0.3683),
-                                sample1PickUp.build()
-                        ),
-
-                        //Sequence to pick up the first sample
-                            axel.setAxelPosition(330),
-                            new SleepAction(0.1),
-                            claw.setClawPosition(0.33),
-                            new SleepAction(0.1),
-                            axel.setAxelPosition(0),
-
-
-                        //sequence to score the first sample
-                        new ParallelAction(
-                            sampleScoreClose.build(),
-                                slide.setSlidePosition(3020),
-                                xClaw.setClawXPosition(1)
-                        ),
-                        sampleScore.build(),
-                        new ParallelAction(
-                            slide.setSlidePosition(3020),
-                            new SequentialAction(
-                                 yClaw.setClawYPosition(0.5),
-                                    new SleepAction(0.3),
-                                    claw.setClawPosition(0.6),
-                                    yClaw.setClawYPosition(0.3),
-                                    new SleepAction(0.2),
-                                    yClaw.setClawYPosition(0.8644)
-                            )
-                        ),
-
-                        //sequence to pick up the second sample and finish reset from scoring
-                        new ParallelAction(
-                            xClaw.setClawXPosition(0.3683),
-                            slide.setSlidePosition(600),
-                            sample2PickUp.build()
-                        ),
-                        axel.setAxelPosition(330),
-                            new SleepAction(0.1),
-                            claw.setClawPosition(0.33),
-                            new SleepAction(0.1),
-                                axel.setAxelPosition(0),
-
-                        //sequence to score second sample
-                        new ParallelAction(
-                                sampleScoreClose.build(),
-                                slide.setSlidePosition(3020),
-                                xClaw.setClawXPosition(1)
-                        ),
-                        sampleScore.build(),
-                        new ParallelAction(
-                                slide.setSlidePosition(3020),
+                                xClaw.setClawXPosition(0.05),
+                                claw.setClawPosition(0.73),
+                                sample1.build(),
+                                yClaw.setClawYPosition(0.81),
                                 new SequentialAction(
-                                        yClaw.setClawYPosition(0.5),
-                                        new SleepAction(0.3),
-                                        claw.setClawPosition(0.6),
-                                        yClaw.setClawYPosition(0.3),
-                                        new SleepAction(0.2),
-                                        yClaw.setClawYPosition(0.8644)
+                                        slide.setSlidePosition(0),
+                                        axel.setAxelPosition(260, 1),
+                                        axel.setAxelPosition(290, 1),
+                                        axel.setAxelPosition(322, 1)
                                 )
                         ),
-
-                        //grab third sample
+                        //Move the axel down onto the sample and close the claw
                         new ParallelAction(
-                                xClaw.setClawXPosition(0),
-                                slide.setSlidePosition(600),
-                                sample3PickUp.build()
-                        ),
-                        axel.setAxelPosition(330),
-                        new SleepAction(0.1),
-                        claw.setClawPosition(0.33),
-                        new SleepAction(0.1),
-                        axel.setAxelPosition(0),
-                        sample3Post.build(),
+                            claw.setClawPosition(0.31),
+                            axel.setAxelPosition(326, 0)
+                                ),
+                        new SleepAction(0.25),
 
-                        //sequence to score third sample
                         new ParallelAction(
+                                claw.setClawPosition(0.31),
+                                xClaw.setClawXPosition(0.7),
                                 sampleScoreClose.build(),
-                                slide.setSlidePosition(3020),
-                                xClaw.setClawXPosition(1)
-                        ),
-                        sampleScore.build(),
-                        new ParallelAction(
-                                slide.setSlidePosition(3020),
-                                new SequentialAction(
-                                        yClaw.setClawYPosition(0.5),
-                                        new SleepAction(0.3),
-                                        claw.setClawPosition(0.6),
-                                        yClaw.setClawYPosition(0.3),
-                                        new SleepAction(0.2),
-                                        yClaw.setClawYPosition(0.8644)
-                                )
+                                axel.setAxelPosition(0, 1),
+                                slide.setSlidePosition(3035)
                         ),
 
+                        yClaw.setClawYPosition(0.3),
+                        new SleepAction(0.5),
+                        claw.setClawPosition(0.73),
+                        new SleepAction(0.5),
+                        yClaw.setClawYPosition(0.81),
                         slide.setSlidePosition(0),
-                        axel.setAxelPosition(0)
+
+                        new ParallelAction(
+                                xClaw.setClawXPosition(0.05),
+                                claw.setClawPosition(0.73),
+                                sample2PickUp.build(),
+                                yClaw.setClawYPosition(0.81),
+                                new SequentialAction(
+                                        slide.setSlidePosition(0),
+                                        axel.setAxelPosition(260, 1),
+                                        axel.setAxelPosition(290, 1),
+                                        axel.setAxelPosition(318, 1)
+                                )
+                        ),
+                        new ParallelAction(
+                                claw.setClawPosition(0.31),
+                                axel.setAxelPosition(326, 0)
+                        ),
+                        new SleepAction(0.25),
+
+                        new ParallelAction(
+                                claw.setClawPosition(0.31),
+                                xClaw.setClawXPosition(0.7),
+                                sample2ScoreClose.build(),
+                                        axel.setAxelPosition(0, 1),
+                                        slide.setSlidePosition(3035)
+                        ),
+                        yClaw.setClawYPosition(0.3),
+                        new SleepAction(0.5),
+                        claw.setClawPosition(0.73),
+                        new SleepAction(0.5),
+                        yClaw.setClawYPosition(0.81),
+                        slide.setSlidePosition(0),
+
+                        new ParallelAction(
+                                xClaw.setClawXPosition(0.40),
+                                claw.setClawPosition(0.73),
+                                sample3PickUp.build(),
+                                yClaw.setClawYPosition(0.81),
+                                new SequentialAction(
+                                        slide.setSlidePosition(0),
+                                        axel.setAxelPosition(260, 1),
+                                        axel.setAxelPosition(290, 1),
+                                        axel.setAxelPosition(320, 1)
+                                )
+                        ),
+                        new ParallelAction(
+                                claw.setClawPosition(0.31),
+                                axel.setAxelPosition(326, 0)
+                        ),
+                        new SleepAction(0.25),
+
+                        new ParallelAction(
+                                claw.setClawPosition(0.36),
+                                xClaw.setClawXPosition(0.7),
+                                sample3ScoreClose.build(),
+                                        axel.setAxelPosition(0, 1),
+                                        slide.setSlidePosition(3035)
+                        ),
+
+                        yClaw.setClawYPosition(0.3),
+                        new SleepAction(0.5),
+                        claw.setClawPosition(0.73),
+                        new SleepAction(0.5),
+                        yClaw.setClawYPosition(0.81),
+                        slide.setSlidePosition(0)
+
                 )
         );
 
     }
 
 
+    //Making the slide class to make the slide object to be moved during auto
     public class Slide {
         DcMotorEx slideMotor;
 
@@ -239,7 +221,7 @@ public class Buckets extends LinearOpMode {
             slideMotor = hardwareMap.get(DcMotorEx.class, "slideMotor");
 
             slideMotor.setTargetPosition(0);
-
+            //Reset the slide encoders to make sure it is accurate
             slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slideMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
@@ -255,22 +237,28 @@ public class Buckets extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                slideMotor.setTargetPosition(slideTarget);
-                if(slideMotor.getCurrentPosition() > slideTarget -5 && slideMotor.getCurrentPosition() < slideTarget + 5){
+                telemetry.addData("axelPos", slideMotor.getCurrentPosition());
+                telemetry.addData("Target", slideTarget);
+                //If the slide is in roughly the correct location then stop the loop so the rest of the code can run, otherwise continue looping
+                if (slideTarget == 0 && slideMotor.getCurrentPosition() < 10) {
                     return false;
-                }else{
+                } else if (slideMotor.getCurrentPosition() > slideTarget - 25 && slideMotor.getCurrentPosition() < slideTarget + 25) {
+                    return false;
+                } else {
+                    slideMotor.setTargetPosition(slideTarget);
+                    telemetry.update();
                     return true;
                 }
             }
         }
 
         public Action setSlidePosition(int slideTar) {
-            return new SetSlidePosition(slideTar);
+            return new Slide.SetSlidePosition(slideTar);
         }
 
     }
 
-
+    //Making the slide class to make the slide object to be moved during auto
     public class Axel {
         DcMotorEx axelMotor;
         DcMotorEx axelMotor2;
@@ -278,48 +266,67 @@ public class Buckets extends LinearOpMode {
         public Axel(HardwareMap hardwareMap) {
             axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
             axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
-            axelMotor2.setDirection(DcMotor.Direction.REVERSE);
+
+            //Reverse the second axelMotor so they work together
+            axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 
             axelMotor.setTargetPosition(0);
             axelMotor2.setTargetPosition(0);
 
+            //Reset the slide encoders to make sure it is accurate
             axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
             axelMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
+            axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             axelMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-            axelMotor.setPower(0.15);
-            axelMotor2.setPower(0.15);
+            axelMotor.setPower(1);
+            axelMotor2.setPower(1);
         }
 
         public class SetAxelPosition implements Action {
-            int axelTarget;
+            int target;
+            double power;
 
-            public SetAxelPosition(int axelTar) {
-                axelTarget = axelTar;
+            public SetAxelPosition(int axelTar, double tarPower) {
+                target = axelTar;
+                power = tarPower;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                axelMotor.setTargetPosition(axelTarget);
-                axelMotor2.setTargetPosition(axelTarget);
-                if(axelMotor.getCurrentPosition() > axelTarget -5 && axelMotor.getCurrentPosition() < axelTarget + 5){
+
+                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
+                telemetry.addData("Target", target);
+                telemetry.addData("AxelPower", axelMotor.getPower());
+
+                axelMotor.setPower(power);
+                axelMotor2.setPower(power);
+
+                if(target == 326){
                     return false;
-                }else{
+                }
+                //If the axel is in roughly the correct location then stop the loop so the rest of the code can run, otherwise continue looping
+                if (axelMotor.getCurrentPosition() > target - 4 && axelMotor.getCurrentPosition() < target + 4) {
+                    return false;
+                } else {
+                    axelMotor.setTargetPosition(target);
+                    axelMotor2.setTargetPosition(target);
+
+                    telemetry.update();
                     return true;
                 }
-
             }
         }
 
-        public Action setAxelPosition(int axelTar) {
-            return new SetAxelPosition(axelTar);
+        public Action setAxelPosition(int axelTar, double tarPower) {
+            return new Axel.SetAxelPosition(axelTar, tarPower);
         }
 
     }
 
 
+    //Making the classes for all of the various servos for the claw, just sets the targetPosition to the parameter value inserted and never loops
     public class Grab {
         Servo claw;
 
@@ -337,14 +344,15 @@ public class Buckets extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                claw.setPosition(clawPosition);
-                return false;
+
+                    claw.setPosition(clawPosition);
+                    return false;
             }
 
         }
 
         public Action setClawPosition(double clawPos) {
-            return new SetClawPosition(clawPos);
+            return new Grab.SetClawPosition(clawPos);
         }
     }
 
@@ -372,7 +380,7 @@ public class Buckets extends LinearOpMode {
         }
 
         public Action setClawYPosition(double clawYPos) {
-            return new SetClawYPosition(clawYPos);
+            return new GrabY.SetClawYPosition(clawYPos);
         }
     }
 
@@ -400,7 +408,7 @@ public class Buckets extends LinearOpMode {
         }
 
         public Action setClawXPosition(double clawXPos) {
-            return new SetClawXPosition(clawXPos);
+            return new GrabX.SetClawXPosition(clawXPos);
         }
 
     }
