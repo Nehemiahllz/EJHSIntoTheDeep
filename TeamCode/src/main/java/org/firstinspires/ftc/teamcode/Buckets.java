@@ -53,9 +53,9 @@ public class Buckets extends LinearOpMode {
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
         TrajectoryActionBuilder specimen = drive.actionBuilder(start)
 //                .splineToConstantHeading(new Vector2d(0, -19.5), Math.toRadians(270))
-                .strafeTo(new Vector2d(-2, -19));
+                .strafeTo(new Vector2d(-4, -19));
 
-        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-2, -19, Math.toRadians(270)))
+        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-4, -19, Math.toRadians(270)))
                 .splineToConstantHeading(new Vector2d(-4, -26), Math.toRadians(270))
 
                 .splineToLinearHeading(new Pose2d(-42.8, -29, Math.toRadians(90)), Math.toRadians(90));
@@ -74,6 +74,7 @@ public class Buckets extends LinearOpMode {
 
         TrajectoryActionBuilder sample2ScoreClose = drive.actionBuilder(new Pose2d(-53, -28.25, Math.toRadians(90)))
                 //twists the robot and moves it to be just before the bucket
+                .strafeTo(new Vector2d(-53, -33))
                 .splineToLinearHeading(new Pose2d(-45, -38.5, Math.toRadians(45)), Math.toRadians(90))
                 .strafeTo(new Vector2d(-51, -45));
 
@@ -81,9 +82,9 @@ public class Buckets extends LinearOpMode {
                 //twists the robot straight and puts it into position to pick sample 3
                 .splineToLinearHeading(new Pose2d(-45, -17.5, Math.toRadians(180)), Math.toRadians(90))
 
-                .splineToConstantHeading(new Vector2d(-45, -17.5), Math.toRadians(180));
+                .splineToConstantHeading(new Vector2d(-45, -17.65), Math.toRadians(180));
 
-        TrajectoryActionBuilder sample3ScoreClose = drive.actionBuilder(new Pose2d(-45, -17.5, Math.toRadians(180)))
+        TrajectoryActionBuilder sample3ScoreClose = drive.actionBuilder(new Pose2d(-45, -17.65, Math.toRadians(180)))
                 //twists the robot and moves it to be just before the bucket
                 .strafeTo(new Vector2d(-42, -16))
                 .splineToLinearHeading(new Pose2d(-45, -41, Math.toRadians(45)), Math.toRadians(90))
@@ -139,6 +140,7 @@ public class Buckets extends LinearOpMode {
                         claw.setClawPosition(0.73),
                         new SleepAction(0.5),
                         yClaw.setClawYPosition(0.81),
+                        new SleepAction(0.1),
                         slide.setSlidePosition(0),
 
                         new ParallelAction(
@@ -150,7 +152,7 @@ public class Buckets extends LinearOpMode {
                                         slide.setSlidePosition(0),
                                         axel.setAxelPosition(260, 1),
                                         axel.setAxelPosition(290, 1),
-                                        axel.setAxelPosition(318, 1)
+                                        axel.setAxelPosition(320, 1)
                                 )
                         ),
                         new ParallelAction(
@@ -171,6 +173,7 @@ public class Buckets extends LinearOpMode {
                         claw.setClawPosition(0.73),
                         new SleepAction(0.5),
                         yClaw.setClawYPosition(0.81),
+                        new SleepAction(0.1),
                         slide.setSlidePosition(0),
 
                         new ParallelAction(
@@ -204,6 +207,7 @@ public class Buckets extends LinearOpMode {
                         claw.setClawPosition(0.73),
                         new SleepAction(0.5),
                         yClaw.setClawYPosition(0.81),
+                        new SleepAction(0.1),
                         slide.setSlidePosition(0)
 
                 )
