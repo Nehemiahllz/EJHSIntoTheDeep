@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(name = "TestTele", group = "Test")
 
@@ -41,21 +42,45 @@ public class Testing extends RobotCore {
         findAxelPos();
 
         if(gamepad1.a){
-            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() + 2);
-            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() + 2);
+            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() + 12);
+            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() + 12);
         }
 
         if(gamepad1.b){
-            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() - 2);
-            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() - 2);
+            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() - 12);
+            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() - 12);
         }
 
+        if(gamepad1.left_trigger > 0.1){
+            axelMotor.setTargetPosition(0);
+            axelMotor2.setTargetPosition(0);
+        }
+
+        if(gamepad1.right_trigger > 0.1){
+            axelMotor.setTargetPosition(679);
+            axelMotor2.setTargetPosition(679);
+        }
+
+
+
         if(gamepad1.x){
-            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 50);
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() + 70);
+            slideMotor2.setTargetPosition(slideMotor.getCurrentPosition() + 70);
         }
 
         if(gamepad1.y){
-            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 50);
+            slideMotor.setTargetPosition(slideMotor.getCurrentPosition() - 70);
+            slideMotor2.setTargetPosition(slideMotor.getCurrentPosition() - 70);
+        }
+
+        if(gamepad1.left_bumper){
+            slideMotor.setTargetPosition(0);
+            slideMotor2.setTargetPosition(0);
+        }
+
+        if(gamepad1.right_bumper){
+            slideMotor.setTargetPosition(4250);
+            slideMotor2.setTargetPosition(4250);
         }
 
 

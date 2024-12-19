@@ -63,9 +63,9 @@ public class Buckets extends LinearOpMode {
         TrajectoryActionBuilder sampleScoreClose = drive.actionBuilder(new Pose2d(-42.8, -29, Math.toRadians(90)))
                 //twists the robot and moves it to be just before the bucket
                 .splineToLinearHeading(new Pose2d(-45, -38.5, Math.toRadians(45)), Math.toRadians(90))
-                .strafeTo(new Vector2d(-51, -45));
+                .strafeTo(new Vector2d(-49.25, -46));
 
-        TrajectoryActionBuilder sample2PickUp = drive.actionBuilder(new Pose2d(-51, -45, Math.toRadians(45)))
+        TrajectoryActionBuilder sample2PickUp = drive.actionBuilder(new Pose2d(-49.25, -46, Math.toRadians(45)))
 //                .splineToConstantHeading(new Vector2d(-40, -42), Math.toRadians(45))
 
                 .splineToLinearHeading(new Pose2d(-40, -42, Math.toRadians(90)), Math.toRadians(90))
@@ -76,19 +76,19 @@ public class Buckets extends LinearOpMode {
                 //twists the robot and moves it to be just before the bucket
                 .strafeTo(new Vector2d(-53, -33))
                 .splineToLinearHeading(new Pose2d(-45, -38.5, Math.toRadians(45)), Math.toRadians(90))
-                .strafeTo(new Vector2d(-51, -45));
+                .strafeTo(new Vector2d(-49.25, -46));
 
-        TrajectoryActionBuilder sample3PickUp = drive.actionBuilder(new Pose2d(-51, -45, Math.toRadians(90)))
+        TrajectoryActionBuilder sample3PickUp = drive.actionBuilder(new Pose2d(-49.25, -46, Math.toRadians(90)))
                 //twists the robot straight and puts it into position to pick sample 3
-                .splineToLinearHeading(new Pose2d(-45, -17.5, Math.toRadians(180)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-45, -16.9, Math.toRadians(180)), Math.toRadians(90))
 
-                .splineToConstantHeading(new Vector2d(-45, -17.65), Math.toRadians(180));
+                .splineToConstantHeading(new Vector2d(-45, -16.9), Math.toRadians(180));
 
-        TrajectoryActionBuilder sample3ScoreClose = drive.actionBuilder(new Pose2d(-45, -17.65, Math.toRadians(180)))
+        TrajectoryActionBuilder sample3ScoreClose = drive.actionBuilder(new Pose2d(-45, -16.9, Math.toRadians(180)))
                 //twists the robot and moves it to be just before the bucket
                 .strafeTo(new Vector2d(-42, -16))
                 .splineToLinearHeading(new Pose2d(-45, -41, Math.toRadians(45)), Math.toRadians(90))
-                .strafeTo(new Vector2d(-51, -45));
+                .strafeTo(new Vector2d(-49.25, -46));
 
         //Closes the claw onto the specimen
         claw.setClawPosition(0.32);

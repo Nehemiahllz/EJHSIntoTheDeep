@@ -121,7 +121,7 @@ public class Auto extends LinearOpMode {
                                         slide.setSlidePosition(950)
                                 ),
                                 new ParallelAction(
-                                axel.setAxelPosition(0, 1),
+                                axel.setAxelPosition(0),
                                 slide.setSlidePosition(1850)
                                 ),
 
@@ -132,20 +132,20 @@ public class Auto extends LinearOpMode {
                                         yClaw.setClawYPosition(0.81),
                                         new SequentialAction(
                                                 slide.setSlidePosition(0),
-                                                axel.setAxelPosition(260, 1),
-                                                axel.setAxelPosition(290, 1),
-                                                axel.setAxelPosition(324, 1)
+                                                axel.setAxelPosition(260),
+                                                axel.setAxelPosition(290),
+                                                axel.setAxelPosition(324)
                                         )
                                 ),
                                 //Move the axel down onto the sample and close the claw
                                 new ParallelAction(
                                     claw.setClawPosition(0.31),
-                                        axel.setAxelPosition(326, 0)
+                                        axel.setAxelPosition(326)
                                         ),
                                 new SleepAction(0.2),
                                 //Move the axel up for driving and move the robot to deposit the sample
                                 new ParallelAction(
-                                axel.setAxelPosition(324, 1),
+                                axel.setAxelPosition(324),
                                 dropSample1.build()
                                 ),
                                 //Release the sample when in deposit location
@@ -153,23 +153,23 @@ public class Auto extends LinearOpMode {
 
                                 new ParallelAction(
                                     sample2.build(),
-                                    axel.setAxelPosition(324, 1)
+                                    axel.setAxelPosition(324)
                                 ),
                                 new ParallelAction(
                                     claw.setClawPosition(0.31),
-                                        axel.setAxelPosition(326, 0)
+                                        axel.setAxelPosition(326)
                                         ),
 
                                 new SleepAction(0.2),
 
                                 new ParallelAction(
                                     dropSample2.build(),
-                                        axel.setAxelPosition(324, 1)
+                                        axel.setAxelPosition(324)
                                         ),
                                 claw.setClawPosition(0.73),
 
                                 new ParallelAction(
-                                        axel.setAxelPosition(233, 1),
+                                        axel.setAxelPosition(233),
                                         xClaw.setClawXPosition(0.05),
                                         yClaw.setClawYPosition(0.556),
                                         grabSpecimen1Close.build()
@@ -183,7 +183,7 @@ public class Auto extends LinearOpMode {
                                         scoreSpecimen1.build(),
                                         yClaw.setClawYPosition(0.1911),
                                         new SequentialAction(
-                                            axel.setAxelPosition(0, 1),
+                                            axel.setAxelPosition(0),
                                                 slide.setSlidePosition(950)
                                                 )
                                 ),
@@ -196,7 +196,7 @@ public class Auto extends LinearOpMode {
                                         yClaw.setClawYPosition(0.556),
                                         new SequentialAction(
                                                 slide.setSlidePosition(0),
-                                                axel.setAxelPosition(233, 1)
+                                                axel.setAxelPosition(233)
                                         )
                                 ),
                                 grabSpecimen2.build(),
@@ -208,7 +208,7 @@ public class Auto extends LinearOpMode {
                                         scoreSpecimen2.build(),
                                         yClaw.setClawYPosition(0.1911),
                                         new SequentialAction(
-                                                axel.setAxelPosition(0, 1),
+                                                axel.setAxelPosition(0),
                                                 slide.setSlidePosition(950)
                                         )
                                 ),
@@ -225,17 +225,24 @@ public class Auto extends LinearOpMode {
     //Making the slide class to make the slide object to be moved during auto
     public class Slide {
         DcMotorEx slideMotor;
+        DcMotorEx slideMotor2;
 
         public Slide(HardwareMap hardwareMap) {
 
             slideMotor = hardwareMap.get(DcMotorEx.class, "slideMotor");
+//            slideMotor2 = hardwareMap.get(DcMotorEx.class, "slideMotor2");
 
             slideMotor.setTargetPosition(0);
+//            slideMotor2.setTargetPosition(0);
             //Reset the slide encoders to make sure it is accurate
-            slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//            slideMotor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
             slideMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+//            slideMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
             slideMotor.setPower(1);
+//            slideMotor2.setPower(1);
         }
 
         public class SetSlidePosition implements Action {
@@ -247,12 +254,24 @@ public class Auto extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                telemetry.addData("axelPos", slideMotor.getCurrentPosition());
+                telemetry.addData("slidePos", slideMotor.getCurrentPosition());
+//                telemetry.addData("slide2Pos", slideMotor2.getCurrentPosition());
                 telemetry.addData("Target", slideTarget);
                 //If the slide is in roughly the correct location then stop the loop so the rest of the code can run, otherwise continue looping
+//                if(slideTarget == 0 && slideMotor.getCurrentPosition() < 10 && slideMotor2.getCurrentPosition() < 10){
+//                    return false;
+//                } else if(slideMotor.getCurrentPosition() == slideTarget && slideMotor2.getCurrentPosition() > slideMotor.getCurrentPosition() - 5 && slideMotor2.getCurrentPosition() < slideMotor.getCurrentPosition() + 5){
+//                    return false;
+//                }else{
+//                    slideMotor.setTargetPosition(slideTarget);
+//                    slideMotor2.setTargetPosition(slideTarget);
+//                    telemetry.update();
+//                    return true;
+//                }
+
                 if(slideTarget == 0 && slideMotor.getCurrentPosition() < 10){
                     return false;
-                } else if(slideMotor.getCurrentPosition() > slideTarget - 25 && slideMotor.getCurrentPosition() < slideTarget + 25){
+                } else if(slideMotor.getCurrentPosition() == slideTarget){
                     return false;
                 }else{
                     slideMotor.setTargetPosition(slideTarget);
@@ -296,11 +315,9 @@ public class Auto extends LinearOpMode {
 
         public class SetAxelPosition implements Action {
             int target;
-            double power;
 
-            public SetAxelPosition(int axelTar, double tarPower) {
+            public SetAxelPosition(int axelTar) {
                 target = axelTar;
-                power = tarPower;
             }
 
             @Override
@@ -310,12 +327,6 @@ public class Auto extends LinearOpMode {
                 telemetry.addData("Target", target);
                 telemetry.addData("AxelPower", axelMotor.getPower());
 
-                axelMotor.setPower(power);
-                axelMotor2.setPower(power);
-
-                if(target == 326){
-                    return false;
-                }
 
                 if(target < 0){
                     if(axelMotor.getCurrentPosition() < 2){
@@ -323,7 +334,7 @@ public class Auto extends LinearOpMode {
                     }
                 }
                 //If the axel is in roughly the correct location then stop the loop so the rest of the code can run, otherwise continue looping
-                if(axelMotor.getCurrentPosition() > target -4 && axelMotor.getCurrentPosition() < target + 4 && target > -1){
+                if(axelMotor.getCurrentPosition() == target && axelMotor2.getCurrentPosition() > axelMotor.getCurrentPosition() - 1 && axelMotor2.getCurrentPosition() < axelMotor.getCurrentPosition() + 1){
                     return false;
                 }else{
                     axelMotor.setTargetPosition(target);
@@ -335,8 +346,8 @@ public class Auto extends LinearOpMode {
             }
         }
 
-        public Action setAxelPosition(int axelTar, double tarPower) {
-            return new Axel.SetAxelPosition(axelTar, tarPower);
+        public Action setAxelPosition(int axelTar) {
+            return new Axel.SetAxelPosition(axelTar);
         }
 
     }

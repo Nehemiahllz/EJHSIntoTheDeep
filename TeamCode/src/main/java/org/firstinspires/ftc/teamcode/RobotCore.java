@@ -15,7 +15,10 @@ public class RobotCore extends OpMode {
     DcMotor rightBack;
     DcMotor leftFront;
     DcMotor rightFront;
+
     DcMotor slideMotor;
+    DcMotor slideMotor2;
+
     DcMotorEx axelMotor;
     DcMotorEx axelMotor2;
 
@@ -31,7 +34,10 @@ public class RobotCore extends OpMode {
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+
         slideMotor = hardwareMap.get(DcMotor.class, "slideMotor");
+        slideMotor2 = hardwareMap.get(DcMotor.class, "slideMotor2");
+
         axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
         axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
 
@@ -47,7 +53,8 @@ public class RobotCore extends OpMode {
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection((DcMotor.Direction.REVERSE));
 
-        axelMotor2.setDirection(DcMotor.Direction.REVERSE);
+        axelMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
 
     }
 
