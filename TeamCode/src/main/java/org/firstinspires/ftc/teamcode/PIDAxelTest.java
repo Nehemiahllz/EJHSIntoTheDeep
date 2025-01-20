@@ -20,7 +20,7 @@ public class PIDAxelTest extends RobotCore{
 
     public static int target = 0;
 
-    private final double ticks_in_degree = 700 / 180.0;
+    private final double ticks_in_degree = 700/90.0;
 
     private DcMotorEx axelMotor;
     private DcMotorEx axelMotor2;
@@ -33,10 +33,10 @@ public class PIDAxelTest extends RobotCore{
         axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
         axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
 
-        axelMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        axelMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        axelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        axelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        axelMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class PIDAxelTest extends RobotCore{
         controller.setPID(p, i, d);
         int axelPos = axelMotor.getCurrentPosition();
         double pid = controller.calculate(axelPos, target);
-        double ff = Math.cos(Math.toRadians(target/ticks_in_degree)) * f;
+        double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
         double power = pid + ff;
 
@@ -53,6 +53,6 @@ public class PIDAxelTest extends RobotCore{
 
         telemetry.addData("pos", axelPos);
         telemetry.addData("target", target);
-        telemetry.addData("power", power);
+        telemetry.update();
     }
 }

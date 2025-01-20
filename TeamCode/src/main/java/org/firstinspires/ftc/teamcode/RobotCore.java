@@ -26,6 +26,7 @@ public class RobotCore extends OpMode {
     Servo xClaw;
     Servo claw;
 
+    Servo sweep;
 
 
     @Override
@@ -50,11 +51,17 @@ public class RobotCore extends OpMode {
         claw = hardwareMap.get(Servo.class, "claw");
         claw.setDirection(Servo.Direction.FORWARD);
 
+        sweep = hardwareMap.get(Servo.class, "sweep");
+        sweep.setDirection(Servo.Direction.FORWARD);
+
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection((DcMotor.Direction.REVERSE));
 
-        axelMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        axelMotor.setDirection(DcMotorEx.Direction.FORWARD);
         axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+
+        slideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        slideMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
 

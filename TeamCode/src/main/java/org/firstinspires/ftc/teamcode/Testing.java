@@ -8,6 +8,16 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Testing extends RobotCore {
 
+
+    double moveX;
+    double moveY;
+    double turnX;
+    double frontLeftPower;
+    double frontRightPower;
+    double backLeftPower;
+    double backRightPower;
+
+
     int axelPos;
     //Fix values, once measured
     final double grabHeight = 76.2;
@@ -31,34 +41,31 @@ public class Testing extends RobotCore {
         axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor2.setTargetPosition(0);
+        slideMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//        axelMotor.setPower(1);
+//        axelMotor2.setPower(1);
+        slideMotor.setPower(1);
+        slideMotor2.setPower(1);
+
         axelMotor.setPower(1);
         axelMotor2.setPower(1);
-        slideMotor.setPower(1);
+
         printDebugData();
     }
 
     public void loop() {
-        printDebugData();
-        findAxelPos();
 
         if(gamepad1.a){
-            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() + 12);
-            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() + 12);
+            axelMotor.setTargetPosition(axelMotor.getTargetPosition() - 3);
+            axelMotor2.setTargetPosition(axelMotor.getTargetPosition());
         }
 
         if(gamepad1.b){
-            axelMotor.setTargetPosition(axelMotor.getCurrentPosition() - 12);
-            axelMotor2.setTargetPosition(axelMotor.getCurrentPosition() - 12);
-        }
-
-        if(gamepad1.left_trigger > 0.1){
-            axelMotor.setTargetPosition(0);
-            axelMotor2.setTargetPosition(0);
-        }
-
-        if(gamepad1.right_trigger > 0.1){
-            axelMotor.setTargetPosition(679);
-            axelMotor2.setTargetPosition(679);
+            axelMotor.setTargetPosition(axelMotor.getTargetPosition() + 3);
+            axelMotor2.setTargetPosition(axelMotor.getTargetPosition());
         }
 
 
@@ -79,17 +86,17 @@ public class Testing extends RobotCore {
         }
 
         if(gamepad1.right_bumper){
-            slideMotor.setTargetPosition(4250);
-            slideMotor2.setTargetPosition(4250);
+            slideMotor.setTargetPosition(4120);
+            slideMotor2 .setTargetPosition(4120);
         }
 
 
 
         if(gamepad2.dpad_up){
-            claw.setPosition(claw.getPosition() + 0.002);
+            claw.setPosition(claw.getPosition() + 0.02);
         }
         if(gamepad2.dpad_down){
-            claw.setPosition(claw.getPosition() - 0.002);
+            claw.setPosition(claw.getPosition() - 0.02);
         }
 
         if(gamepad2.dpad_left){
@@ -105,6 +112,17 @@ public class Testing extends RobotCore {
         if(gamepad2.b){
             xClaw.setPosition(xClaw.getPosition() - 0.002);
         }
+
+
+        if(gamepad2.y){
+            sweep.setPosition(sweep.getPosition() + 0.002);
+        }
+        if(gamepad2.x){
+            sweep.setPosition(sweep.getPosition() - 0.002);
+        }
+
+        printDebugData();
+
     }
 
     //Prints different info for debugging
@@ -117,12 +135,52 @@ public class Testing extends RobotCore {
         telemetry.addData("yCLaw", yClaw.getPosition());
         telemetry.addData("xClaw", xClaw.getPosition());
         telemetry.addData("axelPos", axelPos);
+        telemetry.addData("sweepPos", sweep.getPosition());
     }
 
-    private void findAxelPos() {
+    private int findAxelPos() {
         slideLength = (slideMotor.getCurrentPosition() * ticksPerSlideMM) + slideLengthZero;
         axelAngle = Math.toDegrees(Math.asin(grabHeight/slideLength));
         axelPos = (int) (axelPosLowest - (axelAngle * ticksPerDegree));
+        return axelPos;
+    }
+
+    private void drivetrain(){
+        //Drivetrain
+        moveX = gamepad1.left_stick_x;
+        moveY = -gamepad1.left_stick_y;
+        turnX = gamepad1.right_stick_x;
+
+        frontLeftPower = moveY + moveX + turnX;
+        frontRightPower = moveY - moveX - turnX;
+        backLeftPower = moveY - moveX + turnX;
+        backRightPower = moveY + moveX - turnX;
+
+        //Drivetrain Driver Controls
+        if (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
+
+            if (gamepad1.right_bumper) {
+                leftFront.setPower(frontLeftPower * 0.8);
+                rightFront.setPower(frontRightPower * 0.8);
+                leftBack.setPower(backLeftPower * 0.8);
+                rightBack.setPower(backRightPower * 0.8);
+            } else if (gamepad1.left_bumper) {
+                leftFront.setPower(frontLeftPower * 0.25);
+                rightFront.setPower(frontRightPower * 0.25);
+                leftBack.setPower(backLeftPower * 0.25);
+                rightBack.setPower(backRightPower * 0.25);
+            } else {
+                leftFront.setPower(frontLeftPower * 0.55);
+                rightFront.setPower(frontRightPower * 0.55);
+                leftBack.setPower(backLeftPower * 0.55);
+                rightBack.setPower(backRightPower * 0.55);
+            }
+        } else {
+            leftFront.setPower(0);
+            rightFront.setPower(0);
+            leftBack.setPower(0);
+            rightBack.setPower(0);
+        }
     }
 }
 
