@@ -121,6 +121,14 @@ public class Testing extends RobotCore {
             sweep.setPosition(sweep.getPosition() - 0.002);
         }
 
+        if(gamepad2.left_bumper){
+            stopper.setPosition(stopper.getPosition() - 0.002);
+        }
+
+        if(gamepad2.right_bumper){
+            stopper.setPosition(stopper.getPosition() + 0.002);
+        }
+
         printDebugData();
 
     }
@@ -136,6 +144,7 @@ public class Testing extends RobotCore {
         telemetry.addData("xClaw", xClaw.getPosition());
         telemetry.addData("axelPos", axelPos);
         telemetry.addData("sweepPos", sweep.getPosition());
+        telemetry.addData("stopperPos", stopper.getPosition());
     }
 
     private int findAxelPos() {

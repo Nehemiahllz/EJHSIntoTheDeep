@@ -27,6 +27,7 @@ public class RobotCore extends OpMode {
     Servo claw;
 
     Servo sweep;
+    Servo stopper;
 
 
     @Override
@@ -53,6 +54,9 @@ public class RobotCore extends OpMode {
 
         sweep = hardwareMap.get(Servo.class, "sweep");
         sweep.setDirection(Servo.Direction.FORWARD);
+
+        stopper = hardwareMap.get(Servo.class, "stopper");
+        stopper.setDirection(Servo.Direction.FORWARD);
 
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection((DcMotor.Direction.REVERSE));

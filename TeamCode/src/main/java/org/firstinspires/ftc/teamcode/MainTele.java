@@ -37,24 +37,26 @@ public class MainTele extends RobotCore {
     public enum hangSequence {RESET, AXEL_BAR1, SLIDE_BAR1, SLIDE_PULL1, AXEL_CLIP1, SLIDE_PULL2}
     hangSequence hangSeq;
 
-    public enum axelPosFind {RESET, DROP, ACTIVATE}
-    axelPosFind axelPosFinder;
 
+    boolean hangTilt = false;
 
     ElapsedTime clawTimer = new ElapsedTime();
     ElapsedTime runTime = new ElapsedTime();
-    ElapsedTime dropTime = new ElapsedTime();
 
     int axelTarget = 0;
     int slideTarget = 0;
 
-    int axelPower = 1;
+    int xClawRotate = 0;
+
+    double axelPower = 1;
 
     boolean slideReset = false;
 
     Gamepad.RumbleEffect endgame;
     Gamepad.RumbleEffect hangTime;
     Gamepad.RumbleEffect sampleRumble;
+
+    Gamepad.RumbleEffect yClawTilt;
 
     boolean endgameRumbled = false;
     boolean hangRumbled = false;
@@ -63,7 +65,6 @@ public class MainTele extends RobotCore {
 
     boolean aboveSample = false;
 
-    int offset = 0;
 
     public void init() {
         super.init();
@@ -110,64 +111,70 @@ public class MainTele extends RobotCore {
         axelMotor.setPower(axelPower);
         axelMotor2.setPower(axelPower);
 
-
-        if(axelMoving != axelMode.BUCKET){
-            axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-        }
-
-
         //GRAB
-        if(gamepad2.a){
+        if (gamepad2.a) {
+            if(axelMoving == axelMode.GRABSAMPLE){
+                requireRetract = false;
+            }else{
+                requireRetract = true;
+            }
             axelMoving = axelMode.ABOVEGRAB;
-            yClaw.setPosition(0.507);
-            xClaw.setPosition(0.6);
-            requireRetract = true;
+            stopper.setPosition(0.53);
+            yClaw.setPosition(0.95);
+            xClaw.setPosition(0.745);
+            xClawRotate = 0;
         }
 
-        if((gamepad2.x || gamepad1.b) && axelMoving == axelMode.ABOVEGRAB){
-                axelMoving = axelMode.GRABSAMPLE;
-                yClaw.setPosition(0.507);
+        if ((gamepad2.x || gamepad1.b) && axelMoving == axelMode.ABOVEGRAB) {
+            axelMoving = axelMode.GRABSAMPLE;
+            yClaw.setPosition(0.95);
+        }
+
+        if (axelMoving == axelMode.HANG && gamepad2.b) {
+            hangTilt = true;
         }
 
 
         //GRAB/SCORE SPECIMEN
-        if(gamepad2.dpad_left){
-            xClaw.setPosition(0.6);
-            yClaw.setPosition(0.587);
-            claw.setPosition(0.75);
+        if (gamepad2.dpad_left) {
+            xClawRotate = 0;
+            xClaw.setPosition(0.745);
+            yClaw.setPosition(0.82);
             axelMoving = axelMode.GRABSPEC;
             requireRetract = true;
         }
 
-        if(gamepad2.dpad_right && axelMoving == axelMode.GRABSPEC){
-            yClaw.setPosition(0.22);
-            xClaw.setPosition(0.6);
+        if (gamepad2.dpad_right && axelMoving == axelMode.GRABSPEC) {
+            yClaw.setPosition(0.1);
+            xClaw.setPosition(0.745);
             axelMoving = axelMode.BAR;
         }
 
 
         //SCORE SAMPLE
-        if(gamepad2.y){
-            xClaw.setPosition(0.6);
-            yClaw.setPosition(0.507);
-            axelMoving = axelMode.BUCKET;
+        if (gamepad2.y) {
             requireRetract = true;
+            xClawRotate = 0;
+            xClaw.setPosition(0.745);
+            yClaw.setPosition(0.95);
+            axelMoving = axelMode.BUCKET;
         }
 
 
         //HANG
-        if(gamepad1.y && gamepad2.b){
+        if (gamepad1.y) {
             requireRetract = true;
             hangSeq = hangSequence.RESET;
             axelMoving = axelMode.HANG;
         }
 
 
-        if(gamepad2.left_bumper){
+        if (gamepad2.left_bumper) {
             slideReset = true;
             slideTarget = -5000;
+            axelTarget = -2000;
         }
-        if(gamepad2.right_bumper && slideReset){
+        if (gamepad2.right_bumper && slideReset) {
             slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -175,75 +182,69 @@ public class MainTele extends RobotCore {
 
             slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slideMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            axelTarget = 0;
+
+            axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            slideReset = false;
+            axelMoving = axelMode.BUCKET;
         }
 
 
-        if(requireRetract) {
-            slideTarget = 0;
-            if(slideMotor.getCurrentPosition() < slideMax * 0.1 && slideMotor2.getCurrentPosition() < slideMax * 0.1){
+        if (requireRetract) {
+            if(axelMoving == axelMode.GRABSPEC){
+                slideTarget = 100;
+            }else {
+                slideTarget = 0;
+            }
+            if (slideMotor.getCurrentPosition() < slideMax * 0.1 && slideMotor2.getCurrentPosition() < slideMax * 0.1) {
                 requireRetract = false;
             }
-        }else {
+        } else if (!slideReset) {
             switch (axelMoving) {
                 case GRABSAMPLE:
-                        axelPower = 0;
+                    axelPower = 0;
                     break;
                 case ABOVEGRAB:
                     axelPower = 1;
-                    axelTarget = 917;
+                    axelTarget = 630;
                     break;
                 case GRABSPEC:
-                    axelPower = 1;
-                    axelTarget = 813;
+                    axelTarget = 630;
+                    if(axelMotor.getCurrentPosition() > 610){
+                        axelPower = 0;
+                    }else{
+                        axelPower = 0.7;
+                    }
                     break;
                 case BUCKET:
-                    axelPower = 1;
-                    axelTarget = 360;
+                    axelTarget = -10;
+                    if(axelMotor.getCurrentPosition() < 100) {
+                        axelPower = 0.3;
+                    }else{
+                        axelPower = 0.85;
+                    }
                     break;
                 case BAR:
-                    axelPower = 1;
-                    axelTarget = 292;
+                    axelTarget = -10;
+                    if(axelMotor.getCurrentPosition() < 100) {
+                        axelPower = 0.3;
+                    }else{
+                        axelPower = 0.85;
+                    }
                     break;
                 case HANG:
-                    switch (hangSeq) {
-                        case RESET:
-                            axelTarget = 0;
-                            slideTarget = 480;
-                            if (axelMotor.getCurrentPosition() < 20 && slideMotor.getCurrentPosition() > 460 && slideMotor.getCurrentPosition() < 500) {
-                                hangSeq = hangSequence.SLIDE_BAR1;
-                            }
-                            break;
-                        case SLIDE_BAR1:
-                            axelMotor.setPower(0.8);
-                            axelMotor2.setPower(0.8);
-                            axelTarget = 450;
-                            if (axelMotor.getCurrentPosition() > 445) {
-                                hangSeq = hangSequence.AXEL_BAR1;
-                            }
-                            break;
-                        case AXEL_BAR1:
-                            slideTarget = 0;
-                            if (slideMotor.getCurrentPosition() < 20) {
-                                hangSeq = hangSequence.SLIDE_PULL1;
-                            }
-                        case SLIDE_PULL1:
-                            axelMotor.setPower(1);
-                            axelMotor2.setPower(1);
-                            axelTarget = 260;
-                            if (axelMotor.getCurrentPosition() < 258) {
-                                hangSeq = hangSequence.SLIDE_PULL2;
-                            }
-                            break;
-                        case SLIDE_PULL2:
-                            slideTarget = 340;
-                            if (slideMotor.getCurrentPosition() > 230) {
-                                hangSeq = hangSequence.AXEL_CLIP1;
-                            }
-                            break;
-                        case AXEL_CLIP1:
-                            slideTarget = 0;
-                            axelTarget = 0;
-                            break;
+                    axelPower = 1;
+                    if (!hangTilt) {
+                        axelTarget = 238;
+                    } else {
+                        axelTarget = 75;
                     }
                     break;
                 default:
@@ -256,25 +257,27 @@ public class MainTele extends RobotCore {
         if(gamepad1.left_trigger > 0.1) claw.setPosition(0.75);
 
         //Claw close
-        if (gamepad1.right_trigger > 0.1) claw.setPosition(0);
+        if (gamepad1.right_trigger > 0.1) claw.setPosition(0.3);
 
 
         //Claw rotate
         if(clawTimer.time(TimeUnit.MILLISECONDS) > 80){
-            if(gamepad1.dpad_right){
-                xClaw.setPosition(xClaw.getPosition() + 0.055);
+            if(gamepad1.dpad_right && xClawRotate < 2){
+                xClaw.setPosition(xClaw.getPosition() + 0.02835);
+                xClawRotate += 1;
                 clawTimer.reset();
-            }else if(gamepad1.dpad_left){
-                xClaw.setPosition(xClaw.getPosition() - 0.055);
+            }else if(gamepad1.dpad_left && xClawRotate > -2){
+                xClaw.setPosition(xClaw.getPosition() - 0.02835);
+                xClawRotate -= 1;
                 clawTimer.reset();
             }
         }
 
         //Claw tilt out of bucket
-        if(gamepad2.left_trigger > 0.1) yClaw.setPosition(0.507);
+        if(gamepad2.left_trigger > 0.1) yClaw.setPosition(0.95);
 
         //Claw tilt into bucket
-        if(gamepad2.right_trigger > 0.1) yClaw.setPosition(0.05);
+        if(gamepad2.right_trigger > 0.1) yClaw.setPosition(0.35);
 
 
         if(gamepad2.left_stick_y > 0.2){
@@ -289,20 +292,25 @@ public class MainTele extends RobotCore {
         //Manual slide extension with limits
         if (gamepad2.dpad_up) {
             if (axelMoving == axelMode.GRABSAMPLE || axelMoving == axelMode.ABOVEGRAB) {
-                if (slideTarget < 1060) {
+                if (slideTarget < 800) {
                    slideTarget += 25;
                 }
             } else if(axelMoving == axelMode.BUCKET){
-                axelMotor2.setDirection(DcMotorEx.Direction.FORWARD);
                 slideTarget = slideMax;
             } else if(axelMoving == axelMode.BAR){
-                slideTarget = 1250;
+                slideTarget = 1380;
+            } else if(axelMoving == axelMode.HANG){
+                slideTarget = 1400;
             }
         }
         //Manual slide detraction
         if (gamepad2.dpad_down) {
             if (slideMotor.getCurrentPosition() > 0) {
-                slideTarget -= 50;
+                if(axelMoving == axelMode.HANG){
+                    slideTarget = 0;
+                }else {
+                    slideTarget -= 50;
+                }
             }
         }
 
@@ -379,6 +387,11 @@ public class MainTele extends RobotCore {
 
         sampleRumble = new Gamepad.RumbleEffect.Builder()
                 .addStep(1, 1, 50)
+                .build();
+
+        yClawTilt = new Gamepad.RumbleEffect.Builder()
+                .addStep(0, 1, 100)
+                .addStep(1, 0, 100)
                 .build();
 
 
