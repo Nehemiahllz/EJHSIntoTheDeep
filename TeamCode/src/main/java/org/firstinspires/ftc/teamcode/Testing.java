@@ -1,8 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.ejml.dense.row.decomposition.eig.watched.WatchedDoubleStepQREigenvector_FDRM;
+
+import java.util.Vector;
 
 @TeleOp(name = "TestTele", group = "Test")
 
@@ -18,6 +25,10 @@ public class Testing extends RobotCore {
     double backRightPower;
 
 
+    Vector<Double> yAngles = new Vector<>();
+    double yPosition;
+    int angleNum;
+
     int axelPos;
     //Fix values, once measured
     final double grabHeight = 76.2;
@@ -27,6 +38,8 @@ public class Testing extends RobotCore {
     double slideLength;
     final double slideLengthZero = 317.5;
     double axelAngle;
+
+    private Limelight3A limelight;
 
 
     public void init() {
@@ -54,9 +67,23 @@ public class Testing extends RobotCore {
         axelMotor2.setPower(1);
 
         printDebugData();
+
+
+            limelight = hardwareMap.get(Limelight3A .class, "limelight");
+
+            telemetry.setMsTransmissionInterval(11);
+
+            limelight.pipelineSwitch(0);
+
+            limelight.start();
     }
 
     public void loop() {
+        LLResult result = limelight.getLatestResult();
+
+        double tx = result.getTx(); // How far left or right the target is (degrees)
+        double ty = result.getTy(); // How far up or down the target is (degrees)
+        double ta = result.getTa();
 
         if(gamepad1.a){
             axelMotor.setTargetPosition(axelMotor.getTargetPosition() - 3);
@@ -129,7 +156,21 @@ public class Testing extends RobotCore {
             stopper.setPosition(stopper.getPosition() + 0.002);
         }
 
+
+        for(int i = 0; i <= 20; i++){
+            yAngles.add(ty);
+            telemetry.addData("i", i);
+        }
+
+
+
+        yAngles.sort(null);
+
+        telemetry.addData("yAngles", yAngles.get((yAngles.size()/2)));
+
+
         printDebugData();
+        telemetry.addData("y", yPosition);
 
     }
 
@@ -145,6 +186,7 @@ public class Testing extends RobotCore {
         telemetry.addData("axelPos", axelPos);
         telemetry.addData("sweepPos", sweep.getPosition());
         telemetry.addData("stopperPos", stopper.getPosition());
+        telemetry.addLine("_-_-_-_-_-_-_-");
     }
 
     private int findAxelPos() {

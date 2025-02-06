@@ -30,18 +30,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.opencv.core.Mat;
 
-@Autonomous(name = "Buckets", group = "Auto")
+import java.util.Vector;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@Autonomous(name = "LimelightTesting", group = "Auto")
 
 //Red Bucket Corner is -60,-60
 //Blue Bucket Corner is 60,60
 
-public class Buckets extends LinearOpMode {
+public class limelightTesting extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
         //Change StartPos
         //Left side of robot, beside the vertical bar, vertical part of the side holder
-        Pose2d start = new Pose2d(-33, -63, Math.toRadians(90));
+        Pose2d start = new Pose2d(0, 0, Math.toRadians(90));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, start);
 
@@ -57,31 +61,20 @@ public class Buckets extends LinearOpMode {
 
         Cam camera = new Cam(hardwareMap);
 
-        //This top line will have the position the robot is currently in, but the bottom is where the robot will go
-        //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
 
-        TrajectoryActionBuilder sample = drive.actionBuilder(start)
-                .strafeTo(new Vector2d(-34, -55))
-                .strafeToLinearHeading(new Vector2d(-55.7, -56.3), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-55.7, -56.3, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(-46, -41), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample1Score = drive.actionBuilder(new Pose2d(-46, -41, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-55.5, -56), Math.toRadians(45));
+        TrajectoryActionBuilder driveUp = drive.actionBuilder(start)
+                .strafeToLinearHeading(new Vector2d(0, 5), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-55.5, -56, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(-57, -41), Math.toRadians(90));
+        TrajectoryActionBuilder subSample1Check = drive.actionBuilder(new Pose2d(0, 5, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-2, 5), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample2Score = drive.actionBuilder(new Pose2d(-57, -42, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-55.5, -56), Math.toRadians(45));
+        TrajectoryActionBuilder subSample1 = drive.actionBuilder(new Pose2d(-2, 5, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-9, 5), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(-55.5, -56, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(-45, -28), Math.toRadians(180))
-                .strafeTo(new Vector2d(-51, -21));
 
-        TrajectoryActionBuilder sample3Score = drive.actionBuilder(new Pose2d(-51, -21, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(-53, -57), Math.toRadians(45));
+
 
 
         //Closes the claw onto the specimen
@@ -94,130 +87,29 @@ public class Buckets extends LinearOpMode {
 
         //The actual running stuff:
         Actions.runBlocking(
-                new SequentialAction(
-                        new ParallelAction(
-                                axel.setAxelPosition(),
-                            new SequentialAction(
-                                    claw.setClawPosition(0.45),
+                new ParallelAction(
+                    axel.setAxelPosition(),
+                    new SequentialAction(
+                        camera.activate(),
+                            new SleepAction(5),
+                                camera.subSample(),
 
+                            slide.setSlidePosition(slideDistanceTicksSample, 1)
+                        )
+                ));
 
-                                    new ParallelAction(
-                                            claw.setClawYPosition(0.7),
-                                            sample.build(),
-                                            new SequentialAction(
-                                                    axel.changeAxelPosition(262, 0.8) ,
-                                                    new SleepAction(0.2),
-                                                    slide.setSlidePosition(2160, 1)
-                                            )
-                                    ),
-                                    claw.setClawYPosition(0.27),
-                                    new SleepAction(0.7),
-                                    claw.setClawPosition(0.75),
-                                    new SleepAction(0.2),
-                                    claw.setClawYPosition(0.95),
-                                    new SleepAction(0.5),
-
-
-                                    new ParallelAction(
-                                        sample1.build(),
-                                        claw.setClawYPosition(0.807),
-                                        claw.setClawXPosition(0.745),
-                                        new SequentialAction(
-                                                slide.setSlidePosition(0, 1),
-                                                axel.changeAxelPosition(955, 1),
-                                                axel.changeAxelPosition(0, 0)
-                                        )
-                                    ),
-                                    new SleepAction(0.3),
-                                    claw.setClawPosition(0.3),
-                                    new SleepAction(0.5),
-
-                                    new ParallelAction(
-                                            claw.setClawYPosition(0.7),
-                                            sample1Score.build(),
-                                        new SequentialAction(
-                                            axel.changeAxelPosition(262, 0.7) ,
-                                            slide.setSlidePosition(2160, 1)
-                                        )
-                                    ),
-                                    claw.setClawYPosition(0.30),
-                                    new SleepAction(0.5),
-                                    claw.setClawPosition(0.75),
-                                    new SleepAction(0.2),
-                                    claw.setClawYPosition(0.95),
-                                    new SleepAction(0.5),
-
-
-                                    new ParallelAction(
-                                            sample2.build(),
-                                            claw.setClawPosition(0.75),
-                                            claw.setClawYPosition(0.807),
-                                            claw.setClawXPosition(0.745),
-                                            new SequentialAction(
-                                                    slide.setSlidePosition(0, 1),
-                                                    axel.changeAxelPosition(955, 0.8),
-                                                    axel.changeAxelPosition(0, 0)
-                                            )
-                                    ),
-                                    new SleepAction(0.1),
-                                    claw.setClawPosition(0.3),
-                                    new SleepAction(0.6),
-
-                                    new ParallelAction(
-                                            claw.setClawYPosition(0.7),
-                                            sample2Score.build(),
-                                            new SequentialAction(
-                                                    axel.changeAxelPosition(262, 0.7) ,
-                                                    slide.setSlidePosition(2160, 1)
-                                            )
-                                    ),
-                                    claw.setClawYPosition(0.30),
-                                    new SleepAction(0.5),
-                                    claw.setClawPosition(0.75),
-                                    new SleepAction(0.2),
-                                    claw.setClawYPosition(0.95),
-                                    new SleepAction(0.5),
-
-
-                                    new ParallelAction(
-                                            sample3.build(),
-                                            claw.setClawYPosition(0.807),
-                                            claw.setClawXPosition(0.6883),
-                                            new SequentialAction(
-                                                    slide.setSlidePosition(0, 1),
-                                                    axel.changeAxelPosition(955, 1),
-                                                    axel.changeAxelPosition(0, 0)
-                                            )
-                                    ),
-                                    new SleepAction(0.1),
-                                    claw.setClawPosition(0.3),
-                                    new SleepAction(0.5),
-
-                                    new ParallelAction(
-                                            claw.setClawYPosition(0.7),
-                                            sample3Score.build(),
-                                            claw.setClawXPosition(0.745),
-                                            new SequentialAction(
-                                                    axel.changeAxelPosition(262, 0.8) ,
-                                                    slide.setSlidePosition(2160, 1)
-                                            )
-                                    ),
-                                    claw.setClawYPosition(0.3),
-                                    new SleepAction(0.4),
-                                    claw.setClawPosition(0.75),
-                                    new SleepAction(0.2),
-                                    claw.setClawYPosition(0.95),
-                                    new SleepAction(0.5),
-
-                                    new ParallelAction(
-                                        slide.setSlidePosition(0, 1),
-                                        axel.changeAxelPosition(255,0.4),
-                                            stopper.setStopperPosition(0.53)
-                                            )
-
-                            ))));
-
-
+//        if(targetSample == 1){
+//            Actions.runBlocking(
+//                    new SequentialAction(
+//                            new ParallelAction(
+//                                    slide.setSlidePosition(slideDistanceTicksSample, 1),
+//                                    subSample1.build()
+//                            ),
+//                            claw.setClawPosition(0.2)
+//
+//                    )
+//            );
+//        }
 
     }
 
@@ -323,10 +215,6 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
-                telemetry.addData("Target", target);
-                telemetry.addData("AxelPower", axelMotor.getPower());
 
                 axelMotor.setTargetPosition(target);
                 axelMotor2.setTargetPosition(target);
@@ -358,11 +246,6 @@ public class Buckets extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
                 target = tar;
-
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
-                telemetry.addData("Target", target);
-                telemetry.addData("AxelPower", axelMotor.getPower());
 
                 axelMotor.setPower(pow);
                 axelMotor2.setPower(pow);
@@ -461,9 +344,6 @@ public class Buckets extends LinearOpMode {
     }
 
 
-
-
-
     public class Sweeper {
         Servo sweep;
 
@@ -524,7 +404,8 @@ public class Buckets extends LinearOpMode {
         }
     }
 
-
+    int slideDistanceTicksSample;
+    int targetSample = 1;
 
     public class Cam {
         private Limelight3A limelight;
@@ -539,21 +420,55 @@ public class Buckets extends LinearOpMode {
             limelight.start();
         }
 
+        public class Activate implements Action{
+
+            public Activate(){
+
+
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+
+                limelight.start();
+                return false;
+            }
+
+        }
+
+        public Action activate(){
+            return new Activate();
+        }
+
+
+
         public class SubSample implements Action{
 
-            public SubSample(){
-                LLResult result = limelight.getLatestResult();
-                if (result != null && result.isValid()) {
-                    double tx = result.getTx(); // How far left or right the target is (degrees)
-                    double ty = result.getTy(); // How far up or down the target is (degrees)
-                    double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+            int checkCount = 0;
 
+            public SubSample(){
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+
+                LLResult result = limelight.getLatestResult();
+
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa();
+
+
+                final double slideTicksPerInch = 1992 / 24;
+                final double slideInchesStarting = 11.25;
+
+                if (result != null && result.isValid() && tx < 7 && tx > -7) {
 
                     double targetOffsetAngle_Vertical = ty;
 
-                    double limelightMountAngleDegrees = 25.5;
+                    double limelightMountAngleDegrees = -35;
 
-                    double limelightLensHeightInches = 12.75;
+                    double limelightLensHeightInches = 15.125;
 
                     double goalHeightInches = 1.5;
 
@@ -562,20 +477,45 @@ public class Buckets extends LinearOpMode {
 
                     double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
 
+//                    int slideDistanceTicks = (int)((distanceFromLimelightToGoalInches - slideInchesStarting) * slideTicksPerInch);
+
+
+                    if(ty <= -17.5){
+                       slideDistanceTicksSample = 800;
+                    }else if(ty <= -16.7){
+                        slideDistanceTicksSample = 500;
+                    }else if(ty <= - 0.6){
+                        slideDistanceTicksSample = 170;
+                    }else{
+                        slideDistanceTicksSample = 0;
+                    }
+
+
                     telemetry.addData("distance", distanceFromLimelightToGoalInches);
 
                     telemetry.addData("Target X", tx);
                     telemetry.addData("Target Y", ty);
                     telemetry.addData("Target Area", ta);
+
                 } else {
                     telemetry.addData("Limelight", "No Targets");
                 }
 
+                telemetry.update();
 
-            }
+                Vector<Double> yAngles = new Vector<>();
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                for(int check = 0; check <= 100; check++){
+                    yAngles.add(ty);
+                    telemetry.addData("i", check);
+                }
+
+
+
+                yAngles.sort(null);
+
+                slideDistanceTicksSample = yAngles.size()/2;
+                telemetry.addData("yAngles", slideDistanceTicksSample);
 
                 return false;
             }

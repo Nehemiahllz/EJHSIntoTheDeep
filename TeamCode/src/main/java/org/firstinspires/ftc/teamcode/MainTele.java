@@ -34,11 +34,13 @@ public class MainTele extends RobotCore {
     public enum axelMode {ABOVEGRAB, GRABSAMPLE, BUCKET, HANG, GRABSPEC, BAR, START, POSFIND}
     axelMode axelMoving;
 
-    public enum hangSequence {RESET, AXEL_BAR1, SLIDE_BAR1, SLIDE_PULL1, AXEL_CLIP1, SLIDE_PULL2}
+    public enum hangSequence {SETUP, AXEL_BAR1, SLIDE_BAR1, SLIDE_PULL1, AXEL_ROTATE}
     hangSequence hangSeq;
 
 
     boolean hangTilt = false;
+
+    boolean activeDrivetrain = true;
 
     ElapsedTime clawTimer = new ElapsedTime();
     ElapsedTime runTime = new ElapsedTime();
@@ -120,7 +122,7 @@ public class MainTele extends RobotCore {
             }
             axelMoving = axelMode.ABOVEGRAB;
             stopper.setPosition(0.53);
-            yClaw.setPosition(0.95);
+            yClaw.setPosition(0.807);
             xClaw.setPosition(0.745);
             xClawRotate = 0;
         }
@@ -139,7 +141,7 @@ public class MainTele extends RobotCore {
         if (gamepad2.dpad_left) {
             xClawRotate = 0;
             xClaw.setPosition(0.745);
-            yClaw.setPosition(0.82);
+            yClaw.setPosition(0.7);
             axelMoving = axelMode.GRABSPEC;
             requireRetract = true;
         }
@@ -164,7 +166,7 @@ public class MainTele extends RobotCore {
         //HANG
         if (gamepad1.y) {
             requireRetract = true;
-            hangSeq = hangSequence.RESET;
+            hangSeq = hangSequence.SETUP;
             axelMoving = axelMode.HANG;
         }
 
@@ -240,11 +242,71 @@ public class MainTele extends RobotCore {
                     }
                     break;
                 case HANG:
-                    axelPower = 1;
-                    if (!hangTilt) {
-                        axelTarget = 238;
-                    } else {
-                        axelTarget = 75;
+                    switch(hangSeq){
+                        case SETUP:
+                            axelPower = 0.8;
+                            axelTarget = 0;
+                            stopper.setPosition(0.08);
+
+                            if(axelMotor.getCurrentPosition() < 10){
+                                hangSeq = hangSequence.SLIDE_BAR1;
+                            }
+                            break;
+
+                        case SLIDE_BAR1:
+                            slideTarget = 1055;
+                            if(slideMotor.getCurrentPosition() > 1050){
+                                hangSeq = hangSequence.AXEL_BAR1;
+                            }
+                            break;
+
+                        case AXEL_BAR1:
+                            if(axelMotor.getCurrentPosition() > 200) {
+                                axelPower = 0.025;
+                            }else{
+                                axelPower = 0.1;
+                            }
+
+                            axelTarget = 247;
+                            if(axelMotor.getCurrentPosition() > 245){
+                                hangSeq = hangSequence.SLIDE_PULL1;
+                            }
+                            break;
+
+                        case SLIDE_PULL1:
+
+                            slideTarget = 0;
+
+                            activeDrivetrain = false;
+                            leftBack.setPower(1);
+                            rightBack.setPower(1);
+                            leftFront.setPower(1);
+                            rightFront.setPower(1);
+
+                            stopper.getController().pwmDisable();
+                            claw.getController().pwmDisable();
+
+                            if(slideMotor.getCurrentPosition() < 600){
+                                axelTarget = 150;
+                            }
+
+
+                            if(slideMotor.getCurrentPosition() < 250){
+                                hangSeq = hangSequence.AXEL_ROTATE;
+                            }
+                            break;
+
+                        case AXEL_ROTATE:
+                            axelPower = 1;
+                            axelTarget = 0;
+
+                            activeDrivetrain = true;
+                            break;
+
+                        default:
+                            axelTarget = 0;
+                            slideTarget = 0;
+                            axelPower = 0.7;
                     }
                     break;
                 default:
@@ -254,10 +316,10 @@ public class MainTele extends RobotCore {
         }
 
 
-        if(gamepad1.left_trigger > 0.1) claw.setPosition(0.75);
+        if(gamepad1.left_trigger > 0.1) claw.setPosition(0.807);
 
         //Claw close
-        if (gamepad1.right_trigger > 0.1) claw.setPosition(0.3);
+        if (gamepad1.right_trigger > 0.1) claw.setPosition(0.15);
 
 
         //Claw rotate
@@ -410,41 +472,43 @@ public class MainTele extends RobotCore {
         }
     }
 
-    private void drivetrain(){
-        //Drivetrain
-        moveX = gamepad1.left_stick_x;
-        moveY = -gamepad1.left_stick_y;
-        turnX = gamepad1.right_stick_x;
+    private void drivetrain() {
+        if (activeDrivetrain) {
+            //Drivetrain
+            moveX = gamepad1.left_stick_x;
+            moveY = -gamepad1.left_stick_y;
+            turnX = gamepad1.right_stick_x;
 
-        frontLeftPower = moveY + moveX + turnX;
-        frontRightPower = moveY - moveX - turnX;
-        backLeftPower = moveY - moveX + turnX;
-        backRightPower = moveY + moveX - turnX;
+            frontLeftPower = moveY + moveX + turnX;
+            frontRightPower = moveY - moveX - turnX;
+            backLeftPower = moveY - moveX + turnX;
+            backRightPower = moveY + moveX - turnX;
 
-        //Drivetrain Driver Controls
-        if (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
+            //Drivetrain Driver Controls
+            if (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1) {
 
-            if (gamepad1.right_bumper) {
-                leftFront.setPower(frontLeftPower * 0.8);
-                rightFront.setPower(frontRightPower * 0.8);
-                leftBack.setPower(backLeftPower * 0.8);
-                rightBack.setPower(backRightPower * 0.8);
-            } else if (gamepad1.left_bumper) {
-                leftFront.setPower(frontLeftPower * 0.25);
-                rightFront.setPower(frontRightPower * 0.25);
-                leftBack.setPower(backLeftPower * 0.25);
-                rightBack.setPower(backRightPower * 0.25);
+                if (gamepad1.right_bumper) {
+                    leftFront.setPower(frontLeftPower * 0.8);
+                    rightFront.setPower(frontRightPower * 0.8);
+                    leftBack.setPower(backLeftPower * 0.8);
+                    rightBack.setPower(backRightPower * 0.8);
+                } else if (gamepad1.left_bumper) {
+                    leftFront.setPower(frontLeftPower * 0.25);
+                    rightFront.setPower(frontRightPower * 0.25);
+                    leftBack.setPower(backLeftPower * 0.25);
+                    rightBack.setPower(backRightPower * 0.25);
+                } else {
+                    leftFront.setPower(frontLeftPower * 0.55);
+                    rightFront.setPower(frontRightPower * 0.55);
+                    leftBack.setPower(backLeftPower * 0.55);
+                    rightBack.setPower(backRightPower * 0.55);
+                }
             } else {
-                leftFront.setPower(frontLeftPower * 0.55);
-                rightFront.setPower(frontRightPower * 0.55);
-                leftBack.setPower(backLeftPower * 0.55);
-                rightBack.setPower(backRightPower * 0.55);
+                leftFront.setPower(0);
+                rightFront.setPower(0);
+                leftBack.setPower(0);
+                rightBack.setPower(0);
             }
-        } else {
-            leftFront.setPower(0);
-            rightFront.setPower(0);
-            leftBack.setPower(0);
-            rightBack.setPower(0);
         }
     }
 
