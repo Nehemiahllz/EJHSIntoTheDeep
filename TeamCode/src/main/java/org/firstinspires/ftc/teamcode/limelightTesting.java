@@ -61,7 +61,7 @@ public class limelightTesting extends LinearOpMode {
 
         Cam camera = new Cam(hardwareMap);
 
-
+        int slideTargetDistance;
 
 
         TrajectoryActionBuilder driveUp = drive.actionBuilder(start)
@@ -91,12 +91,20 @@ public class limelightTesting extends LinearOpMode {
                     axel.setAxelPosition(),
                     new SequentialAction(
                         camera.activate(),
-                            new SleepAction(5),
+                            new SleepAction(1),
                                 camera.subSample(),
-
-                            slide.setSlidePosition(slideDistanceTicksSample, 1)
+                                slide.setSlidePosition(slideDistanceTicksSample, 1)
                         )
                 ));
+
+        slideTargetDistance = slideDistanceTicksSample;
+        telemetry.addData("slideTarget", slideTargetDistance);
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        slide.setSlidePosition(slideTargetDistance, 1)
+                )
+        );
 
 //        if(targetSample == 1){
 //            Actions.runBlocking(
@@ -407,6 +415,13 @@ public class limelightTesting extends LinearOpMode {
     int slideDistanceTicksSample;
     int targetSample = 1;
 
+    int maxCount;
+    int count;
+    int maxLocation;
+    double finalArea;
+
+    Vector<Double> area = new Vector<>();
+
     public class Cam {
         private Limelight3A limelight;
 
@@ -479,15 +494,40 @@ public class limelightTesting extends LinearOpMode {
 
 //                    int slideDistanceTicks = (int)((distanceFromLimelightToGoalInches - slideInchesStarting) * slideTicksPerInch);
 
+                    area.clear();
+                    for (int h = 0; h <= 999; h++) {
+                        area.add(ta);
+                    }
 
-                    if(ty <= -17.5){
+                    maxCount = 0;
+                    for (int j = 0; j <= 999; j++) {
+                        count = 0;
+                        for (int k = 0; k <= 999; k++) {
+                            if (area.get(j) == area.get(k)) {
+                                count++;
+                            }
+                        }
+                        if (count > maxCount) {
+                            maxLocation = j;
+                            maxCount = count;
+                        }
+                    }
+                    telemetry.addLine("DONE!");
+                    finalArea = area.get(maxLocation);
+
+
+                    if(finalArea <= 0.46){
                        slideDistanceTicksSample = 800;
-                    }else if(ty <= -16.7){
-                        slideDistanceTicksSample = 500;
-                    }else if(ty <= - 0.6){
-                        slideDistanceTicksSample = 170;
+                    }else if(finalArea <= 0.62){
+                        slideDistanceTicksSample = 620;
+                    }else if(finalArea <= 0.8){
+                        slideDistanceTicksSample = 435;
+                    }else if(finalArea <= 0.92){
+                        slideDistanceTicksSample = 365;
+                    }else if(finalArea <= 1.3){
+                        slideDistanceTicksSample = 175;
                     }else{
-                        slideDistanceTicksSample = 0;
+                        slideDistanceTicksSample = 50;
                     }
 
 
@@ -496,28 +536,22 @@ public class limelightTesting extends LinearOpMode {
                     telemetry.addData("Target X", tx);
                     telemetry.addData("Target Y", ty);
                     telemetry.addData("Target Area", ta);
-
+                    telemetry.addData("Final Area", finalArea);
+                    telemetry.addData("slideTicks", slideDistanceTicksSample);
                 } else {
                     telemetry.addData("Limelight", "No Targets");
                 }
 
                 telemetry.update();
 
-                Vector<Double> yAngles = new Vector<>();
 
-                for(int check = 0; check <= 100; check++){
-                    yAngles.add(ty);
-                    telemetry.addData("i", check);
-                }
+               if(finalArea < 0.00999){
+                   return true;
+               }else {
+                   return false;
+               }
 
 
-
-                yAngles.sort(null);
-
-                slideDistanceTicksSample = yAngles.size()/2;
-                telemetry.addData("yAngles", slideDistanceTicksSample);
-
-                return false;
             }
 
         }

@@ -25,9 +25,11 @@ public class Testing extends RobotCore {
     double backRightPower;
 
 
-    Vector<Double> yAngles = new Vector<>();
-    double yPosition;
-    int angleNum;
+    Vector<Double> area = new Vector<>();
+    double finalArea;
+
+    boolean john = true;
+
 
     int axelPos;
     //Fix values, once measured
@@ -40,6 +42,13 @@ public class Testing extends RobotCore {
     double axelAngle;
 
     private Limelight3A limelight;
+
+
+    int count = 0;
+    int maxCount = 0;
+    int maxLocation = 0;
+
+    double finalYAngle = 0;
 
 
     public void init() {
@@ -83,7 +92,7 @@ public class Testing extends RobotCore {
 
         double tx = result.getTx(); // How far left or right the target is (degrees)
         double ty = result.getTy(); // How far up or down the target is (degrees)
-        double ta = result.getTa();
+        double ta = result.getTa(); //Area it takes up on the screen (percent)
 
         if(gamepad1.a){
             axelMotor.setTargetPosition(axelMotor.getTargetPosition() - 3);
@@ -157,20 +166,39 @@ public class Testing extends RobotCore {
         }
 
 
-        for(int i = 0; i <= 20; i++){
-            yAngles.add(ty);
-            telemetry.addData("i", i);
+
+        if(john) {
+                area.clear();
+                    for (int h = 0; h <= 999; h++) {
+                        area.add(ta);
+                    }
+
+                    maxCount = 0;
+                    for (int j = 0; j <= 999; j++) {
+                        count = 0;
+                        for (int k = 0; k <= 999; k++) {
+                            if (area.get(j) == area.get(k)) {
+                                count++;
+                            }
+                        }
+                        if (count > maxCount) {
+                            maxLocation = j;
+                            maxCount = count;
+                        }
+                    }
+                    telemetry.addLine("DONE!");
+                    finalArea = area.get(maxLocation);
+
+            john = false;
+        }
+
+        if(finalArea < 0.00999){
+            john = true;
         }
 
 
-
-        yAngles.sort(null);
-
-        telemetry.addData("yAngles", yAngles.get((yAngles.size()/2)));
-
-
         printDebugData();
-        telemetry.addData("y", yPosition);
+        telemetry.addData("y", finalArea);
 
     }
 

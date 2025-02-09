@@ -27,7 +27,7 @@ public class MainTele extends RobotCore {
     double backLeftPower;
     double backRightPower;
 
-    int slideMax = 2160;
+    int slideMax = 2290;
 
     boolean requireRetract;
 
@@ -129,7 +129,7 @@ public class MainTele extends RobotCore {
 
         if ((gamepad2.x || gamepad1.b) && axelMoving == axelMode.ABOVEGRAB) {
             axelMoving = axelMode.GRABSAMPLE;
-            yClaw.setPosition(0.95);
+            yClaw.setPosition(0.807);
         }
 
         if (axelMoving == axelMode.HANG && gamepad2.b) {
@@ -141,13 +141,14 @@ public class MainTele extends RobotCore {
         if (gamepad2.dpad_left) {
             xClawRotate = 0;
             xClaw.setPosition(0.745);
-            yClaw.setPosition(0.7);
+            yClaw.setPosition(0.68);
             axelMoving = axelMode.GRABSPEC;
             requireRetract = true;
+
         }
 
         if (gamepad2.dpad_right && axelMoving == axelMode.GRABSPEC) {
-            yClaw.setPosition(0.1);
+            yClaw.setPosition(0);
             xClaw.setPosition(0.745);
             axelMoving = axelMode.BAR;
         }
@@ -158,7 +159,7 @@ public class MainTele extends RobotCore {
             requireRetract = true;
             xClawRotate = 0;
             xClaw.setPosition(0.745);
-            yClaw.setPosition(0.95);
+            yClaw.setPosition(0.267);
             axelMoving = axelMode.BUCKET;
         }
 
@@ -226,12 +227,8 @@ public class MainTele extends RobotCore {
                     }
                     break;
                 case BUCKET:
-                    axelTarget = -10;
-                    if(axelMotor.getCurrentPosition() < 100) {
-                        axelPower = 0.3;
-                    }else{
-                        axelPower = 0.85;
-                    }
+                    axelTarget = -5;
+                    axelPower = 1;
                     break;
                 case BAR:
                     axelTarget = -10;
@@ -244,31 +241,28 @@ public class MainTele extends RobotCore {
                 case HANG:
                     switch(hangSeq){
                         case SETUP:
-                            axelPower = 0.8;
-                            axelTarget = 0;
+                            axelPower = 0.5;
+                            axelTarget = 133;
                             stopper.setPosition(0.08);
 
-                            if(axelMotor.getCurrentPosition() < 10){
+                            if(axelMotor.getCurrentPosition() < 140 && axelMotor.getCurrentPosition() > 127){
                                 hangSeq = hangSequence.SLIDE_BAR1;
                             }
                             break;
 
                         case SLIDE_BAR1:
                             slideTarget = 1055;
-                            if(slideMotor.getCurrentPosition() > 1050){
+                            if(slideMotor.getCurrentPosition() > 1020){
                                 hangSeq = hangSequence.AXEL_BAR1;
                             }
                             break;
 
                         case AXEL_BAR1:
-                            if(axelMotor.getCurrentPosition() > 200) {
-                                axelPower = 0.025;
-                            }else{
-                                axelPower = 0.1;
-                            }
+                                axelPower = 0.05;
 
-                            axelTarget = 247;
-                            if(axelMotor.getCurrentPosition() > 245){
+
+                            axelTarget = 241;
+                            if(axelMotor.getCurrentPosition() > 232){
                                 hangSeq = hangSequence.SLIDE_PULL1;
                             }
                             break;
@@ -286,12 +280,12 @@ public class MainTele extends RobotCore {
                             stopper.getController().pwmDisable();
                             claw.getController().pwmDisable();
 
-                            if(slideMotor.getCurrentPosition() < 600){
-                                axelTarget = 150;
+                            if(slideMotor.getCurrentPosition() < 750){
+                                axelTarget = 120;
                             }
 
 
-                            if(slideMotor.getCurrentPosition() < 250){
+                            if(slideMotor.getCurrentPosition() < 310 && slideMotor2.getCurrentPosition() < 310){
                                 hangSeq = hangSequence.AXEL_ROTATE;
                             }
                             break;
@@ -336,13 +330,13 @@ public class MainTele extends RobotCore {
         }
 
         //Claw tilt out of bucket
-        if(gamepad2.left_trigger > 0.1) yClaw.setPosition(0.95);
+        if(gamepad2.left_trigger > 0.1) yClaw.setPosition(0.807);
 
         //Claw tilt into bucket
-        if(gamepad2.right_trigger > 0.1) yClaw.setPosition(0.35);
+        if(gamepad2.right_trigger > 0.1) yClaw.setPosition(0.2678);
 
 
-        if(gamepad2.left_stick_y > 0.2){
+        if(gamepad1.left_stick_button){
             sweep.setPosition(0.23);
         }else{
             sweep.setPosition(0.84);
