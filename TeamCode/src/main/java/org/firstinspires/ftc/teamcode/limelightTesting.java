@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.opencv.core.Mat;
 
+import java.util.Objects;
 import java.util.Vector;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -78,9 +79,12 @@ public class limelightTesting extends LinearOpMode {
 
 
         //Closes the claw onto the specimen
-        claw.setClawPosition(0.4);
-        new SleepAction(0.5);
-        claw.setClawPosition(0.4);
+        Actions.runBlocking(
+                new SequentialAction(
+                     claw.setClawPosition(0.807),
+                        camera.activate()
+                )
+        );
 
         waitForStart();
         if (isStopRequested()) return;
@@ -88,21 +92,22 @@ public class limelightTesting extends LinearOpMode {
         //The actual running stuff:
         Actions.runBlocking(
                 new ParallelAction(
-                    axel.setAxelPosition(),
-                    new SequentialAction(
-                        camera.activate(),
-                            new SleepAction(1),
-                                camera.subSample(),
-                                slide.setSlidePosition(slideDistanceTicksSample, 1)
-                        )
-                ));
+                        axel.setAxelPosition(),
+                new SequentialAction(
+                        camera.subSample(),
+                        axel.changeAxelPosition(955, 0.7),
+                        new SleepAction(0.6),
+                        axel.changeAxelPosition(0,0),
+                        axel.changeAxelPosition(10000000, 0)
+                )
+                )
+        );
 
-        slideTargetDistance = slideDistanceTicksSample;
-        telemetry.addData("slideTarget", slideTargetDistance);
+        telemetry.addData("slideTarget", slideDistanceTicksSample);
 
         Actions.runBlocking(
                 new SequentialAction(
-                        slide.setSlidePosition(slideTargetDistance, 1)
+                        slide.setSlidePosition(slideDistanceTicksSample, 1)
                 )
         );
 
@@ -413,14 +418,12 @@ public class limelightTesting extends LinearOpMode {
     }
 
     int slideDistanceTicksSample;
-    int targetSample = 1;
+    int limeCheckLoc = 0;
 
-    int maxCount;
-    int count;
-    int maxLocation;
-    double finalArea;
+    int i = 0;
 
     Vector<Double> area = new Vector<>();
+    Vector<Integer> distance = new Vector<>();
 
     public class Cam {
         private Limelight3A limelight;
@@ -438,14 +441,12 @@ public class limelightTesting extends LinearOpMode {
         public class Activate implements Action{
 
             public Activate(){
-
-
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
-
                 limelight.start();
+
                 return false;
             }
 
@@ -458,8 +459,6 @@ public class limelightTesting extends LinearOpMode {
 
 
         public class SubSample implements Action{
-
-            int checkCount = 0;
 
             public SubSample(){
             }
@@ -474,83 +473,143 @@ public class limelightTesting extends LinearOpMode {
                 double ta = result.getTa();
 
 
-                final double slideTicksPerInch = 1992 / 24;
-                final double slideInchesStarting = 11.25;
+                if(tx > -7 && tx < 7) {
 
-                if (result != null && result.isValid() && tx < 7 && tx > -7) {
-
-                    double targetOffsetAngle_Vertical = ty;
-
-                    double limelightMountAngleDegrees = -35;
-
-                    double limelightLensHeightInches = 15.125;
-
-                    double goalHeightInches = 1.5;
-
-                    double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-                    double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
-
-                    double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-
-//                    int slideDistanceTicks = (int)((distanceFromLimelightToGoalInches - slideInchesStarting) * slideTicksPerInch);
-
-                    area.clear();
-                    for (int h = 0; h <= 999; h++) {
-                        area.add(ta);
+                    if (ta < 0.0099) {
+                        return true;
                     }
 
-                    maxCount = 0;
-                    for (int j = 0; j <= 999; j++) {
-                        count = 0;
-                        for (int k = 0; k <= 999; k++) {
-                            if (area.get(j) == area.get(k)) {
-                                count++;
-                            }
-                        }
-                        if (count > maxCount) {
-                            maxLocation = j;
-                            maxCount = count;
-                        }
-                    }
-                    telemetry.addLine("DONE!");
-                    finalArea = area.get(maxLocation);
-
-
-                    if(finalArea <= 0.46){
-                       slideDistanceTicksSample = 800;
-                    }else if(finalArea <= 0.62){
+                    if (ta <= 0.33) {
+                        slideDistanceTicksSample = 800;
+                    } else if (ta <= 0.41) {
+                        slideDistanceTicksSample = 710;
+                    } else if (ta <= 0.44) {
                         slideDistanceTicksSample = 620;
-                    }else if(finalArea <= 0.8){
+                    } else if (ta <= 0.5) {
+                        slideDistanceTicksSample = 527;
+                    } else if (ta <= 0.55) {
                         slideDistanceTicksSample = 435;
-                    }else if(finalArea <= 0.92){
+                    } else if (ta <= 0.61) {
+                        slideDistanceTicksSample = 400;
+                    }else if (ta <= 0.67) {
                         slideDistanceTicksSample = 365;
-                    }else if(finalArea <= 1.3){
+                    } else if (ta <= 0.76) {
+                        slideDistanceTicksSample = 270;
+                    }else if (ta <= 0.85) {
                         slideDistanceTicksSample = 175;
-                    }else{
+                    } else {
                         slideDistanceTicksSample = 50;
                     }
 
+                    distance.add(slideDistanceTicksSample);
 
-                    telemetry.addData("distance", distanceFromLimelightToGoalInches);
+                    if (i == 5) {
+                        if (Objects.equals(distance.get(0), distance.get(1)) && Objects.equals(distance.get(0), distance.get(2)) && Objects.equals(distance.get(0), distance.get(3)) && Objects.equals(distance.get(0), distance.get(4)) && Objects.equals(distance.get(0), distance.get(5))) {
+                            i = 0;
 
-                    telemetry.addData("Target X", tx);
-                    telemetry.addData("Target Y", ty);
-                    telemetry.addData("Target Area", ta);
-                    telemetry.addData("Final Area", finalArea);
-                    telemetry.addData("slideTicks", slideDistanceTicksSample);
-                } else {
-                    telemetry.addData("Limelight", "No Targets");
+                            telemetry.addData("0", distance.get(0));
+                            telemetry.addData("1", distance.get(1));
+                            telemetry.addData("2", distance.get(2));
+                            telemetry.addData("3", distance.get(3));
+                            telemetry.addData("4", distance.get(4));
+
+                            distance.clear();
+                            return false;
+                        } else {
+                            i = 0;
+                            distance.clear();
+                            return true;
+                        }
+                    } else if (i > 5) {
+                        i = 0;
+                        distance.clear();
+                        return true;
+                    } else {
+                        i++;
+                        return true;
+                    }
+                }else{
+                    limeCheckLoc++;
+                    return false;
                 }
 
-                telemetry.update();
 
 
-               if(finalArea < 0.00999){
-                   return true;
-               }else {
-                   return false;
-               }
 
+//                    for (int s = 0; s <= 1; s++) {
+//                        area.clear();
+//                        for (int h = 0; h <= 999; h++) {
+//                            area.add(ta);
+//                        }
+//
+//                        maxCount = 0;
+//                        for (int j = 0; j <= 999; j++) {
+//                            count = 0;
+//                            for (int k = 0; k <= 999; k++) {
+//                                if (area.get(j) == area.get(k)) {
+//                                    count++;
+//                                }
+//                            }
+//                            if (count > maxCount) {
+//                                maxLocation = j;
+//                                maxCount = count;
+//                            }
+//                        }
+//                        telemetry.addLine("DONE!");
+//                        finalArea = area.get(maxLocation);
+//
+//                        if(finalArea < 0.0099){
+//                            return true;
+//                        }
+//
+//                        if (finalArea <= 0.46) {
+//                            slideDistanceTicksSample = 800;
+//                        } else if (finalArea <= 0.62) {
+//                            slideDistanceTicksSample = 620;
+//                        } else if (finalArea <= 0.8) {
+//                            slideDistanceTicksSample = 435;
+//                        } else if (finalArea <= 0.92) {
+//                            slideDistanceTicksSample = 365;
+//                        } else if (finalArea <= 1.3) {
+//                            slideDistanceTicksSample = 175;
+//                        } else {
+//                            slideDistanceTicksSample = 50;
+//                        }
+//
+//                        distance.add(slideDistanceTicksSample);
+//
+//
+//                        telemetry.addData("Target X", tx);
+//                        telemetry.addData("Target Y", ty);
+//                        telemetry.addData("Target Area", ta);
+//                        telemetry.addData("Final Area", finalArea);
+//                        telemetry.addData("slideTicks", slideDistanceTicksSample);
+//
+//                        telemetry.update();
+//                    }
+//
+//                    telemetry.addData("distance1", distance.get(0));
+//                    telemetry.addData("distance2", distance.get(1));
+//
+//                        if(distance.get(0) == distance.get(1)){
+//                            distanceEqual = true;
+//                            telemetry.addLine("Ronaldo");
+//                        }else{
+//                            distanceEqual = false;
+//                            telemetry.addLine("WRONG");
+//                        }
+//
+//                        if (distanceEqual) {
+//                            return false;
+//                        }else{
+//                            return true;
+//                        }
+//
+//                    } else{
+//                        telemetry.addData("Limelight", "No Targets");
+//                        telemetry.update();
+//                        return true;
+//                    }
 
             }
 

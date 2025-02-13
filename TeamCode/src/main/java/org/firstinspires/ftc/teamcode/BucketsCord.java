@@ -1,49 +1,40 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.database.sqlite.SQLiteReadOnlyDatabaseException;
-import android.media.audiofx.BassBoost;
-
 import androidx.annotation.NonNull;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
-import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.opencv.core.Mat;
+import java.util.Objects;
+import java.util.Vector;
 
-@Autonomous(name = "Bars", group = "Auto")
+@Autonomous(name = "BucketsCord", group = "Auto")
 
 //Red Bucket Corner is -60,-60
 //Blue Bucket Corner is 60,60
 
-public class Auto extends LinearOpMode {
+public class BucketsCord extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
         //Change StartPos
         //Left side of robot, beside the vertical bar, vertical part of the side holder
-        Pose2d start = new Pose2d(18, -60, Math.toRadians(270));
+        Pose2d start = new Pose2d(-33, -63, Math.toRadians(90));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, start);
 
@@ -57,118 +48,124 @@ public class Auto extends LinearOpMode {
 
         Stop stopper = new Stop(hardwareMap);
 
+        Cam camera = new Cam(hardwareMap);
+
         //This top line will have the position the robot is currently in, but the bottom is where the robot will go
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
 
+        TrajectoryActionBuilder sample = drive.actionBuilder(start)
+                .strafeTo(new Vector2d(-34, -47))
+                .strafeToLinearHeading(new Vector2d(-54.4, -53.8), Math.toRadians(45));
+
+        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-54.4, -53.8, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-46.5, -41), Math.toRadians(90));
+
+        TrajectoryActionBuilder sample1Score = drive.actionBuilder(new Pose2d(-46.5, -41, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
+                .strafeToLinearHeading(new Vector2d(-53, -53.4), Math.toRadians(45));
+
+        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-53, -53.4, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-56.5, -41), Math.toRadians(90));
+
+        TrajectoryActionBuilder sample2Score = drive.actionBuilder(new Pose2d(-56.5, -41, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
+                .strafeToLinearHeading(new Vector2d(-53, -53.4), Math.toRadians(45));
+
+        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(-53, -53.4, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-44, -23), Math.toRadians(180))
+                .strafeTo(new Vector2d(-51.25, -23));
+
+        TrajectoryActionBuilder sample3Score = drive.actionBuilder(new Pose2d(-51.25, -23, Math.toRadians(180)))
+                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
+                .strafeToLinearHeading(new Vector2d(-52.5, -54.5), Math.toRadians(45));
 
 
 
-        TrajectoryActionBuilder specimen1 = drive.actionBuilder(start)
-                .strafeToLinearHeading(new Vector2d( 2, -32), Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(2, -28), Math.toRadians(270));
+        TrajectoryActionBuilder submersible1 = drive.actionBuilder(new Pose2d(-52.5, -54.5, Math.toRadians(45)))
+                .splineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(0)), Math.toRadians(90))
+                .strafeTo(new Vector2d(-23.5, -10));
 
-        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(2, -28, Math.toRadians(270)))
-                .strafeTo(new Vector2d(2, -45))
-                .strafeToLinearHeading(new Vector2d(32, -42), Math.toRadians(58))
-                .strafeToLinearHeading(new Vector2d(40, -44), Math.toRadians(58));
+        TrajectoryActionBuilder submersible1Grab = drive.actionBuilder(new Pose2d(-23.5, -10, Math.toRadians(0)))
+                .strafeTo(new Vector2d(-23.5, -4.5));
 
-        TrajectoryActionBuilder sample1Slide = drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(58)))
-                .strafeToLinearHeading(new Vector2d(37, -42), Math.toRadians(270));
+        TrajectoryActionBuilder sub1SPullOut = drive.actionBuilder(new Pose2d(-23.5, -4.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-35, -4.5), Math.toRadians(0));
 
-        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(37, -42, Math.toRadians(270)))
-                .strafeToLinearHeading(new Vector2d(36, -43.5), Math.toRadians(57));
-
-        TrajectoryActionBuilder sample2Slide = drive.actionBuilder(new Pose2d(36, -43.5, Math.toRadians(57)))
-                .strafeToLinearHeading(new Vector2d(38.5, -44), Math.toRadians(270));
-
-//        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(32.5, -42, Math.toRadians(315)))
-//                .strafeToLinearHeading(new Vector2d(32, -28), Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(38, -24.5), Math.toRadians(0));
-//
-//        TrajectoryActionBuilder sample3Slide = drive.actionBuilder(new Pose2d(38, -24.5, Math.toRadians(0)))
-//                .strafeToLinearHeading(new Vector2d(37, -42), Math.toRadians(270));
-
-        TrajectoryActionBuilder specimen1Grab = drive.actionBuilder(new Pose2d(42, -8, Math.toRadians(270)))
-                .strafeToLinearHeading(new Vector2d(42, -49), Math.toRadians(270));
+        TrajectoryActionBuilder sub1Score = drive.actionBuilder(new Pose2d(-35, -4.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-50, -52), Math.toRadians(45))
+                .strafeTo(new Vector2d(-52.5, -54.5));
 
 
+        TrajectoryActionBuilder submersible2 = drive.actionBuilder(new Pose2d(-23.5, -10, Math.toRadians(0)))
+                .strafeTo(new Vector2d(-23.5, -8));
 
-        //Closes the claw onto the specimen
-        claw.setClawPosition(0.2);
+        TrajectoryActionBuilder submersible2Grab = drive.actionBuilder(new Pose2d(-23.5, -8, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-23.5, -2.5), Math.toRadians(0));
+
+        TrajectoryActionBuilder sub2SPullOut = drive.actionBuilder(new Pose2d(-23.5, -2.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-35, -2.5), Math.toRadians(0));
+
+        TrajectoryActionBuilder sub2Score = drive.actionBuilder(new Pose2d(-35, -2.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-50, -52), Math.toRadians(45))
+                .strafeToLinearHeading(new Vector2d(-52.5, -54.5), Math.toRadians(45));
+
+
+        TrajectoryActionBuilder submersible3 = drive.actionBuilder(new Pose2d(-23.5, -8, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-23.5, -6), Math.toRadians(45));
+
+        TrajectoryActionBuilder submersible3Grab = drive.actionBuilder(new Pose2d(-23.5, -6, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-23.5, -0.5), Math.toRadians(0));
+
+        TrajectoryActionBuilder sub3SPullOut = drive.actionBuilder(new Pose2d(-23.5, -0.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-35, -0.5), Math.toRadians(0));
+
+        TrajectoryActionBuilder sub3Score = drive.actionBuilder(new Pose2d(-35, -0.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-50, -52), Math.toRadians(45))
+                .strafeToLinearHeading(new Vector2d(-52.5, -54.5), Math.toRadians(45));
+
+
+        //Closes the claw onto the sample
+        Actions.runBlocking(
+                new ParallelAction(
+                    claw.setClawPosition(0.4),
+                        camera.activate()
+                )
+        );
+
+        boolean stopInput = false;
+        int xPos = 0;
+        int yPos = 0;
+
+
+        while(!stopInput){
+            if(gamepad2.dpad_up){
+                yPos ++;
+            }
+
+            if(gamepad2.dpad_down){
+                yPos--;
+            }
+
+
+            if(gamepad2.dpad_right){
+                xPos++;
+            }
+
+            if(gamepad2.dpad_left){
+                xPos--;
+            }
+
+            try {
+                Thread.sleep(50); // Adjust the delay as needed
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
         waitForStart();
         if (isStopRequested()) return;
 
-        //The actual running stuff:
-        Actions.runBlocking(
-                new SequentialAction(
-                        new ParallelAction(
-                                axel.setAxelPosition(),
-                                new SequentialAction(
 
-                                        claw.setClawYPosition(0),
-                                        claw.setClawPosition(0.4),
-                                        new SleepAction(0.2),
-                                        new ParallelAction(
-                                                specimen1.build(),
-                                                new SequentialAction(
-                                                        stopper.setStopperPosition(0.53),
-                                                        axel.changeAxelPosition(276, 0.8),
-                                                        new SleepAction(0.4),
-
-                                                        new ParallelAction(
-                                                                slide.setSlidePosition(650, 1),
-                                                                axel.changeAxelPosition(258, 0.7)
-                                                        )
-                                                )
-                                        ),
-
-                                        slide.setSlidePosition(1380, 1),
-                                        claw.setClawPosition(0.75),
-                                        new SleepAction(0.1),
-
-                                        new ParallelAction(
-                                                stopper.setStopperPosition(0.53),
-                                                sample1.build(),
-                                                claw.setClawYPosition(0.95),
-                                                claw.setClawXPosition(0.72),
-                                                claw.setClawPosition(0.75),
-                                                new SequentialAction(
-                                                        axel.changeAxelPosition(950, 0.5),
-                                                        new SleepAction(0.4),
-                                                        axel.changeAxelPosition(0, 0),
-                                                        slide.setSlidePosition(515, 1)
-                                                )
-                                        ),
-                                        claw.setClawPosition(0.4),
-                                        new SleepAction(0.3),
-
-                                        new ParallelAction(
-                                            sample1Slide.build(),
-                                                slide.setSlidePosition(180, 1)
-                                        ),
-                                        slide.setSlidePosition(350, 1),
-                                        claw.setClawPosition(0.75),
-                                        new SleepAction(0.3),
-
-                                        new ParallelAction(
-                                                sample2.build(),
-                                               slide.setSlidePosition(180, 1),
-                                               claw.setClawXPosition(0.6883)
-                                        ),
-                                        slide.setSlidePosition(300, 1),
-                                        claw.setClawPosition(0.4),
-                                        new SleepAction(0.3),
-
-                                        new ParallelAction(
-                                                slide.setSlidePosition(180, 1),
-                                                sample2Slide.build(),
-                                                claw.setClawXPosition(0.745)
-                                        ),
-                                        claw.setClawPosition(0.75),
-                                        new SleepAction(0.3)
-
-                                ))));
 
 
 
@@ -215,9 +212,11 @@ public class Auto extends LinearOpMode {
                 //If the slide is in roughly the correct location then stop the loop so the rest of the code can run, otherwise continue looping
                 if (slideTarget == 0 && slideMotor.getCurrentPosition() < 10) {
                     return false;
-                } else if (slideMotor.getCurrentPosition() > slideTarget - 6 && slideMotor.getCurrentPosition() < slideTarget + 6) {
+                } else if (slideTarget == 15 && slideMotor.getCurrentPosition() < 25) {
                     return false;
-                } else if (slideTarget == 2160 && slideMotor.getCurrentPosition() > 2140) {
+                }else if (slideMotor.getCurrentPosition() > slideTarget - 6 && slideMotor.getCurrentPosition() < slideTarget + 6) {
+                    return false;
+                } else if (slideTarget == 2240 && slideMotor.getCurrentPosition() > 2210) {
                     return false;
                 } else {
                     slideMotor.setTargetPosition(slideTarget);
@@ -317,31 +316,19 @@ public class Auto extends LinearOpMode {
                 telemetry.addData("Target", target);
                 telemetry.addData("AxelPower", axelMotor.getPower());
 
+                axelMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                axelMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
                 axelMotor.setPower(pow);
                 axelMotor2.setPower(pow);
 
-                if (axelMotor.getCurrentPosition() > target - 3 && axelMotor.getCurrentPosition() < target + 3) {
-                    return false;
-                } else if (axelMotor.getPower() == 0) {
-                    return false;
-                } else if (target == 950 && axelMotor.getCurrentPosition() > 945) {
-                    return false;
-                }  else if(target == 350 && axelMotor.getCurrentPosition() > 340){
-                    return false;
-                }  else if(target == 262 && axelMotor.getCurrentPosition() < 270){
-                    return false;
-                }  else if(target == 0 && axelMotor.getCurrentPosition() < 15){
-                    return false;
-                }else {
-                    return true;
-                }
+                return false;
             }
         }
 
         public Action changeAxelPosition(int axelTar, double power) {
             return new ChangeAxelPosition(axelTar, power);
         }
-
 
 
 
@@ -487,6 +474,140 @@ public class Auto extends LinearOpMode {
             return new SetStopperPosition(stopPos);
         }
     }
+
+
+    int slideDistanceTicksSample;
+    int limeCheckLoc = 0;
+
+    int i = 0;
+
+
+    Vector<Integer> distance = new Vector<>();
+
+    public class Cam {
+        private Limelight3A limelight;
+
+        public Cam(HardwareMap hardwareMap){
+            limelight = hardwareMap.get(Limelight3A .class, "limelight");
+
+            telemetry.setMsTransmissionInterval(11);
+
+            limelight.pipelineSwitch(0);
+
+            limelight.start();
+        }
+
+        public class Activate implements Action{
+
+            public Activate(){
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                limelight.start();
+
+                return false;
+            }
+
+        }
+
+        public Action activate(){
+            return new Activate();
+        }
+
+
+
+        public class SubSample implements Action{
+
+            public SubSample(){
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+
+                LLResult result = limelight.getLatestResult();
+
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa();
+
+
+                if(tx > -5.5 && tx < 5.5) {
+
+                    telemetry.addData("tx", tx);
+
+                    if (ta < 0.0099) {
+                        return true;
+                    }
+
+                    if (ta <= 0.33) {
+                        slideDistanceTicksSample = 800;
+                    } else if (ta <= 0.41) {
+                        slideDistanceTicksSample = 710;
+                    } else if (ta <= 0.44) {
+                        slideDistanceTicksSample = 620;
+                    } else if (ta <= 0.5) {
+                        slideDistanceTicksSample = 527;
+                    } else if (ta <= 0.55) {
+                        slideDistanceTicksSample = 435;
+                    } else if (ta <= 0.61) {
+                        slideDistanceTicksSample = 400;
+                    }else if (ta <= 0.67) {
+                        slideDistanceTicksSample = 365;
+                    } else if (ta <= 0.76) {
+                        slideDistanceTicksSample = 270;
+                    }else if (ta <= 0.85) {
+                        slideDistanceTicksSample = 175;
+                    } else {
+                        slideDistanceTicksSample = 50;
+                    }
+
+                    distance.add(slideDistanceTicksSample);
+
+                    if (i == 5) {
+                        if (Objects.equals(distance.get(0), distance.get(1)) && Objects.equals(distance.get(0), distance.get(2)) && Objects.equals(distance.get(0), distance.get(3)) && Objects.equals(distance.get(0), distance.get(4)) && Objects.equals(distance.get(0), distance.get(5))) {
+                            i = 0;
+
+                            telemetry.addData("0", distance.get(0));
+                            telemetry.addData("1", distance.get(1));
+                            telemetry.addData("2", distance.get(2));
+                            telemetry.addData("3", distance.get(3));
+                            telemetry.addData("4", distance.get(4));
+                            telemetry.addData("5", distance.get(5));
+
+
+                            distance.clear();
+                            return false;
+                        } else {
+                            i = 0;
+                            distance.clear();
+                            return true;
+                        }
+                    } else if (i > 5) {
+                        i = 0;
+                        distance.clear();
+                        return true;
+                    } else {
+                        i++;
+                        return true;
+                    }
+                } else{
+                    limeCheckLoc++;
+                    telemetry.addData("tx", tx);
+                    return false;
+                }
+
+            }
+
+        }
+
+        public Action subSample(){
+            return new SubSample();
+        }
+
+
+    }
+
 
 
 }

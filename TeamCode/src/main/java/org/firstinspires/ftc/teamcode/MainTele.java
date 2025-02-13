@@ -31,7 +31,7 @@ public class MainTele extends RobotCore {
 
     boolean requireRetract;
 
-    public enum axelMode {ABOVEGRAB, GRABSAMPLE, BUCKET, HANG, GRABSPEC, BAR, START, POSFIND}
+    public enum axelMode {ABOVEGRAB, GRABSAMPLE, BUCKET, HANG, GRABSPEC, BAR, START,RESET}
     axelMode axelMoving;
 
     public enum hangSequence {SETUP, AXEL_BAR1, SLIDE_BAR1, SLIDE_PULL1, AXEL_ROTATE}
@@ -122,7 +122,7 @@ public class MainTele extends RobotCore {
             }
             axelMoving = axelMode.ABOVEGRAB;
             stopper.setPosition(0.53);
-            yClaw.setPosition(0.807);
+            yClaw.setPosition(0.26);
             xClaw.setPosition(0.745);
             xClawRotate = 0;
         }
@@ -178,10 +178,14 @@ public class MainTele extends RobotCore {
             axelTarget = -2000;
         }
         if (gamepad2.right_bumper && slideReset) {
+            axelPower = 0;
+
             slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             slideTarget = 0;
+            slideMotor.setTargetPosition(0);
+            slideMotor2.setTargetPosition(0);
 
             slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slideMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -191,6 +195,8 @@ public class MainTele extends RobotCore {
             axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             axelTarget = 0;
+            axelMotor.setTargetPosition(0);
+            axelMotor2.setTargetPosition(0);
 
             axelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             axelMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -212,28 +218,33 @@ public class MainTele extends RobotCore {
         } else if (!slideReset) {
             switch (axelMoving) {
                 case GRABSAMPLE:
+                    axelTarget = 721;
                     axelPower = 0;
                     break;
                 case ABOVEGRAB:
-                    axelPower = 1;
-                    axelTarget = 630;
+                    axelPower = 0.6;
+                    axelTarget = 570;
                     break;
                 case GRABSPEC:
-                    axelTarget = 630;
-                    if(axelMotor.getCurrentPosition() > 610){
+                    axelTarget = 721;
+                    if(axelMotor.getCurrentPosition() > 600){
                         axelPower = 0;
                     }else{
-                        axelPower = 0.7;
+                        axelPower = 0.4;
                     }
                     break;
                 case BUCKET:
-                    axelTarget = -5;
-                    axelPower = 1;
+                    axelTarget = -100;
+                    if(axelMotor.getCurrentPosition() < 100) {
+                        axelPower = 0.05;
+                    }else{
+                        axelPower = 0.85;
+                    }
                     break;
                 case BAR:
-                    axelTarget = -10;
+                    axelTarget = -100;
                     if(axelMotor.getCurrentPosition() < 100) {
-                        axelPower = 0.3;
+                        axelPower = 0.15;
                     }else{
                         axelPower = 0.85;
                     }

@@ -15,6 +15,14 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
+
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-23.5, -3, Math.toRadians(0)))
+
+                .strafeToLinearHeading(new Vector2d(-33.5, -3), Math.toRadians(45))
+                .strafeTo(new Vector2d(-52.5, -54.5))
+
+
+
 //        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(24, -63, Math.toRadians(90)))
                 //Push + close grab = 27 sec - TOO SLOW
 //                .strafeTo(new Vector2d(40,-7))
@@ -132,30 +140,30 @@ public class MeepMeepTesting {
 
 
 //                //Start score + rotate + far grab = 18.02, LIGHTNING FAST, extremely rotate based
-                        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(9, -63, Math.toRadians(270)))
-                .strafeTo(new Vector2d(9, -33))
-                .strafeTo(new Vector2d(9, -36))
-
-                .strafeToLinearHeading(new Vector2d(37, -39), Math.toRadians(60))
-                .strafeToLinearHeading(new Vector2d(46.5, -39), Math.toRadians(300))
-
-                .strafeToLinearHeading(new Vector2d(47, -39), Math.toRadians(60))
-                .strafeToLinearHeading(new Vector2d(56.5, -39), Math.toRadians(300))
-
-                .strafeToLinearHeading(new Vector2d(57, -39), Math.toRadians(60))
-                .strafeToLinearHeading(new Vector2d(37, -59), Math.toRadians(270))
-
-                .strafeTo(new Vector2d(35, -59))
-                .strafeTo(new Vector2d(2, -32))
-
-                .strafeToLinearHeading(new Vector2d(20, -47), Math.toRadians(315))
-                .strafeToLinearHeading(new Vector2d(2, -32), Math.toRadians(270))
-
-                .strafeToLinearHeading(new Vector2d(20, -47), Math.toRadians(315))
-                .strafeToLinearHeading(new Vector2d(2, -32), Math.toRadians(270))
-
-                .strafeToLinearHeading(new Vector2d(20, -47), Math.toRadians(315))
-                .strafeToLinearHeading(new Vector2d(2, -32), Math.toRadians(270))
+//                        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(9, -63, Math.toRadians(270)))
+//                .strafeTo(new Vector2d(9, -33))
+//                .strafeTo(new Vector2d(9, -36))
+//
+//                .strafeToLinearHeading(new Vector2d(37, -39), Math.toRadians(60))
+//                .strafeToLinearHeading(new Vector2d(46.5, -39), Math.toRadians(300))
+//
+//                .strafeToLinearHeading(new Vector2d(47, -39), Math.toRadians(60))
+//                .strafeToLinearHeading(new Vector2d(56.5, -39), Math.toRadians(300))
+//
+//                .strafeToLinearHeading(new Vector2d(57, -39), Math.toRadians(60))
+//                .strafeToLinearHeading(new Vector2d(37, -59), Math.toRadians(270))
+//
+//                .strafeTo(new Vector2d(35, -59))
+//                .strafeTo(new Vector2d(2, -32))
+//
+//                .strafeToLinearHeading(new Vector2d(20, -47), Math.toRadians(315))
+//                .strafeToLinearHeading(new Vector2d(2, -32), Math.toRadians(270))
+//
+//                .strafeToLinearHeading(new Vector2d(20, -47), Math.toRadians(315))
+//                .strafeToLinearHeading(new Vector2d(2, -32), Math.toRadians(270))
+//
+//                .strafeToLinearHeading(new Vector2d(20, -47), Math.toRadians(315))
+//                .strafeToLinearHeading(new Vector2d(2, -32), Math.toRadians(270))
 
 
 
