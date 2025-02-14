@@ -31,10 +31,12 @@ public class MainTele extends RobotCore {
 
     boolean requireRetract;
 
-    public enum axelMode {ABOVEGRAB, GRABSAMPLE, BUCKET, HANG, GRABSPEC, BAR, START,RESET}
+    public enum axelMode {ABOVEGRAB, GRABSAMPLE, BUCKET, HANG, GRABSPEC, BAR, START, RESET}
+
     axelMode axelMoving;
 
     public enum hangSequence {SETUP, AXEL_BAR1, SLIDE_BAR1, SLIDE_PULL1, AXEL_ROTATE}
+
     hangSequence hangSeq;
 
 
@@ -49,7 +51,7 @@ public class MainTele extends RobotCore {
 
     private PIDController controller;
 
-    private final double ticks_in_degree = 700/180.0;
+    private final double ticks_in_degree = 700 / 180.0;
 
     private static double p = 0.005, i = 0, d = 0.00015;
     private static double f = 0.0025;
@@ -63,7 +65,7 @@ public class MainTele extends RobotCore {
 
     public static int targetS = 0;
 
-    private final double ticks_in_degreeS = 700/180.0;
+    private final double ticks_in_degreeS = 700 / 180.0;
 
 
     Gamepad.RumbleEffect endgame;
@@ -100,10 +102,10 @@ public class MainTele extends RobotCore {
         slideMotor.setPower(0);
         slideMotor2.setPower(0);
 
-        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -119,21 +121,21 @@ public class MainTele extends RobotCore {
         drivetrain();
 
 
-if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
-    controller.setPID(p, i, d);
-    int axelPos = axelMotor.getCurrentPosition();
-    double pid = controller.calculate(axelPos, target);
-    double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
+        if (axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
+            controller.setPID(p, i, d);
+            int axelPos = axelMotor.getCurrentPosition();
+            double pid = controller.calculate(axelPos, target);
+            double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
-    double power = pid + ff;
+            double power = pid + ff;
 
-    axelMotor.setPower(power);
-    axelMotor2.setPower(power);
+            axelMotor.setPower(power);
+            axelMotor2.setPower(power);
 
-    telemetry.addData("pos", axelPos);
-    telemetry.addData("target", target);
-    telemetry.addData("power", power);
-}
+            telemetry.addData("pos", axelPos);
+            telemetry.addData("target", target);
+            telemetry.addData("power", power);
+        }
 
 
         controllerS.setPID(pS, iS, dS);
@@ -149,9 +151,9 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
 
         //GRAB
         if (gamepad2.a) {
-            if(axelMoving == axelMode.GRABSAMPLE){
+            if (axelMoving == axelMode.GRABSAMPLE) {
                 requireRetract = false;
-            }else{
+            } else {
                 requireRetract = true;
             }
             axelMoving = axelMode.ABOVEGRAB;
@@ -209,9 +211,9 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
 
 
         if (requireRetract) {
-            if(axelMoving == axelMode.GRABSPEC){
+            if (axelMoving == axelMode.GRABSPEC) {
                 targetS = 100;
-            }else {
+            } else {
                 targetS = 0;
             }
             if (slideMotor.getCurrentPosition() < slideMax * 0.1 && slideMotor2.getCurrentPosition() < slideMax * 0.1) {
@@ -276,7 +278,7 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
                         case AXEL_BAR1:
                             target = 241;
 
-                            if (axelMotor.getCurrentPosition() > 232) {
+                            if (axelMotor.getCurrentPosition() > 239) {
                                 hangSeq = hangSequence.SLIDE_PULL1;
                             }
                             break;
@@ -321,20 +323,19 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
         }
 
 
-
-        if(gamepad1.left_trigger > 0.1) claw.setPosition(0.807);
+        if (gamepad1.left_trigger > 0.1) claw.setPosition(0.807);
 
         //Claw close
         if (gamepad1.right_trigger > 0.1) claw.setPosition(0.15);
 
 
         //Claw rotate
-        if(clawTimer.time(TimeUnit.MILLISECONDS) > 80){
-            if(gamepad1.dpad_right && xClawRotate < 2){
+        if (clawTimer.time(TimeUnit.MILLISECONDS) > 80) {
+            if (gamepad1.dpad_right && xClawRotate < 2) {
                 xClaw.setPosition(xClaw.getPosition() + 0.02835);
                 xClawRotate += 1;
                 clawTimer.reset();
-            }else if(gamepad1.dpad_left && xClawRotate > -2){
+            } else if (gamepad1.dpad_left && xClawRotate > -2) {
                 xClaw.setPosition(xClaw.getPosition() - 0.02835);
                 xClawRotate -= 1;
                 clawTimer.reset();
@@ -342,19 +343,17 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
         }
 
         //Claw tilt out of bucket
-        if(gamepad2.left_trigger > 0.1) yClaw.setPosition(0.807);
+        if (gamepad2.left_trigger > 0.1) yClaw.setPosition(0.807);
 
         //Claw tilt into bucket
-        if(gamepad2.right_trigger > 0.1) yClaw.setPosition(0.2678);
+        if (gamepad2.right_trigger > 0.1) yClaw.setPosition(0.2678);
 
 
-        if(gamepad1.left_stick_button){
+        if (gamepad1.left_stick_button) {
             sweep.setPosition(0.23);
-        }else{
+        } else {
             sweep.setPosition(0.84);
         }
-
-
 
 
         //Manual slide extension with limits
@@ -363,20 +362,20 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
                 if (targetS < 800) {
                     targetS += 25;
                 }
-            } else if(axelMoving == axelMode.BUCKET){
+            } else if (axelMoving == axelMode.BUCKET) {
                 targetS = slideMax;
-            } else if(axelMoving == axelMode.BAR){
+            } else if (axelMoving == axelMode.BAR) {
                 targetS = 1380;
-            } else if(axelMoving == axelMode.HANG){
+            } else if (axelMoving == axelMode.HANG) {
                 targetS = 1400;
             }
         }
         //Manual slide detraction
         if (gamepad2.dpad_down) {
             if (slideMotor.getCurrentPosition() > 0) {
-                if(axelMoving == axelMode.HANG){
+                if (axelMoving == axelMode.HANG) {
                     targetS = 0;
-                }else {
+                } else {
                     targetS -= 50;
                 }
             }
@@ -400,9 +399,9 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
         telemetry.addData("claw", claw.getPosition());
     }
 
-    private void rumbles(){
+    private void rumbles() {
 
-        if(!runTimeReset){
+        if (!runTimeReset) {
             runTime.reset();
             runTimeReset = true;
         }
@@ -463,17 +462,17 @@ if(axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
                 .build();
 
 
-        if (runTime.time(TimeUnit.SECONDS) > 89 && !endgameRumbled)  {
+        if (runTime.time(TimeUnit.SECONDS) > 89 && !endgameRumbled) {
             gamepad1.runRumbleEffect(endgame);
             endgameRumbled = true;
         }
 
-        if (runTime.time(TimeUnit.SECONDS) > 104 && !hangRumbled)  {
+        if (runTime.time(TimeUnit.SECONDS) > 104 && !hangRumbled) {
             gamepad1.runRumbleEffect(hangTime);
             hangRumbled = true;
         }
 
-        if(aboveSample){
+        if (aboveSample) {
             gamepad1.runRumbleEffect(sampleRumble);
         }
     }

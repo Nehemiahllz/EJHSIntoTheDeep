@@ -14,6 +14,8 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PosePath;
+import com.acmerobotics.roadrunner.QuinticSpline1d;
+import com.acmerobotics.roadrunner.QuinticSpline2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
@@ -31,6 +33,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.opencv.core.Mat;
+
+import java.net.BindException;
 
 @Autonomous(name = "Bars", group = "Auto")
 
@@ -60,6 +64,11 @@ public class Auto extends LinearOpMode {
         //This top line will have the position the robot is currently in, but the bottom is where the robot will go
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
 
+
+        QuinticSpline2d spline = new QuinticSpline2d(
+                new QuinticSpline1d(0,0,0,0,0,0),
+                new QuinticSpline1d(10,30,60,90,65,2)
+        );
 
 
 

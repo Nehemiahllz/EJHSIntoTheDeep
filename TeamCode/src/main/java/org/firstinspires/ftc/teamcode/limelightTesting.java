@@ -20,14 +20,17 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.opencv.core.Mat;
 
 import java.util.Objects;
@@ -46,7 +49,7 @@ public class limelightTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         //Change StartPos
         //Left side of robot, beside the vertical bar, vertical part of the side holder
-        Pose2d start = new Pose2d(0, 0, Math.toRadians(90));
+        Pose2d start = new Pose2d(0, 0, Math.toRadians(0));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, start);
 
@@ -66,7 +69,7 @@ public class limelightTesting extends LinearOpMode {
 
 
         TrajectoryActionBuilder driveUp = drive.actionBuilder(start)
-                .strafeToLinearHeading(new Vector2d(0, 5), Math.toRadians(90));
+                .strafeToLinearHeading(new Vector2d(-1, 0), Math.toRadians(0));
 
         TrajectoryActionBuilder subSample1Check = drive.actionBuilder(new Pose2d(0, 5, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-2, 5), Math.toRadians(90));
@@ -89,40 +92,41 @@ public class limelightTesting extends LinearOpMode {
         waitForStart();
         if (isStopRequested()) return;
 
+
         //The actual running stuff:
+
         Actions.runBlocking(
                 new ParallelAction(
                         axel.setAxelPosition(),
-                new SequentialAction(
-                        camera.subSample(),
-                        axel.changeAxelPosition(955, 0.7),
-                        new SleepAction(0.6),
-                        axel.changeAxelPosition(0,0),
-                        axel.changeAxelPosition(10000000, 0)
-                )
+                        new SequentialAction(
+                                driveUp.build(),
+                                camera.rotation(),
+                                camera.distance(),
+                                axel.pickUp(),
+                                axel.changeAxelPosition(10000000),
+                                slide.setSlidePosition(slideDistanceTicksSample, 1)
+                        )
                 )
         );
 
-        telemetry.addData("slideTarget", slideDistanceTicksSample);
+
+        TrajectoryActionBuilder afterMath = drive.actionBuilder(new Pose2d(-1, 0, Math.toRadians(targetRotation)))
+                .strafeToLinearHeading(new Vector2d(-4, 0), Math.toRadians(0));
+
 
         Actions.runBlocking(
                 new SequentialAction(
-                        slide.setSlidePosition(slideDistanceTicksSample, 1)
+                        afterMath.build()
                 )
         );
 
-//        if(targetSample == 1){
-//            Actions.runBlocking(
-//                    new SequentialAction(
-//                            new ParallelAction(
-//                                    slide.setSlidePosition(slideDistanceTicksSample, 1),
-//                                    subSample1.build()
-//                            ),
-//                            claw.setClawPosition(0.2)
-//
-//                    )
-//            );
-//        }
+        for(int n = 0; n < 1000; n++){
+            telemetry.addData("finalTa", finalArea);
+            telemetry.addData("finalTicks", slideDistanceTicksSample);
+            telemetry.update();
+        }
+
+
 
     }
 
@@ -193,31 +197,35 @@ public class limelightTesting extends LinearOpMode {
     }
 
     int target = 0;
+    boolean axelOff = false;
 
     //Making the axel class to make the slide object to be moved during auto
     public class Axel {
+        private PIDController controller;
+
+        public double p = 0.005, i = 0, d = 0.00015;
+        public double f = 0.0025;
+
+        private final double ticks_in_degree = 700 / 180.0;
+
         DcMotorEx axelMotor;
         DcMotorEx axelMotor2;
 
         public Axel(HardwareMap hardwareMap) {
+            controller = new PIDController(p, i, d);
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
             axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
             axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
 
-            //Reverse the second axelMotor so they work together
-            axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-
-            axelMotor.setTargetPosition(0);
-            axelMotor2.setTargetPosition(0);
-
-            //Reset the slide encoders to make sure it is accurate
             axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            axelMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-
             axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            axelMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-            axelMotor.setPower(1);
-            axelMotor2.setPower(1);
+            axelMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            axelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+            axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+            axelMotor.setDirection(DcMotorEx.Direction.FORWARD);
         }
 
         public class SetAxelPosition implements Action {
@@ -228,15 +236,31 @@ public class limelightTesting extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
+                controller.setPID(p, i, d);
+                int axelPos = axelMotor.getCurrentPosition();
+                double pid = controller.calculate(axelPos, target);
+                double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
-                axelMotor.setTargetPosition(target);
-                axelMotor2.setTargetPosition(target);
+                double power = pid + ff;
+
+
+                if (!axelOff) {
+                    axelMotor.setPower(power);
+                    axelMotor2.setPower(power);
+                } else {
+                    axelMotor.setPower(0);
+                    axelMotor2.setPower(0);
+                }
+
+                telemetry.addData("pos", axelPos);
+                telemetry.addData("target", target);
+                telemetry.addData("power", power);
+
+                telemetry.update();
 
                 if (target == 10000000) {
                     return false;
                 }
-
-                telemetry.update();
                 return true;
             }
         }
@@ -250,28 +274,62 @@ public class limelightTesting extends LinearOpMode {
             int tar;
             double pow;
 
-            public ChangeAxelPosition(int axelTar, double power) {
+            public ChangeAxelPosition(int axelTar) {
                 tar = axelTar;
-                pow = power;
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
+                axelOff = false;
                 target = tar;
 
-                axelMotor.setPower(pow);
-                axelMotor2.setPower(pow);
+                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("Target", target);
+                telemetry.addData("AxelPower", axelMotor.getPower());
 
-                return false;
+                if (axelMotor.getCurrentPosition() > target - 3 && axelMotor.getCurrentPosition() < target + 3) {
+                    return false;
+                }
+                return true;
             }
         }
 
-        public Action changeAxelPosition(int axelTar, double power) {
-            return new ChangeAxelPosition(axelTar, power);
+        public Action changeAxelPosition(int axelTar) {
+            return new ChangeAxelPosition(axelTar);
         }
 
 
+        public class PickUp implements Action {
+
+            public PickUp() {
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("Target", target);
+                telemetry.addData("AxelPower", axelMotor.getPower());
+
+                if (axelMotor.getCurrentPosition() > 520) {
+                    axelOff = true;
+                    target = 721;
+                    return false;
+                } else {
+                    axelOff = false;
+                    target = 530;
+                }
+
+                return true;
+            }
+        }
+
+        public Action pickUp() {
+            return new PickUp();
+        }
 
     }
 
@@ -387,7 +445,6 @@ public class limelightTesting extends LinearOpMode {
     }
 
 
-
     public class Stop {
         Servo stopper;
 
@@ -418,15 +475,27 @@ public class limelightTesting extends LinearOpMode {
     }
 
     int slideDistanceTicksSample;
-    int limeCheckLoc = 0;
 
     int i = 0;
 
-    Vector<Double> area = new Vector<>();
+    double robotAngle = 0;
+    double targetRotation = 0;
+
+    double finalArea = 0;
+    double areaTotal = 0;
+
     Vector<Integer> distance = new Vector<>();
+    Vector<Double> area = new Vector<>();
 
     public class Cam {
         private Limelight3A limelight;
+
+        DcMotor leftBack;
+        DcMotor rightBack;
+        DcMotor leftFront;
+        DcMotor rightFront;
+
+        IMU imu;
 
         public Cam(HardwareMap hardwareMap){
             limelight = hardwareMap.get(Limelight3A .class, "limelight");
@@ -436,6 +505,19 @@ public class limelightTesting extends LinearOpMode {
             limelight.pipelineSwitch(0);
 
             limelight.start();
+
+            leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
+            rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+            leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+            rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+            leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+
+            imu = hardwareMap.get(IMU.class, "imu");
+
+            imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.FORWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+
         }
 
         public class Activate implements Action{
@@ -458,13 +540,13 @@ public class limelightTesting extends LinearOpMode {
 
 
 
-        public class SubSample implements Action{
+        public class Distance implements Action {
 
-            public SubSample(){
+            public Distance() {
             }
 
             @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
                 LLResult result = limelight.getLatestResult();
 
@@ -472,155 +554,157 @@ public class limelightTesting extends LinearOpMode {
                 double ty = result.getTy(); // How far up or down the target is (degrees)
                 double ta = result.getTa();
 
+                double a = 7301.82;
+                double b = -5.8445;
 
-                if(tx > -7 && tx < 7) {
+                if (ta < 0.0099) {
+                    return true;
+                }
 
-                    if (ta < 0.0099) {
-                        return true;
-                    }
+                if (ta <= 0.33) {
+                    slideDistanceTicksSample = 800;
+                } else if (ta <= 0.41) {
+                    slideDistanceTicksSample = 710;
+                } else if (ta <= 0.44) {
+                    slideDistanceTicksSample = 620;
+                } else if (ta <= 0.5) {
+                    slideDistanceTicksSample = 527;
+                } else if (ta <= 0.55) {
+                    slideDistanceTicksSample = 435;
+                } else if (ta <= 0.61) {
+                    slideDistanceTicksSample = 400;
+                } else if (ta <= 0.67) {
+                    slideDistanceTicksSample = 365;
+                } else if (ta <= 0.76) {
+                    slideDistanceTicksSample = 270;
+                } else if (ta <= 0.95) {
+                    slideDistanceTicksSample = 175;
+                } else {
+                    slideDistanceTicksSample = 15;
+                }
 
-                    if (ta <= 0.33) {
-                        slideDistanceTicksSample = 800;
-                    } else if (ta <= 0.41) {
-                        slideDistanceTicksSample = 710;
-                    } else if (ta <= 0.44) {
-                        slideDistanceTicksSample = 620;
-                    } else if (ta <= 0.5) {
-                        slideDistanceTicksSample = 527;
-                    } else if (ta <= 0.55) {
-                        slideDistanceTicksSample = 435;
-                    } else if (ta <= 0.61) {
-                        slideDistanceTicksSample = 400;
-                    }else if (ta <= 0.67) {
-                        slideDistanceTicksSample = 365;
-                    } else if (ta <= 0.76) {
-                        slideDistanceTicksSample = 270;
-                    }else if (ta <= 0.85) {
-                        slideDistanceTicksSample = 175;
-                    } else {
-                        slideDistanceTicksSample = 50;
-                    }
+                distance.add(slideDistanceTicksSample);
+                area.add(ta);
 
-                    distance.add(slideDistanceTicksSample);
+                if (i == 5) {
+                    if (Objects.equals(distance.get(0), distance.get(1)) && Objects.equals(distance.get(0), distance.get(2)) && Objects.equals(distance.get(0), distance.get(3)) && Objects.equals(distance.get(0), distance.get(4)) && Objects.equals(distance.get(0), distance.get(5))) {
+                        i = 0;
 
-                    if (i == 5) {
-                        if (Objects.equals(distance.get(0), distance.get(1)) && Objects.equals(distance.get(0), distance.get(2)) && Objects.equals(distance.get(0), distance.get(3)) && Objects.equals(distance.get(0), distance.get(4)) && Objects.equals(distance.get(0), distance.get(5))) {
-                            i = 0;
+                        telemetry.addData("0", distance.get(0));
+                        telemetry.addData("1", distance.get(1));
+                        telemetry.addData("2", distance.get(2));
+                        telemetry.addData("3", distance.get(3));
+                        telemetry.addData("4", distance.get(4));
 
-                            telemetry.addData("0", distance.get(0));
-                            telemetry.addData("1", distance.get(1));
-                            telemetry.addData("2", distance.get(2));
-                            telemetry.addData("3", distance.get(3));
-                            telemetry.addData("4", distance.get(4));
-
-                            distance.clear();
-                            return false;
-                        } else {
-                            i = 0;
-                            distance.clear();
-                            return true;
+                        for(int h = 0; h < 6; h++) {
+                            areaTotal += distance.get(h);
                         }
-                    } else if (i > 5) {
+
+                        finalArea = (areaTotal/6);
+
+                        slideDistanceTicksSample = (int)(a * Math.exp(b * finalArea));
+
+                        slideDistanceTicksSample += 60;
+
+                        distance.clear();
+                        area.clear();
+                        return false;
+                    } else {
                         i = 0;
                         distance.clear();
-                        return true;
-                    } else {
-                        i++;
+                        area.clear();
                         return true;
                     }
-                }else{
-                    limeCheckLoc++;
-                    return false;
+                } else if (i > 5) {
+                    i = 0;
+                    distance.clear();
+                    area.clear();
+                    return true;
+                } else {
+                    i++;
+                    return true;
                 }
 
 
+            }
+        }
+
+            public Action distance() {return new Distance();}
 
 
-//                    for (int s = 0; s <= 1; s++) {
-//                        area.clear();
-//                        for (int h = 0; h <= 999; h++) {
-//                            area.add(ta);
-//                        }
-//
-//                        maxCount = 0;
-//                        for (int j = 0; j <= 999; j++) {
-//                            count = 0;
-//                            for (int k = 0; k <= 999; k++) {
-//                                if (area.get(j) == area.get(k)) {
-//                                    count++;
-//                                }
-//                            }
-//                            if (count > maxCount) {
-//                                maxLocation = j;
-//                                maxCount = count;
-//                            }
-//                        }
-//                        telemetry.addLine("DONE!");
-//                        finalArea = area.get(maxLocation);
-//
-//                        if(finalArea < 0.0099){
-//                            return true;
-//                        }
-//
-//                        if (finalArea <= 0.46) {
-//                            slideDistanceTicksSample = 800;
-//                        } else if (finalArea <= 0.62) {
-//                            slideDistanceTicksSample = 620;
-//                        } else if (finalArea <= 0.8) {
-//                            slideDistanceTicksSample = 435;
-//                        } else if (finalArea <= 0.92) {
-//                            slideDistanceTicksSample = 365;
-//                        } else if (finalArea <= 1.3) {
-//                            slideDistanceTicksSample = 175;
-//                        } else {
-//                            slideDistanceTicksSample = 50;
-//                        }
-//
-//                        distance.add(slideDistanceTicksSample);
-//
-//
-//                        telemetry.addData("Target X", tx);
-//                        telemetry.addData("Target Y", ty);
-//                        telemetry.addData("Target Area", ta);
-//                        telemetry.addData("Final Area", finalArea);
-//                        telemetry.addData("slideTicks", slideDistanceTicksSample);
-//
-//                        telemetry.update();
-//                    }
-//
-//                    telemetry.addData("distance1", distance.get(0));
-//                    telemetry.addData("distance2", distance.get(1));
-//
-//                        if(distance.get(0) == distance.get(1)){
-//                            distanceEqual = true;
-//                            telemetry.addLine("Ronaldo");
-//                        }else{
-//                            distanceEqual = false;
-//                            telemetry.addLine("WRONG");
-//                        }
-//
-//                        if (distanceEqual) {
-//                            return false;
-//                        }else{
-//                            return true;
-//                        }
-//
-//                    } else{
-//                        telemetry.addData("Limelight", "No Targets");
-//                        telemetry.update();
-//                        return true;
-//                    }
+            public class Rotation implements Action {
+
+                double speed = 0;
+                double angle = 0;
+
+                public Rotation() {
+                }
+
+                @Override
+                public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                    LLResult result = limelight.getLatestResult();
+
+                    double tx = result.getTx(); // How far left or right the target is (degrees)
+                    double ty = result.getTy(); // How far up or down the target is (degrees)
+                    double ta = result.getTa();
+
+                    angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                    robotAngle = angle;
+
+                    if (robotAngle >= 0) {
+                        targetRotation = 0 + robotAngle;
+                    } else {
+                        targetRotation = 360 + robotAngle;
+                    }
+
+                    telemetry.addData("robotAngle", angle);
+                    telemetry.addData("targetRotation", targetRotation);
+
+                    leftBack.setPower(speed);
+                    leftFront.setPower(speed);
+                    rightBack.setPower(-speed);
+                    rightFront.setPower(-speed);
+
+                    telemetry.addData("tx", tx);
+
+                    if (tx > -4 && tx < -2) {
+                        leftBack.setPower(0);
+                        leftFront.setPower(0);
+                        rightBack.setPower(0);
+                        rightFront.setPower(0);
+
+                        speed = 0;
+                        telemetry.addLine("Targeted Successfully");
+                        return false;
+                    } else {
+                        if (tx <= -4) {
+                            if (tx <= -20) {
+                                speed = -0.35;
+                            } else {
+                                speed = -0.15;
+                            }
+                        } else if (tx >= -2) {
+                            if (tx >= 14) {
+                                speed = 0.35;
+                            } else {
+                                speed = 0.15;
+                            }
+                        }
+                    }
+
+
+                    return true;
+                }
 
             }
 
+            //-1.5 to -4
+
+            public Action rotation() {return new Rotation();}
+
+
         }
-
-        public Action subSample(){
-            return new SubSample();
-        }
-
-
-    }
 
 
 

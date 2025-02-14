@@ -77,22 +77,22 @@ public class Testing extends RobotCore {
 
         printDebugData();
 
-
-            limelight = hardwareMap.get(Limelight3A .class, "limelight");
-
-            telemetry.setMsTransmissionInterval(11);
-
-            limelight.pipelineSwitch(0);
-
-            limelight.start();
+//
+//            limelight = hardwareMap.get(Limelight3A .class, "limelight");
+//
+//            telemetry.setMsTransmissionInterval(11);
+//
+//            limelight.pipelineSwitch(0);
+//
+//            limelight.start();
     }
 
     public void loop() {
-        LLResult result = limelight.getLatestResult();
-
-        double tx = result.getTx(); // How far left or right the target is (degrees)
-        double ty = result.getTy(); // How far up or down the target is (degrees)
-        double ta = result.getTa(); //Area it takes up on the screen (percent)
+//        LLResult result = limelight.getLatestResult();
+//
+//        double tx = result.getTx(); // How far left or right the target is (degrees)
+//        double ty = result.getTy(); // How far up or down the target is (degrees)
+//        double ta = result.getTa(); //Area it takes up on the screen (percent)
 
         if(gamepad1.a){
             axelMotor.setTargetPosition(axelMotor.getTargetPosition() - 3);
@@ -165,36 +165,6 @@ public class Testing extends RobotCore {
             stopper.setPosition(stopper.getPosition() + 0.002);
         }
 
-
-
-        if(john) {
-                area.clear();
-                    for (int h = 0; h <= 999; h++) {
-                        area.add(ta);
-                    }
-
-                    maxCount = 0;
-                    for (int j = 0; j <= 999; j++) {
-                        count = 0;
-                        for (int k = 0; k <= 999; k++) {
-                            if (area.get(j) == area.get(k)) {
-                                count++;
-                            }
-                        }
-                        if (count > maxCount) {
-                            maxLocation = j;
-                            maxCount = count;
-                        }
-                    }
-                    telemetry.addLine("DONE!");
-                    finalArea = area.get(maxLocation);
-
-            john = false;
-        }
-
-        if(finalArea < 0.00999){
-            john = true;
-        }
 
 
         printDebugData();

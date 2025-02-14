@@ -59,7 +59,7 @@ public class RobotCore extends OpMode {
         stopper.setDirection(Servo.Direction.FORWARD);
 
         leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection((DcMotor.Direction.REVERSE));
+        leftBack.setDirection(DcMotor.Direction.REVERSE);
 
         axelMotor.setDirection(DcMotorEx.Direction.FORWARD);
         axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);

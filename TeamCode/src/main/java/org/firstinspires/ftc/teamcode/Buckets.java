@@ -22,14 +22,17 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.opencv.core.Mat;
 
 import java.util.Objects;
@@ -66,80 +69,41 @@ public class Buckets extends LinearOpMode {
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
 
         TrajectoryActionBuilder sample = drive.actionBuilder(start)
-                .strafeTo(new Vector2d(-34, -47))
-                .strafeToLinearHeading(new Vector2d(-54.4, -53.8), Math.toRadians(45));
+//                .strafeTo(new Vector2d(-34, -47))
+                .strafeToLinearHeading(new Vector2d(-53.4, -52.6), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-54.4, -53.8, Math.toRadians(45)))
+        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-53.4, -52.6, Math.toRadians(45)))
                 .strafeToLinearHeading(new Vector2d(-47, -43), Math.toRadians(90));
 
         TrajectoryActionBuilder sample1Score = drive.actionBuilder(new Pose2d(-47, -43, Math.toRadians(90)))
 //                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
-                .strafeToLinearHeading(new Vector2d(-53, -53.4), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-53, -52.2), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-53, -53.4, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(-57, -43), Math.toRadians(90));
+        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-53, -52.2, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-58, -43), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample2Score = drive.actionBuilder(new Pose2d(-57, -43, Math.toRadians(90)))
+        TrajectoryActionBuilder sample2Score = drive.actionBuilder(new Pose2d(-58, -43, Math.toRadians(90)))
 //                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
-                .strafeToLinearHeading(new Vector2d(-53, -53.4), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-53, -52.2), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(-53, -53.4, Math.toRadians(45)))
+        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(-53, -52.2, Math.toRadians(45)))
                 .strafeToLinearHeading(new Vector2d(-50, -43), Math.toRadians(142));
 //                .strafeTo(new Vector2d(-51.25, -23));
 
         TrajectoryActionBuilder sample3Score = drive.actionBuilder(new Pose2d(-50, -43, Math.toRadians(142)))
 //                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
-                .strafeToLinearHeading(new Vector2d(-52.5, -54.5), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-53, -52.2), Math.toRadians(45));
 
 
-
-        TrajectoryActionBuilder submersible1 = drive.actionBuilder(new Pose2d(-52.5, -54.5, Math.toRadians(45)))
+        TrajectoryActionBuilder submersible1 = drive.actionBuilder(new Pose2d(-53, -52.2, Math.toRadians(45)))
                 .splineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(0)), Math.toRadians(90))
-                .strafeTo(new Vector2d(-23.5, -10));
-
-        TrajectoryActionBuilder submersible1Grab = drive.actionBuilder(new Pose2d(-23.5, -10, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-23.5, -2.5));
-
-        TrajectoryActionBuilder sub1SPullOut = drive.actionBuilder(new Pose2d(-23.5, -2.5, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-35, -2.5));
-
-        TrajectoryActionBuilder sub1Score = drive.actionBuilder(new Pose2d(-35, -2.5, Math.toRadians(0)))
-                .strafeToLinearHeading(new Vector2d(-52.5, -54.5), Math.toRadians(45));
-
-
-        TrajectoryActionBuilder submersible2 = drive.actionBuilder(new Pose2d(-23.5, -10, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-23.5, -8));
-
-        TrajectoryActionBuilder submersible2Grab = drive.actionBuilder(new Pose2d(-23.5, -8, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-23.5, -0.5));
-
-        TrajectoryActionBuilder sub2SPullOut = drive.actionBuilder(new Pose2d(-23.5, -0.5, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-35, -0.5));
-
-        TrajectoryActionBuilder sub2Score = drive.actionBuilder(new Pose2d(-35, -0.5, Math.toRadians(0)))
-                .strafeToLinearHeading(new Vector2d(-50, -52), Math.toRadians(45))
-                .strafeTo(new Vector2d(-52.5, -54.5));
-
-
-        TrajectoryActionBuilder submersible3 = drive.actionBuilder(new Pose2d(-23.5, -8, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-23.5, -6));
-
-        TrajectoryActionBuilder submersible3Grab = drive.actionBuilder(new Pose2d(-23.5, -6, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-23.5, 1.5));
-
-        TrajectoryActionBuilder sub3SPullOut = drive.actionBuilder(new Pose2d(-23.5, 1.5, Math.toRadians(0)))
-                .strafeTo(new Vector2d(-35, 1.5));
-
-        TrajectoryActionBuilder sub3Score = drive.actionBuilder(new Pose2d(-35, 1.5, Math.toRadians(0)))
-                .strafeToLinearHeading(new Vector2d(-50, -52), Math.toRadians(45))
-                .strafeTo(new Vector2d(-52.5, -54.5));
+                .strafeTo(new Vector2d(-26, -7));
 
 
         //Closes the claw onto the sample
         Actions.runBlocking(
                 new ParallelAction(
-                    claw.setClawPosition(0.4),
-                        camera.activate()
+                        claw.setClawPosition(0.4)
                 )
         );
 
@@ -148,328 +112,171 @@ public class Buckets extends LinearOpMode {
 
         //The actual running stuff:
         Actions.runBlocking(
-                new SequentialAction(
-                        new ParallelAction(
-                                axel.setAxelPosition(),
-                                new SequentialAction(
-                                    new ParallelAction(
-                                                    claw.setClawYPosition(0.267),
-                                                    sample.build(),
-                                                    new SequentialAction(
-                                                            axel.changeAxelPosition(276, 1),
-                                                            stopper.setStopperPosition(0.53),
-                                                            new SleepAction(0.4),
-                                                            new ParallelAction(
-                                                                    axel.changeAxelPosition(258, 0.65),
-                                                                    slide.setSlidePosition(2240, 1)
-                                                            )
-                                                    )
-                                            ),
-                                            claw.setClawPosition(0.75),
-                                            new SleepAction(0.1),
-                                            claw.setClawYPosition(0.4),
-
-                                            new ParallelAction(
-                                                    sample1.build(),
-                                                    claw.setClawYPosition(0.807),
-                                                    claw.setClawXPosition(0.745),
-                                                    new SequentialAction(
-                                                            slide.setSlidePosition(15, 1),
-                                                            axel.changeAxelPosition(985, 0.6),
-                                                            new SleepAction(0.3),
-                                                            axel.changeAxelPosition(985, 0.01)
-                                                    )
-                                            ),
-                                            new SleepAction(0.3),
-                                            claw.setClawPosition(0.4),
-                                            new SleepAction(0.4),
-
-                                            new ParallelAction(
-                                                    claw.setClawYPosition(0.3),
-                                                    sample1Score.build(),
-                                                    new SequentialAction(
-                                                            axel.changeAxelPosition(255, 0.85),
-                                                            new SleepAction(0.4),
-                                                            slide.setSlidePosition(2240, 1)
-                                                    )
-                                            ),
-                                            claw.setClawYPosition(0.2),
-                                            new SleepAction(0.2),
-                                            claw.setClawPosition(0.75),
-                                            new SleepAction(0.1),
-                                            claw.setClawYPosition(0.4),
-
-                                            new ParallelAction(
-                                                    sample2.build(),
-                                                    claw.setClawYPosition(0.807),
-                                                    claw.setClawXPosition(0.745),
-                                                    new SequentialAction(
-                                                            slide.setSlidePosition(15, 1),
-                                                            axel.changeAxelPosition(985, 0.6),
-                                                            new SleepAction(0.3),
-                                                            axel.changeAxelPosition(985, 0.01)
-                                                    )
-                                            ),
-                                            new SleepAction(0.4),
-                                            claw.setClawPosition(0.4),
-                                            new SleepAction(0.4),
-
-                                            new ParallelAction(
-                                                    claw.setClawYPosition(0.3),
-                                                    sample2Score.build(),
-                                                    new SequentialAction(
-                                                            axel.changeAxelPosition(255, 0.75),
-                                                            new SleepAction(0.4),
-                                                            slide.setSlidePosition(2240, 1)
-                                                    )
-                                            ),
-                                            claw.setClawYPosition(0.2),
-                                            new SleepAction(0.2),
-                                            claw.setClawPosition(0.75),
-                                            new SleepAction(0.1),
-                                            claw.setClawYPosition(0.4),
-
-                                            new ParallelAction(
-                                                    sample3.build(),
-                                                    claw.setClawYPosition(0.807),
-                                                    claw.setClawXPosition(0.78),
-                                                    new SequentialAction(
-                                                            slide.setSlidePosition(15, 1),
-                                                            axel.changeAxelPosition(985, 0.6),
-                                                            new SleepAction(0.3),
-                                                            axel.changeAxelPosition(985, 0.01)
-                                                    )
-                                            ),
-                                            new SleepAction(0.2),
-                                            slide.setSlidePosition(600, 1),
-                                            new SleepAction(0.1),
-                                            claw.setClawPosition(0.4),
-                                            new SleepAction(0.4),
-
-                                            new ParallelAction(
-                                                    claw.setClawYPosition(0.3),
-                                                    sample3Score.build(),
-                                                    claw.setClawXPosition(0.745),
-                                                    new SequentialAction(
-                                                            slide.setSlidePosition(300, 1),
-                                                            axel.changeAxelPosition(258, 1),
-                                                            new SleepAction(0.3),
-                                                            slide.setSlidePosition(2240, 1)
-                                                    )
-                                            ),
-                                            claw.setClawYPosition(0.2),
-                                            new SleepAction(0.2),
-                                            claw.setClawPosition(0.75),
-                                            new SleepAction(0.1),
-                                            claw.setClawYPosition(0.4),
-
-                                            new ParallelAction(
-                                                    submersible1.build(),
-                                                    claw.setClawYPosition(0.807),
-                                                    claw.setClawXPosition(0.7767),
-                                                    new SequentialAction(
-                                                            slide.setSlidePosition(15,1),
-                                                            axel.changeAxelPosition(600, 0.7)
-                                                    )
-                                            ),
-
-                                            new SleepAction(0.3),
-
-                                            new ParallelAction(
-                                                    camera.subSample(),
-                                                    new SequentialAction(
-                                                            axel.changeAxelPosition(955, 0.7),
-                                                            new SleepAction(0.4),
-                                                            axel.changeAxelPosition(0, 0),
-                                                            axel.changeAxelPosition(10000000, 0)
-                                                    )
-                                            )
-
-                            ))));
-
-        telemetry.addData("step", limeCheckLoc);
-
-                            if(limeCheckLoc == 0) {
-                                Actions.runBlocking(
+                new ParallelAction(
+                        axel.setAxelPosition(),
+                        new SequentialAction(
+                                new ParallelAction(
+                                        claw.setClawYPosition(0.4),
+                                        sample.build(),
                                         new SequentialAction(
-                                                axel.changeAxelPosition(0,0),
+                                                stopper.setStopperPosition(0.53),
+                                                axel.changeAxelPosition(285),
                                                 new ParallelAction(
-                                                        axel.setAxelPosition(),
+                                                        slide.setSlidePosition(2240, 1),
                                                         new SequentialAction(
-                                                                new ParallelAction(
-                                                                        submersible1Grab.build(),
-                                                                        slide.setSlidePosition(slideDistanceTicksSample, 1)
-                                                                ),
-                                                                claw.setClawPosition(0.4),
-                                                                new SleepAction(0.4),
-                                                                new ParallelAction(
-                                                                        new SequentialAction(
-                                                                                new SleepAction(0.2),
-                                                                            sub1SPullOut.build()
-                                                                                ),
-                                                                        new SequentialAction(
-                                                                                 new ParallelAction(
-                                                                                        slide.setSlidePosition(15,1),
-                                                                                        axel.changeAxelPosition(915, 1)
-                                                                                 ),
-                                                                                claw.setClawYPosition(0.3),
-                                                                                claw.setClawXPosition(0.745),
-                                                                                axel.changeAxelPosition(258, 1),
-                                                                                new SleepAction(0.2)
-                                                                        )
-                                                                ),
-                                                                new ParallelAction(
-                                                                        sub1Score.build(),
-                                                                        slide.setSlidePosition(2240, 1)
-                                                                ),
-                                                                claw.setClawYPosition(0.2),
-                                                                new SleepAction(0.2),
-                                                                claw.setClawPosition(0.75),
-                                                                new SleepAction(0.1),
-                                                                claw.setClawYPosition(0.4),
-                                                                slide.setSlidePosition(0, 1)
+                                                                axel.changeAxelPosition(255),
+                                                                axel.reset()
                                                         )
                                                 )
+
                                         )
-                                );
-                            }
+                                ),
+                                claw.setClawYPosition(0.267),
+                                new SleepAction(0.3),
+                                claw.setClawPosition(0.75),
+                                new SleepAction(0.1),
+                                claw.setClawYPosition(0.4),
 
-//        telemetry.addData("step", limeCheckLoc);
-//
-//                            if(limeCheckLoc == 1) {
-//                                 Actions.runBlocking(
-//                                         new SequentialAction(
-//                                                 submersible2.build(),
-//                                                new SleepAction(0.5),
-//                                                camera.subSample()
-//                                         )
-//                                );
-//                            }
-//
-//        telemetry.addData("step", limeCheckLoc);
-//
-//                            if(limeCheckLoc == 1){
-//                                    Actions.runBlocking(
-//                                            new SequentialAction(
-//                                                    axel.changeAxelPosition(0,0),
-//                                                    new ParallelAction(
-//                                                            axel.setAxelPosition(),
-//                                                            new SequentialAction(
-//                                                                    new ParallelAction(
-//                                                                            submersible2Grab.build(),
-//                                                                            slide.setSlidePosition(slideDistanceTicksSample, 1)
-//                                                                     ),
-//                                                                    claw.setClawPosition(0.4),
-//                                                                    new SleepAction(0.4),
-//                                                                    new ParallelAction(
-//                                                                            sub2SPullOut.build(),
-//                                                                            new SequentialAction(
-//                                                                                    new ParallelAction(
-//                                                                                            slide.setSlidePosition(15,1),
-//                                                                                            axel.changeAxelPosition(915, 1)
-//                                                                                    ),
-//                                                                                    claw.setClawYPosition(0.267),
-//                                                                                    claw.setClawXPosition(0.745),
-//                                                                                    axel.changeAxelPosition(258, 1),
-//                                                                                    slide.setSlidePosition(2240, 1)
-//                                                                            )
-//                                                                    ),
-//                                                                    new ParallelAction(
-//                                                                            sub2Score.build(),
-//                                                                            new SequentialAction(
-//                                                                                    axel.changeAxelPosition(258, 1),
-//                                                                                    slide.setSlidePosition(2240, 1)
-//                                                                            )
-//                                                                    )
-//                                                            )
-//                                                    )
-//                                            )
-//                                    );
-//                            }
+                                new ParallelAction(
+                                        sample1.build(),
+                                        claw.setClawYPosition(0.807),
+                                        claw.setClawXPosition(0.745),
+                                        new SequentialAction(
+                                                slide.setSlidePosition(15, 1),
+                                                axel.pickUp(),
+                                                new SleepAction(0.45)
+                                        )
+                                ),
+                                claw.setClawPosition(0.4),
+                                new SleepAction(0.4),
 
-        telemetry.addData("step", limeCheckLoc);
+                                new ParallelAction(
+                                        claw.setClawYPosition(0.4),
+                                        sample1Score.build(),
+                                        new SequentialAction(
+                                                axel.score(),
+                                                axel.reset(),
+                                                slide.setSlidePosition(2240, 1)
+                                        )
+                                ),
+                                claw.setClawYPosition(0.267),
+                                new SleepAction(0.3),
+                                claw.setClawPosition(0.75),
+                                new SleepAction(0.1),
+                                claw.setClawYPosition(0.4),
+
+                                new ParallelAction(
+                                        sample2.build(),
+                                        claw.setClawYPosition(0.807),
+                                        claw.setClawXPosition(0.745),
+                                        new SequentialAction(
+                                                slide.setSlidePosition(15, 1),
+                                                axel.pickUp(),
+                                                new SleepAction(0.45)
+                                        )
+                                ),
+                                claw.setClawPosition(0.4),
+                                new SleepAction(0.4),
+
+                                new ParallelAction(
+                                        claw.setClawYPosition(0.4),
+                                        sample2Score.build(),
+                                        new SequentialAction(
+                                                axel.score(),
+                                                axel.reset(),
+                                                slide.setSlidePosition(2240, 1)
+                                        )
+                                ),
+                                claw.setClawYPosition(0.267),
+                                new SleepAction(0.3),
+                                claw.setClawPosition(0.75),
+                                new SleepAction(0.1),
+                                claw.setClawYPosition(0.4),
+
+                                new ParallelAction(
+                                        sample3.build(),
+                                        claw.setClawYPosition(0.807),
+                                        claw.setClawXPosition(0.78),
+                                        new SequentialAction(
+                                                slide.setSlidePosition(15, 1),
+                                                axel.pickUp(),
+                                                new SleepAction(0.3)
+                                        )
+                                ),
+                                slide.setSlidePosition(630, 1),
+                                new SleepAction(0.1),
+                                claw.setClawPosition(0.4),
+                                new SleepAction(0.4),
+
+                                new ParallelAction(
+                                        claw.setClawYPosition(0.4),
+                                        sample3Score.build(),
+                                        claw.setClawXPosition(0.745),
+                                        new SequentialAction(
+                                                slide.setSlidePosition(15, 1),
+                                                axel.score(),
+                                                axel.reset(),
+                                                slide.setSlidePosition(2240, 1)
+                                        )
+                                ),
+                                claw.setClawYPosition(0.267),
+                                new SleepAction(0.3),
+                                claw.setClawPosition(0.74),
+                                new SleepAction(0.1),
+                                claw.setClawYPosition(0.4),
+
+                                new ParallelAction(
+                                        slide.setSlidePosition(15, 1),
+                                        submersible1.build(),
+                                        claw.setClawYPosition(0.807),
+                                        claw.setClawPosition(0.75)
+                                ),
+                                camera.rotation(),
+                                camera.distance(),
+                                axel.pickUp(),
+                                slide.setSlidePosition(slideDistanceTicksSample, 1),
+                                claw.setClawPosition(0.4),
+                                new SleepAction(0.4),
+                                axel.off()
+                        )));
+
+        TrajectoryActionBuilder subScore = drive.actionBuilder(new Pose2d(-26, -7, Math.toRadians(targetRotation)))
+                .strafeToLinearHeading(new Vector2d(-59, -53.4), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(-54, -53.4), Math.toRadians(45));
 
 
-//                            if(limeCheckLoc == 2) {
-//                                    Actions.runBlocking(
-//                                            new SequentialAction(
-//                                                    submersible3.build(),
-//                                                    new SleepAction(0.5),
-//                                                    camera.subSample()
-//                                            )
-//                                    );
-//                            }
-//
-//        telemetry.addData("step", limeCheckLoc);
-//
-//                            if(limeCheckLoc == 2){
-//                                    Actions.runBlocking(
-//                                            new SequentialAction(
-//                                                    axel.changeAxelPosition(0, 0),
-//                                                    new ParallelAction(
-//                                                            axel.setAxelPosition(),
-//                                                            new SequentialAction(
-//                                                                    new ParallelAction(
-//                                                                            submersible3Grab.build(),
-//                                                                            slide.setSlidePosition(slideDistanceTicksSample, 1)
-//                                                                    ),
-//                                                                    claw.setClawPosition(0.4),
-//                                                                    new SleepAction(0.4),
-//                                                                    new ParallelAction(
-//                                                                            sub3SPullOut.build(),
-//                                                                            new SequentialAction(
-//                                                                                    new ParallelAction(
-//                                                                                            slide.setSlidePosition(15,1),
-//                                                                                            axel.changeAxelPosition(915, 1)
-//                                                                                    ),
-//                                                                                    claw.setClawYPosition(0.267),
-//                                                                                    claw.setClawXPosition(0.745),
-//                                                                                    axel.changeAxelPosition(258, 1),
-//                                                                                    slide.setSlidePosition(2240, 1)
-//                                                                            )
-//                                                                    ),
-//                                                                    new ParallelAction(
-//                                                                            sub3Score.build(),
-//                                                                            new SequentialAction(
-//                                                                                    axel.changeAxelPosition(258, 1),
-//                                                                                    slide.setSlidePosition(2240, 1)
-//                                                                            )
-//                                                                    )
-//                                                            )
-//                                                    )
-//                                            )
-//                                    );
-//                            }
+        Actions.runBlocking(
+                new ParallelAction(
+                        axel.setAxelPosition(),
+                        new SequentialAction(
+                                new ParallelAction(
+                                        subScore.build(),
+                                        claw.setClawYPosition(0.267),
+                                        new SequentialAction(
+                                                new ParallelAction(
+                                                        axel.changeAxelPosition(750),
+                                                    slide.setSlidePosition(0, 1)
+                                                ),
+                                                axel.score(),
+                                                slide.setSlidePosition(2240, 1)
+                                        )
+                                ),
+                                claw.setClawPosition(0.74),
+                                new SleepAction(0.1),
+                                claw.setClawYPosition(0.4),
+                                slide.setSlidePosition(15, 1)
 
-        telemetry.addData("step", limeCheckLoc);
-
-                            if(limeCheckLoc > 0){
-                                    Actions.runBlocking(
-                                            new SequentialAction(
-                                                    axel.changeAxelPosition(0,0),
-                                                    new ParallelAction(
-                                                            axel.setAxelPosition(),
-                                                            new SequentialAction(
-                                                                    slide.setSlidePosition(15, 1),
-                                                                    axel.changeAxelPosition(255, 0.8),
-                                                                    sub1SPullOut.build(),
-                                                                    sub1Score.build()
-                                                            )
-                                                    )
-
-                                            )
-
-                                    );
-                            }
-
-        telemetry.addData("step", limeCheckLoc);
-
+                        )
+                )
+        );
 
 
     }
 
 
     //Making the slide class to make the slide object to be moved during auto
+    int slideLength;
+
     public class Slide {
         DcMotorEx slideMotor;
         DcMotorEx slideMotor2;
@@ -506,12 +313,14 @@ public class Buckets extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                slideLength = slideMotor.getCurrentPosition();
                 //If the slide is in roughly the correct location then stop the loop so the rest of the code can run, otherwise continue looping
                 if (slideTarget == 0 && slideMotor.getCurrentPosition() < 10) {
                     return false;
                 } else if (slideTarget == 15 && slideMotor.getCurrentPosition() < 25) {
                     return false;
-                }else if (slideMotor.getCurrentPosition() > slideTarget - 6 && slideMotor.getCurrentPosition() < slideTarget + 6) {
+                } else if (slideMotor.getCurrentPosition() > slideTarget - 6 && slideMotor.getCurrentPosition() < slideTarget + 6) {
                     return false;
                 } else if (slideTarget == 2240 && slideMotor.getCurrentPosition() > 2210) {
                     return false;
@@ -538,30 +347,38 @@ public class Buckets extends LinearOpMode {
 
     int target = 0;
 
+    boolean axelOff = false;
+    boolean axelReset = false;
+
+    boolean turnAxelOff = false;
+
     //Making the axel class to make the slide object to be moved during auto
     public class Axel {
+        private PIDController controller;
+
+        public double p = 0.005, i = 0, d = 0.00015;
+        public double f = 0.0025;
+
+        private final double ticks_in_degree = 700 / 180.0;
+
         DcMotorEx axelMotor;
         DcMotorEx axelMotor2;
 
         public Axel(HardwareMap hardwareMap) {
+            controller = new PIDController(p, i, d);
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
             axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
             axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
 
-            //Reverse the second axelMotor so they work together
-            axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-
-            axelMotor.setTargetPosition(0);
-            axelMotor2.setTargetPosition(0);
-
-            //Reset the slide encoders to make sure it is accurate
             axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            axelMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-
             axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            axelMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-            axelMotor.setPower(1);
-            axelMotor2.setPower(1);
+            axelMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            axelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+            axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+            axelMotor.setDirection(DcMotorEx.Direction.FORWARD);
         }
 
         public class SetAxelPosition implements Action {
@@ -572,25 +389,78 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
-                telemetry.addData("Target", target);
-                telemetry.addData("AxelPower", axelMotor.getPower());
+                controller.setPID(p, i, d);
+                int axelPos = axelMotor.getCurrentPosition();
+                double pid = controller.calculate(axelPos, target);
+                double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
-                axelMotor.setTargetPosition(target);
-                axelMotor2.setTargetPosition(target);
+                double power = pid + ff;
 
-                if (target == 10000000) {
-                    return false;
+                if (axelReset && slideLength > 1300) {
+                    axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                    axelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    axelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                    axelReset = false;
                 }
 
+                if (!axelOff) {
+                    axelMotor.setPower(power);
+                    axelMotor2.setPower(power);
+                } else {
+                    axelMotor.setPower(0);
+                    axelMotor2.setPower(0);
+                }
+
+                telemetry.addData("pos", axelPos);
+                telemetry.addData("target", target);
+                telemetry.addData("power", power);
+
                 telemetry.update();
+
+                if (turnAxelOff) {
+                    turnAxelOff = false;
+                    return false;
+                }
                 return true;
             }
         }
 
         public Action setAxelPosition() {
             return new SetAxelPosition();
+        }
+
+
+        public class ChangeAxelPosition implements Action {
+            int tar;
+            double pow;
+
+            public ChangeAxelPosition(int axelTar) {
+                tar = axelTar;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                axelOff = false;
+                target = tar;
+
+                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("Target", target);
+                telemetry.addData("AxelPower", axelMotor.getPower());
+
+                if (axelMotor.getCurrentPosition() > target - 3 && axelMotor.getCurrentPosition() < target + 3) {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        public Action changeAxelPosition(int axelTar) {
+            return new ChangeAxelPosition(axelTar);
         }
 
 
@@ -607,23 +477,21 @@ public class Buckets extends LinearOpMode {
                 telemetry.addData("Target", target);
                 telemetry.addData("AxelPower", axelMotor.getPower());
 
-                target = 985;
+                target = 875;
+                return false;
 
-                if(axelMotor.getCurrentPosition() > 720){
-                    axelMotor.setPower(0.001);
-                    axelMotor2.setPower(0.001);
-                }else{
-                    axelMotor.setPower(0.6);
-                    axelMotor2.setPower(0.6);
-                }
-
-                telemetry.update();
-
-                if(axelMotor.getCurrentPosition() > 880){
-                    return false;
-                }
-                return true;
-
+//                if (axelMotor.getCurrentPosition() > 485) {
+//                    axelOff = true;
+//                    target = 721;
+//                } else {
+//                    axelOff = false;
+//                    target = 500;
+//                }
+//
+//                if(axelMotor.getCurrentPosition() > 710){
+//                    return false;
+//                }
+//                return true;
             }
         }
 
@@ -632,40 +500,86 @@ public class Buckets extends LinearOpMode {
         }
 
 
-        public class ChangeAxelPosition implements Action {
-            int tar;
-            double pow;
+        public class Score implements Action {
 
-            public ChangeAxelPosition(int axelTar, double power) {
-                tar = axelTar;
-                pow = power;
+            public Score() {
             }
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-                target = tar;
 
                 telemetry.addData("axelPos", axelMotor.getCurrentPosition());
                 telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
                 telemetry.addData("Target", target);
                 telemetry.addData("AxelPower", axelMotor.getPower());
 
-                axelMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                axelMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                axelOff = false;
 
-                axelMotor.setPower(pow);
-                axelMotor2.setPower(pow);
+                if (axelMotor.getCurrentPosition() < 50) {
+                    axelReset = true;
+                    target = -30;
+                    return false;
+                } else {
+                    target = -100;
+                }
+
+                return true;
+            }
+        }
+
+        public Action score() {
+            return new Score();
+        }
+
+
+        public class Reset implements Action {
+
+            public Reset() {
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("Target", target);
+                telemetry.addData("AxelPower", axelMotor.getPower());
+
+                axelOff = false;
+
+                if (axelMotor.getCurrentPosition() < 285) {
+                    target = -3;
+                    axelReset = true;
+                    return false;
+                } else {
+                    target = 280;
+                }
+                return true;
+            }
+        }
+
+        public Action reset() {
+            return new Reset();
+        }
+
+
+        public class Off implements Action {
+
+            public Off() {
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                turnAxelOff = true;
 
                 return false;
             }
         }
 
-        public Action changeAxelPosition(int axelTar, double power) {
-            return new ChangeAxelPosition(axelTar, power);
+        public Action off() {
+            return new Off();
         }
-
-
 
     }
 
@@ -728,7 +642,6 @@ public class Buckets extends LinearOpMode {
         }
 
 
-
         public class SetClawXPosition implements Action {
             double clawXPosition;
 
@@ -744,6 +657,7 @@ public class Buckets extends LinearOpMode {
             }
 
         }
+
         public Action setClawXPosition(double clawXPos) {
             return new SetClawXPosition(clawXPos);
         }
@@ -812,33 +726,58 @@ public class Buckets extends LinearOpMode {
 
 
     int slideDistanceTicksSample;
-    int limeCheckLoc = 0;
 
     int i = 0;
 
+    double robotAngle = 0;
+    double targetRotation = 0;
+
+    double finalArea = 0;
+    double areaTotal = 0;
 
     Vector<Integer> distance = new Vector<>();
+    Vector<Double> area = new Vector<>();
 
     public class Cam {
         private Limelight3A limelight;
 
-        public Cam(HardwareMap hardwareMap){
-            limelight = hardwareMap.get(Limelight3A .class, "limelight");
+        DcMotor leftBack;
+        DcMotor rightBack;
+        DcMotor leftFront;
+        DcMotor rightFront;
+
+        IMU imu;
+
+        public Cam(HardwareMap hardwareMap) {
+            limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
             telemetry.setMsTransmissionInterval(11);
 
             limelight.pipelineSwitch(0);
 
             limelight.start();
+
+            leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
+            rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
+            leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+            rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+            leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+
+            imu = hardwareMap.get(IMU.class, "imu");
+
+            imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.FORWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+
         }
 
-        public class Activate implements Action{
+        public class Activate implements Action {
 
-            public Activate(){
+            public Activate() {
             }
 
             @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 limelight.start();
 
                 return false;
@@ -846,19 +785,18 @@ public class Buckets extends LinearOpMode {
 
         }
 
-        public Action activate(){
+        public Action activate() {
             return new Activate();
         }
 
 
+        public class Distance implements Action {
 
-        public class SubSample implements Action{
-
-            public SubSample(){
+            public Distance() {
             }
 
             @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
                 LLResult result = limelight.getLatestResult();
 
@@ -866,84 +804,164 @@ public class Buckets extends LinearOpMode {
                 double ty = result.getTy(); // How far up or down the target is (degrees)
                 double ta = result.getTa();
 
+                double a = 7301.82;
+                double b = -5.8445;
 
-                if(tx > -7 && tx < 7) {
-
-                    telemetry.addData("tx", tx);
-
-                    if (ta < 0.0099) {
-                        return true;
-                    }
-
-                    if (ta <= 0.33) {
-                        slideDistanceTicksSample = 800;
-                    } else if (ta <= 0.41) {
-                        slideDistanceTicksSample = 710;
-                    } else if (ta <= 0.44) {
-                        slideDistanceTicksSample = 620;
-                    } else if (ta <= 0.5) {
-                        slideDistanceTicksSample = 527;
-                    } else if (ta <= 0.55) {
-                        slideDistanceTicksSample = 435;
-                    } else if (ta <= 0.61) {
-                        slideDistanceTicksSample = 400;
-                    }else if (ta <= 0.67) {
-                        slideDistanceTicksSample = 365;
-                    } else if (ta <= 0.76) {
-                        slideDistanceTicksSample = 270;
-                    }else if (ta <= 0.85) {
-//                        slideDistanceTicksSample = 175;
-                    } else {
-                        limeCheckLoc ++;
-                        return false;
-                    }
-
-                    distance.add(slideDistanceTicksSample);
-
-                    if (i == 5) {
-                        if (Objects.equals(distance.get(0), distance.get(1)) && Objects.equals(distance.get(0), distance.get(2)) && Objects.equals(distance.get(0), distance.get(3)) && Objects.equals(distance.get(0), distance.get(4)) && Objects.equals(distance.get(0), distance.get(5))) {
-                            i = 0;
-
-                            telemetry.addData("0", distance.get(0));
-                            telemetry.addData("1", distance.get(1));
-                            telemetry.addData("2", distance.get(2));
-                            telemetry.addData("3", distance.get(3));
-                            telemetry.addData("4", distance.get(4));
-                            telemetry.addData("5", distance.get(5));
-
-
-                            distance.clear();
-                            return false;
-                        } else {
-                            i = 0;
-                            distance.clear();
-                            return true;
-                        }
-                    } else if (i > 5) {
-                        i = 0;
-                        distance.clear();
-                        return true;
-                    } else {
-                        i++;
-                        return true;
-                    }
-                } else{
-                    limeCheckLoc++;
-                    telemetry.addData("tx", tx);
-                    return false;
+                if (ta < 0.0099) {
+                    return true;
                 }
 
+                if (ta <= 0.33) {
+                    slideDistanceTicksSample = 800;
+                } else if (ta <= 0.41) {
+                    slideDistanceTicksSample = 710;
+                } else if (ta <= 0.44) {
+                    slideDistanceTicksSample = 620;
+                } else if (ta <= 0.5) {
+                    slideDistanceTicksSample = 527;
+                } else if (ta <= 0.55) {
+                    slideDistanceTicksSample = 435;
+                } else if (ta <= 0.61) {
+                    slideDistanceTicksSample = 400;
+                } else if (ta <= 0.67) {
+                    slideDistanceTicksSample = 365;
+                } else if (ta <= 0.76) {
+                    slideDistanceTicksSample = 270;
+                } else if (ta <= 0.95) {
+                    slideDistanceTicksSample = 175;
+                } else {
+                    slideDistanceTicksSample = 15;
+                }
+
+                distance.add(slideDistanceTicksSample);
+                area.add(ta);
+
+                if (i == 5) {
+                    if (Objects.equals(distance.get(0), distance.get(1)) && Objects.equals(distance.get(0), distance.get(2)) && Objects.equals(distance.get(0), distance.get(3)) && Objects.equals(distance.get(0), distance.get(4)) && Objects.equals(distance.get(0), distance.get(5))) {
+                        i = 0;
+                        areaTotal = 0;
+
+                        telemetry.addData("0", distance.get(0));
+                        telemetry.addData("1", distance.get(1));
+                        telemetry.addData("2", distance.get(2));
+                        telemetry.addData("3", distance.get(3));
+                        telemetry.addData("4", distance.get(4));
+
+                        for (int h = 0; h < 6; h++) {
+                            areaTotal += distance.get(h);
+                        }
+
+                        finalArea = (areaTotal / 6);
+
+                        slideDistanceTicksSample = (int) (a * Math.exp(b * finalArea));
+
+//                        slideDistanceTicksSample += 60;
+
+                        telemetry.addData("slideEncoder", slideDistanceTicksSample);
+
+                        distance.clear();
+                        area.clear();
+                        return false;
+                    } else {
+                        i = 0;
+                        areaTotal = 0;
+                        distance.clear();
+                        area.clear();
+                        return true;
+                    }
+                } else if (i > 5) {
+                    i = 0;
+                    distance.clear();
+                    area.clear();
+                    areaTotal = 0;
+                    return true;
+                } else {
+                    return true;
+                }
+
+
+            }
+        }
+
+        public Action distance() {
+            return new Distance();
+        }
+
+
+        public class Rotation implements Action {
+
+            double speed = 0;
+            double angle = 0;
+
+            public Rotation() {
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+                LLResult result = limelight.getLatestResult();
+
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa();
+
+                angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                robotAngle = angle;
+
+                if (robotAngle >= 0) {
+                    targetRotation = 0 + robotAngle;
+                } else {
+                    targetRotation = 360 + robotAngle;
+                }
+
+                telemetry.addData("robotAngle", angle);
+                telemetry.addData("targetRotation", targetRotation);
+
+                leftBack.setPower(speed);
+                leftFront.setPower(speed);
+                rightBack.setPower(-speed);
+                rightFront.setPower(-speed);
+
+                telemetry.addData("tx", tx);
+
+                if (tx > -4 && tx < -2) {
+                    leftBack.setPower(0);
+                    leftFront.setPower(0);
+                    rightBack.setPower(0);
+                    rightFront.setPower(0);
+                    speed = 0;
+                    telemetry.addLine("Targeted Successfully");
+                    return false;
+                } else {
+                    if (tx <= -4) {
+                        if (tx <= -12) {
+                            speed = -0.35;
+                        } else {
+                            speed = -0.25;
+                        }
+                    } else if (tx >= -2) {
+                        if (tx >= 6) {
+                            speed = 0.35;
+                        } else {
+                            speed = 0.25;
+                        }
+                    }
+                }
+
+
+                return true;
             }
 
         }
 
-        public Action subSample(){
-            return new SubSample();
+        //-1.5 to -4
+
+        public Action rotation() {
+            return new Rotation();
         }
 
 
     }
-
 
 
 }
