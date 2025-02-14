@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -17,9 +18,9 @@ import java.util.List;
 @TeleOp(name = "RobotCore", group = "Core")
 public class RobotCore extends OpMode
 {
-    DcMotor frontLeft, frontRight, backRight, backLeft, leftSlide, rightSlide, leftHang, rightHang;
+    DcMotor frontLeft, frontRight, backRight, backLeft, leftSlide, rightSlide, leftGrevious, rightGrevious;
 
-    Servo horizontal, pivot;
+    Servo horizontal, pivot, leftHang, rightHang;
 
     CRServo leftClaw, rightClaw;
 
@@ -37,11 +38,14 @@ public class RobotCore extends OpMode
 
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
         rightSlide = hardwareMap.get(DcMotor.class, "rightSlide");
-        leftHang = hardwareMap.get(DcMotor.class, "leftHang");
-        rightHang = hardwareMap.get(DcMotor.class, "rightHang");
+        leftGrevious = hardwareMap.get(DcMotor.class, "leftGrevious");
+        rightGrevious = hardwareMap.get(DcMotor.class, "rightGrevious");
 
+        leftHang = hardwareMap.get(Servo.class, "drivePivot");
+        rightHang = hardwareMap.get(Servo.class, "supportPivot");
         horizontal = hardwareMap.get(Servo.class, "horizontal");
         pivot = hardwareMap.get(Servo.class, "pivot");
+
 
         leftClaw = hardwareMap.get(CRServo.class, "leftClaw");
         rightClaw = hardwareMap.get(CRServo.class, "rightClaw");
@@ -50,7 +54,7 @@ public class RobotCore extends OpMode
 
         computer.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
-        motors = Arrays.asList(frontLeft, backLeft, frontRight, backRight, leftSlide, rightSlide, leftHang, rightHang);
+        motors = Arrays.asList(frontLeft, backLeft, frontRight, backRight, leftSlide, rightSlide, leftGrevious, rightGrevious);
 
 
         //Reversing
@@ -60,22 +64,19 @@ public class RobotCore extends OpMode
         horizontal.setDirection(Servo.Direction.REVERSE);
         pivot.setDirection(Servo.Direction.REVERSE);
 
-        rightSlide.setDirection(DcMotor.Direction.REVERSE);
-        leftHang.setDirection(DcMotor.Direction.REVERSE);
+        leftHang.setDirection(Servo.Direction.REVERSE);
 
+        rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftGrevious.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Slide Settings
 
-        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         for(DcMotor motor: motors)

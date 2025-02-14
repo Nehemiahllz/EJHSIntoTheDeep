@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
+import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 @TeleOp(name = "MainTele", group = "A")
@@ -22,15 +27,18 @@ public class MainTeleOp extends RobotCore
 
     double max;
 
+
     //This is a public subclass of RobotCore, so the robot's wheel motors are initialized in RobotCore
     public void init()
     {
         super.init();
     }
 
+    public void start()
+    {
+    }
+
     public void loop() {
-
-
         //MOVING CONTROLS-----------------------------------------------------------------
         y = gamepad1.left_stick_y; // Remember, Y stick value is reversed
         x = -gamepad1.left_stick_x; // Counteract imperfect strafing
@@ -71,24 +79,13 @@ public class MainTeleOp extends RobotCore
         }
 
 
-        //INTAKE  CONTROLS------------------------------------------------------
-        if (gamepad1.right_stick_y > 0.5)
-            horizontal.setPosition(0);
-        if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.42);
 
-        if (gamepad1.a)
-            pivot.setPosition(0);
-        if (gamepad1.y)
-            pivot.setPosition(0.7);
-        if(gamepad1.x)
-            pivot.setPosition(0.35);
-
+        //INTAKE  CONTROLS----------------------------------------------------------------------------------------------
         //Taking In Sample
         if (gamepad2.left_bumper) {
             leftClaw.setPower(1);
             rightClaw.setPower(-1);
-        //Pushing Out Sample
+            //Pushing Out Sample
         } else if (gamepad2.right_bumper) {
             leftClaw.setPower(-1);
             rightClaw.setPower(1);
@@ -98,70 +95,112 @@ public class MainTeleOp extends RobotCore
         }
 
 
-        //SLIDE CONTROLS-----------------------------------------------------------
-        if (gamepad2.dpad_up && limitHeight("<", 4400)) {
-            leftSlide.setPower(1);
-            rightSlide.setPower(1);
-        } else if (gamepad2.dpad_down && limitHeight(">=", 0)) {
-            leftSlide.setPower(-0.75);
-            rightSlide.setPower(-0.75);
-        } else {
+        //HORIZONTAL SLIDE CONTROLS--------------------------------------------------------------------------
+        
+        if (gamepad1.right_stick_y > 0.5)
+            horizontal.setPosition(0);
+        if (gamepad1.right_stick_y < -0.5)
+            horizontal.setPosition(0.23);
+
+        //PIVOT CONTROLS -------------------------------------------------------------------------------------
+            if (gamepad1.a)
+                pivot.setPosition(0);
+            if (gamepad1.y)
+                pivot.setPosition(0.6);
+            if (gamepad1.x)
+                pivot.setPosition(0.3);
+
+        //HANG CONTROLS----------------------------------------------------------------------------
+        if(gamepad1.left_stick_button)
+        {
+            leftHang.setPosition(0);
+            rightHang.setPosition(0);
+        }
+        if(gamepad1.right_stick_button)
+        {
+            leftHang.setPosition(1);
+            rightHang.setPosition(1);
+        }
+
+
+
+        //VERTICAL SLIDES CONTROLS-----------------------------------------------------------
+        if (gamepad2.dpad_up) {
+            setSlidePositions(4400);
+        }
+        else if(gamepad2.dpad_down) {
+            setSlidePositions(0);
+        }
+        else if(gamepad2.dpad_right  || gamepad1.dpad_right)
+            setSlidePositions(290);
+        else if(gamepad2.dpad_left || gamepad1.dpad_left)
+            setSlidePositions(4480);
+        else if(gamepad2.left_trigger > 0.3 || gamepad1.left_trigger > 0.3)
+            setSlidePositions(325);
+        else if(gamepad2.right_trigger > 0.3  || gamepad1.right_trigger > 0.3)
+            setSlidePositions(2200);
+        else
+        {
+            setBothSlideModes("RUN_USING_ENCODER");
             leftSlide.setPower(0.002);
             rightSlide.setPower(0.002);
         }
 
-        if(gamepad1.dpad_up  && leftHang.getCurrentPosition() < 1500)
+        if(gamepad1.dpad_up)
         {
-            leftHang.setPower(1);
-            rightHang.setPower(1);
+            leftGrevious.setPower(1);
+            rightGrevious.setPower(1);
         }
-        else if(gamepad1.dpad_down  && leftHang.getCurrentPosition() > 0)
+        else if(gamepad1.dpad_down)
         {
-            leftHang.setPower(-1);
-            rightHang.setPower(-1);
+            leftGrevious.setPower(-1);
+            rightGrevious.setPower(-1);
         }
         else
         {
-            leftHang.setPower(0);
-            rightHang.setPower(0);
+            leftGrevious.setPower(0);
+            rightGrevious.setPower(0);
         }
 
-        //Slide L 4088 R 4060
 
         //TELEMETRY----------------------------------------------------------------------
         telemetry.addData("Left Slide pos: ", leftSlide.getCurrentPosition());
         telemetry.addData("Right Slide Pos: ", rightSlide.getCurrentPosition());
-        telemetry.addData("Left Hang pos: ", leftHang.getCurrentPosition());
-        telemetry.addData("Right Hang Pos: ", rightHang.getCurrentPosition());
         telemetry.update();
 
     }
 
+
+    //METHODS-----------------------------------------------------------------------------
     public boolean limitHeight(String modifier, int targetPosition)
     {
-        if(modifier.equals( ">"))
+        if(modifier == ">")
         {
-            if(leftSlide.getCurrentPosition() > targetPosition  && rightSlide.getCurrentPosition() > targetPosition)
+            if(findLowestSlide().getCurrentPosition() > targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
-        else if (modifier.equals( "<"))
+        else if (modifier == "<")
         {
-            if(leftSlide.getCurrentPosition() < targetPosition  && rightSlide.getCurrentPosition() < targetPosition)
+            if(findHighestSlide().getCurrentPosition() < targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
-        else if (modifier.equals( "<="))
+        else if (modifier == "<=")
         {
-            if(leftSlide.getCurrentPosition() <= targetPosition && rightSlide.getCurrentPosition() <= targetPosition)
+            if(findHighestSlide().getCurrentPosition() <= targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
-        else if(modifier.equals( ">="))
+        else if(modifier == ">=")
         {
-            if(leftSlide.getCurrentPosition() >= targetPosition && rightSlide.getCurrentPosition() >= targetPosition)
+            if(findLowestSlide().getCurrentPosition() >= targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
         else return false;
     }
@@ -188,6 +227,32 @@ public class MainTeleOp extends RobotCore
             leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+    }
+
+    public void setSlidePositions(int tar)
+    {
+
+        leftSlide.setTargetPosition(tar);
+        rightSlide.setTargetPosition(tar);
+        setBothSlideModes("RUN_TO_POSITION");
+        leftSlide.setPower(1);
+        rightSlide.setPower(1);
+    }
+
+    public DcMotor findHighestSlide()
+    {
+        if(leftSlide.getCurrentPosition() > rightSlide.getCurrentPosition())
+            return leftSlide;
+        else
+            return rightSlide;
+    }
+
+    public DcMotor findLowestSlide()
+    {
+        if(leftSlide.getCurrentPosition() < rightSlide.getCurrentPosition())
+            return leftSlide;
+        else
+            return rightSlide;
     }
 
 }

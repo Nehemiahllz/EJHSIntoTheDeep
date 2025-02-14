@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -24,7 +25,9 @@ public class SoloTeleOp extends RobotCore
     //This is a public subclass of RobotCore, so the robot's wheel motors are initialized in RobotCore
     public void init()
     {
+
         super.init();
+        setBothSlideModes("STOP_AND_RESET_ENCODER");
     }
 
     public void loop() {
@@ -52,6 +55,7 @@ public class SoloTeleOp extends RobotCore
             backRightPower  /= max / 2.5;
         }
 
+
         if (gamepad1.b && (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1 || Math.abs(gamepad1.right_stick_x) > 0.1)) {
             frontLeft.setPower(frontLeftPower * 0.5);
             frontRight.setPower(frontRightPower * 0.5);
@@ -74,24 +78,46 @@ public class SoloTeleOp extends RobotCore
         if (gamepad1.right_stick_y > 0.5)
             horizontal.setPosition(0);
         if (gamepad1.right_stick_y < -0.5)
-            horizontal.setPosition(0.6);
+            horizontal.setPosition(0.23);
+
+
+        double quickPickupPos = 0.2;
 
         if (gamepad1.a)
             pivot.setPosition(0);
         if (gamepad1.y)
-            pivot.setPosition(0.7);
-        if(gamepad1.x)
-            pivot.setPosition(0.35);
+            pivot.setPosition(0.6);
+        if (gamepad1.x)
+            pivot.setPosition(0.3);
+//        if(gamepad1.left_stick_button)
+//            pivot.setPosition(quickPickupPos);
 
-        //Taking In Sample
-        if (gamepad1.left_bumper) {
+        if(gamepad1.left_stick_button)
+        {
+            leftHang.setPosition(0.05);
+            rightHang.setPosition(0.05);
+        }
+        if(gamepad1.right_stick_button)
+        {
+            leftHang.setPosition(0.4);
+            rightHang.setPosition(0.4);
+        }
+
+        if(gamepad1.left_bumper)
+        {
+            leftClaw.setPower(0.5);
+            rightClaw.setPower(-0.5);
+        }
+        else if (gamepad1.left_bumper) {
             leftClaw.setPower(1);
             rightClaw.setPower(-1);
-        //Pushing Out Sample
-        } else if (gamepad1.right_bumper) {
+        }
+        else if (gamepad1.right_bumper) {
             leftClaw.setPower(-1);
             rightClaw.setPower(1);
-        } else {
+        }
+        else
+        {
             leftClaw.setPower(0);
             rightClaw.setPower(0);
         }
@@ -99,43 +125,49 @@ public class SoloTeleOp extends RobotCore
 
         //SLIDE CONTROLS-----------------------------------------------------------
         if (gamepad1.dpad_up && limitHeight("<", 4400)) {
+            setBothSlideModes("RUN_USING_ENCODER");
             leftSlide.setPower(1);
             rightSlide.setPower(1);
-        } else if (gamepad1.dpad_down && limitHeight(">=", 0)) {
+        } else if (gamepad1.dpad_down && limitHeight(">=", 500)) {
+            setBothSlideModes("RUN_USING_ENCODER");
             leftSlide.setPower(-1);
             rightSlide.setPower(-1);
-        } else {
+        }
+        else if(gamepad1.dpad_down && limitHeight( "<=", 500) && limitHeight(">=", 0)) {
+            setBothSlideModes("RUN_USING_ENCODER");
+            leftSlide.setPower(-0.5);
+            rightSlide.setPower(-0.5);
+        }
+        else if(gamepad1.dpad_right)
+            setSlidePositions(290);
+        else if(gamepad1.dpad_left)
+            setSlidePositions(4400);
+        else if(gamepad1.left_trigger > 0.3)
+            setSlidePositions(322);
+        else if(gamepad1.right_trigger > 0.3)
+            setSlidePositions(2000);
+        else
+        {
             leftSlide.setPower(0.002);
             rightSlide.setPower(0.002);
         }
 
+//        if(gamepad1.dpad_right  && leftHang.getCurrentPosition() < 1500)
+//        {
+//            leftHang.setPower(1);
+//            rightHang.setPower(1);
+//        }
+//        else if(gamepad1.dpad_left  && leftHang.getCurrentPosition() > 0)
+//        {
+//            leftHang.setPower(-1);
+//            rightHang.setPower(-1);
+//        }
+//        else
+//        {
+//            leftHang.setPower(0);
+//            rightHang.setPower(0);
+//        }
 
-        if(gamepad1.dpad_right  && leftHang.getCurrentPosition() < 1500)
-        {
-            leftHang.setPower(1);
-            rightHang.setPower(1);
-        }
-        else if(gamepad1.dpad_left  && leftHang.getCurrentPosition() > 0)
-        {
-            leftHang.setPower(-1);
-            rightHang.setPower(-1);
-        }
-        else
-        {
-            leftHang.setPower(0);
-            rightHang.setPower(0);
-        }
-
-        if(gamepad1.right_trigger > 0.5) {
-            setBothSlideModes("RUN_WITHOUT_ENCODER");
-            while(gamepad1.right_trigger > 0.5)
-            {
-                leftSlide.setPower(-0.5);
-                rightSlide.setPower(-0.5);
-            }
-            setBothSlideModes("STOP_AND_RESET_ENCODER");
-            setBothSlideModes("RUN_USING_ENCODER");
-        }
 
         //Slide L 4088 R 4060
 
@@ -152,41 +184,33 @@ public class SoloTeleOp extends RobotCore
     {
         if(modifier == ">")
         {
-            if(leftSlide.getCurrentPosition() > targetPosition  && rightSlide.getCurrentPosition() > targetPosition)
+            if(findLowestSlide().getCurrentPosition() > targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
         else if (modifier == "<")
         {
-            if(leftSlide.getCurrentPosition() < targetPosition  && rightSlide.getCurrentPosition() < targetPosition)
+            if(findHighestSlide().getCurrentPosition() < targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
         else if (modifier == "<=")
         {
-            if(leftSlide.getCurrentPosition() <= targetPosition && rightSlide.getCurrentPosition() <= targetPosition)
+            if(findHighestSlide().getCurrentPosition() <= targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
         else if(modifier == ">=")
         {
-            if(leftSlide.getCurrentPosition() >= targetPosition && rightSlide.getCurrentPosition() >= targetPosition)
+            if(findLowestSlide().getCurrentPosition() >= targetPosition)
                 return true;
-            else return false;
+            else
+                return false;
         }
         else return false;
-    }
-
-    public void setBothSlidePositions(int leftTarget, int rightTarget)
-    {
-        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftSlide.setTargetPosition(leftTarget);
-        rightSlide.setTargetPosition(rightTarget);
-
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setBothSlideModes(String mode)
@@ -211,6 +235,32 @@ public class SoloTeleOp extends RobotCore
             leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+    }
+
+    public void setSlidePositions(int tar)
+    {
+
+        leftSlide.setTargetPosition(tar);
+        rightSlide.setTargetPosition(tar);
+        setBothSlideModes("RUN_TO_POSITION");
+        leftSlide.setPower(1);
+        rightSlide.setPower(1);
+    }
+
+    public DcMotor findHighestSlide()
+    {
+        if(leftSlide.getCurrentPosition() > rightSlide.getCurrentPosition())
+            return leftSlide;
+        else
+            return rightSlide;
+    }
+
+    public DcMotor findLowestSlide()
+    {
+        if(leftSlide.getCurrentPosition() < rightSlide.getCurrentPosition())
+            return leftSlide;
+        else
+            return rightSlide;
     }
 
 }
