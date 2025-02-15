@@ -682,13 +682,13 @@ public class limelightTesting extends LinearOpMode {
                             if (tx <= -20) {
                                 speed = -0.35;
                             } else {
-                                speed = -0.15;
+                                speed = -0.2;
                             }
                         } else if (tx >= -2) {
                             if (tx >= 14) {
                                 speed = 0.35;
                             } else {
-                                speed = 0.15;
+                                speed = 0.2;
                             }
                         }
                     }

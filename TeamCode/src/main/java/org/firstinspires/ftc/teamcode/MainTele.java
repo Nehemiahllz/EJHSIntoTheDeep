@@ -123,7 +123,7 @@ public class MainTele extends RobotCore {
 
         if (axelMoving != axelMode.GRABSAMPLE && axelMoving != axelMode.GRABSPEC) {
             controller.setPID(p, i, d);
-            int axelPos = axelMotor.getCurrentPosition();
+            int axelPos = axelMotor2.getCurrentPosition();
             double pid = controller.calculate(axelPos, target);
             double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
@@ -236,7 +236,7 @@ public class MainTele extends RobotCore {
                     break;
                 case BUCKET:
 
-                    if (axelReset && axelMotor.getCurrentPosition() < 10 && slideMotor.getCurrentPosition() > 400) {
+                    if (axelReset && axelMotor2.getCurrentPosition() < 10 && slideMotor.getCurrentPosition() > 400) {
                         axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -263,7 +263,7 @@ public class MainTele extends RobotCore {
                             target = 133;
                             stopper.setPosition(0.08);
 
-                            if (axelMotor.getCurrentPosition() < 140 && axelMotor.getCurrentPosition() > 127) {
+                            if (axelMotor2.getCurrentPosition() < 140 && axelMotor2.getCurrentPosition() > 127) {
                                 hangSeq = hangSequence.SLIDE_BAR1;
                             }
                             break;
@@ -278,7 +278,7 @@ public class MainTele extends RobotCore {
                         case AXEL_BAR1:
                             target = 241;
 
-                            if (axelMotor.getCurrentPosition() > 239) {
+                            if (axelMotor2.getCurrentPosition() > 238) {
                                 hangSeq = hangSequence.SLIDE_PULL1;
                             }
                             break;

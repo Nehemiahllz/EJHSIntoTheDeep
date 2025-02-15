@@ -65,39 +65,40 @@ public class Buckets extends LinearOpMode {
 
         Cam camera = new Cam(hardwareMap);
 
+
         //This top line will have the position the robot is currently in, but the bottom is where the robot will go
         //The bottom line can have as many lines as you want, but the last line will have the semi colon, not the others
 
         TrajectoryActionBuilder sample = drive.actionBuilder(start)
 //                .strafeTo(new Vector2d(-34, -47))
-                .strafeToLinearHeading(new Vector2d(-53.4, -52.6), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-54, -53.60), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-53.4, -52.6, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(-47, -43), Math.toRadians(90));
+        TrajectoryActionBuilder sample1 = drive.actionBuilder(new Pose2d(-54, -53.60, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-47, -42), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample1Score = drive.actionBuilder(new Pose2d(-47, -43, Math.toRadians(90)))
+        TrajectoryActionBuilder sample1Score = drive.actionBuilder(new Pose2d(-47, -42, Math.toRadians(90)))
 //                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
-                .strafeToLinearHeading(new Vector2d(-53, -52.2), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-53.5, -53.1), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-53, -52.2, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(-58, -43), Math.toRadians(90));
+        TrajectoryActionBuilder sample2 = drive.actionBuilder(new Pose2d(-53.5, -53.1, Math.toRadians(45)))
+                .strafeToLinearHeading(new Vector2d(-58, -42), Math.toRadians(90));
 
-        TrajectoryActionBuilder sample2Score = drive.actionBuilder(new Pose2d(-58, -43, Math.toRadians(90)))
+        TrajectoryActionBuilder sample2Score = drive.actionBuilder(new Pose2d(-58, -42, Math.toRadians(90)))
 //                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
-                .strafeToLinearHeading(new Vector2d(-53, -52.2), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-53.5, -53.1), Math.toRadians(45));
 
-        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(-53, -52.2, Math.toRadians(45)))
+        TrajectoryActionBuilder sample3 = drive.actionBuilder(new Pose2d(-53.5, -53.1, Math.toRadians(45)))
                 .strafeToLinearHeading(new Vector2d(-50, -43), Math.toRadians(142));
 //                .strafeTo(new Vector2d(-51.25, -23));
 
         TrajectoryActionBuilder sample3Score = drive.actionBuilder(new Pose2d(-50, -43, Math.toRadians(142)))
 //                .strafeToLinearHeading(new Vector2d(-50, -50), Math.toRadians(45))
-                .strafeToLinearHeading(new Vector2d(-53, -52.2), Math.toRadians(45));
+                .strafeToLinearHeading(new Vector2d(-53.5, -53.1), Math.toRadians(45));
 
 
-        TrajectoryActionBuilder submersible1 = drive.actionBuilder(new Pose2d(-53, -52.2, Math.toRadians(45)))
+        TrajectoryActionBuilder submersible1 = drive.actionBuilder(new Pose2d(-53, -53.1, Math.toRadians(45)))
                 .splineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(0)), Math.toRadians(90))
-                .strafeTo(new Vector2d(-26, -7));
+                .strafeTo(new Vector2d(-26, -10));
 
 
         //Closes the claw onto the sample
@@ -106,6 +107,8 @@ public class Buckets extends LinearOpMode {
                         claw.setClawPosition(0.4)
                 )
         );
+
+        //1790 exposure
 
         waitForStart();
         if (isStopRequested()) return;
@@ -120,13 +123,11 @@ public class Buckets extends LinearOpMode {
                                         sample.build(),
                                         new SequentialAction(
                                                 stopper.setStopperPosition(0.53),
-                                                axel.changeAxelPosition(285),
+                                                axel.changeAxelPosition(285, 0.6),
                                                 new ParallelAction(
                                                         slide.setSlidePosition(2240, 1),
-                                                        new SequentialAction(
-                                                                axel.changeAxelPosition(255),
-                                                                axel.reset()
-                                                        )
+                                                        axel.changeAxelPosition(255, 0.6)
+
                                                 )
 
                                         )
@@ -144,7 +145,7 @@ public class Buckets extends LinearOpMode {
                                         new SequentialAction(
                                                 slide.setSlidePosition(15, 1),
                                                 axel.pickUp(),
-                                                new SleepAction(0.45)
+                                                new SleepAction(0.2)
                                         )
                                 ),
                                 claw.setClawPosition(0.4),
@@ -155,7 +156,6 @@ public class Buckets extends LinearOpMode {
                                         sample1Score.build(),
                                         new SequentialAction(
                                                 axel.score(),
-                                                axel.reset(),
                                                 slide.setSlidePosition(2240, 1)
                                         )
                                 ),
@@ -183,7 +183,6 @@ public class Buckets extends LinearOpMode {
                                         sample2Score.build(),
                                         new SequentialAction(
                                                 axel.score(),
-                                                axel.reset(),
                                                 slide.setSlidePosition(2240, 1)
                                         )
                                 ),
@@ -203,7 +202,7 @@ public class Buckets extends LinearOpMode {
                                                 new SleepAction(0.3)
                                         )
                                 ),
-                                slide.setSlidePosition(630, 1),
+                                slide.setSlidePosition(620, 1),
                                 new SleepAction(0.1),
                                 claw.setClawPosition(0.4),
                                 new SleepAction(0.4),
@@ -215,7 +214,6 @@ public class Buckets extends LinearOpMode {
                                         new SequentialAction(
                                                 slide.setSlidePosition(15, 1),
                                                 axel.score(),
-                                                axel.reset(),
                                                 slide.setSlidePosition(2240, 1)
                                         )
                                 ),
@@ -233,15 +231,11 @@ public class Buckets extends LinearOpMode {
                                 ),
                                 camera.rotation(),
                                 camera.distance(),
-                                axel.pickUp(),
-                                slide.setSlidePosition(slideDistanceTicksSample, 1),
-                                claw.setClawPosition(0.4),
-                                new SleepAction(0.4),
                                 axel.off()
                         )));
 
-        TrajectoryActionBuilder subScore = drive.actionBuilder(new Pose2d(-26, -7, Math.toRadians(targetRotation)))
-                .strafeToLinearHeading(new Vector2d(-59, -53.4), Math.toRadians(0))
+        TrajectoryActionBuilder subScore = drive.actionBuilder(new Pose2d(-26, -10, Math.toRadians(targetRotation)))
+                .strafeToLinearHeading(new Vector2d(-34, -10), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d(-54, -53.4), Math.toRadians(45));
 
 
@@ -249,12 +243,16 @@ public class Buckets extends LinearOpMode {
                 new ParallelAction(
                         axel.setAxelPosition(),
                         new SequentialAction(
+                                axel.pickUp(),
+                                slide.setSlidePosition(slideDistanceTicksSample, 1),
+                                claw.setClawPosition(0.4),
+                                new SleepAction(0.4),
                                 new ParallelAction(
                                         subScore.build(),
                                         claw.setClawYPosition(0.267),
                                         new SequentialAction(
                                                 new ParallelAction(
-                                                        axel.changeAxelPosition(750),
+                                                        axel.changeAxelPosition(750, 0.5),
                                                     slide.setSlidePosition(0, 1)
                                                 ),
                                                 axel.score(),
@@ -269,6 +267,8 @@ public class Buckets extends LinearOpMode {
                         )
                 )
         );
+
+        telemetry.addData("ticks", slideDistanceTicksSample);
 
 
     }
@@ -346,36 +346,29 @@ public class Buckets extends LinearOpMode {
     }
 
     int target = 0;
+    double power;
 
     boolean axelOff = false;
-    boolean axelReset = false;
-
     boolean turnAxelOff = false;
 
     //Making the axel class to make the slide object to be moved during auto
     public class Axel {
-        private PIDController controller;
-
-        public double p = 0.005, i = 0, d = 0.00015;
-        public double f = 0.0025;
-
-        private final double ticks_in_degree = 700 / 180.0;
 
         DcMotorEx axelMotor;
         DcMotorEx axelMotor2;
 
         public Axel(HardwareMap hardwareMap) {
-            controller = new PIDController(p, i, d);
-            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
             axelMotor = hardwareMap.get(DcMotorEx.class, "axelMotor");
             axelMotor2 = hardwareMap.get(DcMotorEx.class, "axelMotor2");
 
             axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            axelMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            axelMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            axelMotor.setTargetPosition(0);
+            axelMotor2.setTargetPosition(0);
+
+            axelMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            axelMotor2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
             axelMotor2.setDirection(DcMotorEx.Direction.REVERSE);
             axelMotor.setDirection(DcMotorEx.Direction.FORWARD);
@@ -389,32 +382,14 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                controller.setPID(p, i, d);
-                int axelPos = axelMotor.getCurrentPosition();
-                double pid = controller.calculate(axelPos, target);
-                double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
+                axelMotor.setTargetPosition(target);
+                axelMotor2.setTargetPosition(target);
 
-                double power = pid + ff;
+                axelMotor.setPower(power);
+                axelMotor2.setPower(power);
 
-                if (axelReset && slideLength > 1300) {
-                    axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-                    axelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    axelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-                    axelReset = false;
-                }
-
-                if (!axelOff) {
-                    axelMotor.setPower(power);
-                    axelMotor2.setPower(power);
-                } else {
-                    axelMotor.setPower(0);
-                    axelMotor2.setPower(0);
-                }
-
-                telemetry.addData("pos", axelPos);
+                telemetry.addData("pos", axelMotor2.getCurrentPosition());
                 telemetry.addData("target", target);
                 telemetry.addData("power", power);
 
@@ -437,8 +412,9 @@ public class Buckets extends LinearOpMode {
             int tar;
             double pow;
 
-            public ChangeAxelPosition(int axelTar) {
+            public ChangeAxelPosition(int axelTar, double pows) {
                 tar = axelTar;
+                pow = pows;
             }
 
             @Override
@@ -446,21 +422,19 @@ public class Buckets extends LinearOpMode {
 
                 axelOff = false;
                 target = tar;
+                power = pow;
 
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("axelPos", axelMotor2.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor2.getTargetPosition());
                 telemetry.addData("Target", target);
                 telemetry.addData("AxelPower", axelMotor.getPower());
 
-                if (axelMotor.getCurrentPosition() > target - 3 && axelMotor.getCurrentPosition() < target + 3) {
-                    return false;
-                }
-                return true;
+                return false;
             }
         }
 
-        public Action changeAxelPosition(int axelTar) {
-            return new ChangeAxelPosition(axelTar);
+        public Action changeAxelPosition(int axelTar, double pows) {
+            return new ChangeAxelPosition(axelTar, pows);
         }
 
 
@@ -472,26 +446,23 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("axelPos", axelMotor2.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor2.getTargetPosition());
                 telemetry.addData("Target", target);
-                telemetry.addData("AxelPower", axelMotor.getPower());
+                telemetry.addData("AxelPower", axelMotor2.getPower());
 
-                target = 875;
-                return false;
+                if (axelMotor2.getCurrentPosition() > 840) {
+                    power = 0;
+                    target = 1000;
+                } else {
+                    power = 0.5;
+                    target = 850;
+                }
 
-//                if (axelMotor.getCurrentPosition() > 485) {
-//                    axelOff = true;
-//                    target = 721;
-//                } else {
-//                    axelOff = false;
-//                    target = 500;
-//                }
-//
-//                if(axelMotor.getCurrentPosition() > 710){
-//                    return false;
-//                }
-//                return true;
+                if(axelMotor2.getCurrentPosition() > 842){
+                    return false;
+                }
+                return true;
             }
         }
 
@@ -508,58 +479,32 @@ public class Buckets extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
+                telemetry.addData("axelPos", axelMotor2.getCurrentPosition());
+                telemetry.addData("axelTargetPos", axelMotor2.getTargetPosition());
                 telemetry.addData("Target", target);
                 telemetry.addData("AxelPower", axelMotor.getPower());
 
                 axelOff = false;
 
-                if (axelMotor.getCurrentPosition() < 50) {
-                    axelReset = true;
-                    target = -30;
+                if (axelMotor2.getCurrentPosition() < 320) {
+                    target = 250;
+                    power = 0.2;
                     return false;
                 } else {
-                    target = -100;
+                    target = 250;
+                    power = 0.6;
                 }
 
-                return true;
+                if(axelMotor2.getCurrentPosition() < 257) {
+                    return false;
+                }else{
+                    return true;
+                }
             }
         }
 
         public Action score() {
             return new Score();
-        }
-
-
-        public class Reset implements Action {
-
-            public Reset() {
-            }
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-                telemetry.addData("axelPos", axelMotor.getCurrentPosition());
-                telemetry.addData("axelTargetPos", axelMotor.getTargetPosition());
-                telemetry.addData("Target", target);
-                telemetry.addData("AxelPower", axelMotor.getPower());
-
-                axelOff = false;
-
-                if (axelMotor.getCurrentPosition() < 285) {
-                    target = -3;
-                    axelReset = true;
-                    return false;
-                } else {
-                    target = 280;
-                }
-                return true;
-            }
-        }
-
-        public Action reset() {
-            return new Reset();
         }
 
 
@@ -724,8 +669,7 @@ public class Buckets extends LinearOpMode {
         }
     }
 
-
-    int slideDistanceTicksSample;
+    int ticks;
 
     int i = 0;
 
@@ -737,6 +681,8 @@ public class Buckets extends LinearOpMode {
 
     Vector<Integer> distance = new Vector<>();
     Vector<Double> area = new Vector<>();
+
+    int slideDistanceTicksSample;
 
     public class Cam {
         private Limelight3A limelight;
@@ -855,7 +801,9 @@ public class Buckets extends LinearOpMode {
 
                         slideDistanceTicksSample = (int) (a * Math.exp(b * finalArea));
 
-//                        slideDistanceTicksSample += 60;
+                        slideDistanceTicksSample += 60;
+
+                        ticks = slideDistanceTicksSample;
 
                         telemetry.addData("slideEncoder", slideDistanceTicksSample);
 
@@ -876,6 +824,7 @@ public class Buckets extends LinearOpMode {
                     areaTotal = 0;
                     return true;
                 } else {
+                    i++;
                     return true;
                 }
 
@@ -935,15 +884,15 @@ public class Buckets extends LinearOpMode {
                 } else {
                     if (tx <= -4) {
                         if (tx <= -12) {
-                            speed = -0.35;
+                            speed = -0.4;
                         } else {
-                            speed = -0.25;
+                            speed = -0.3;
                         }
                     } else if (tx >= -2) {
                         if (tx >= 6) {
-                            speed = 0.35;
+                            speed = 0.4;
                         } else {
-                            speed = 0.25;
+                            speed = 0.3;
                         }
                     }
                 }
