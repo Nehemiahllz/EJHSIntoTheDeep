@@ -149,7 +149,7 @@ public class Buckets extends LinearOpMode {
                                         )
                                 ),
                                 claw.setClawPosition(0.4),
-                                new SleepAction(0.4),
+                                new SleepAction(0.8),
 
                                 new ParallelAction(
                                         claw.setClawYPosition(0.4),
@@ -176,7 +176,7 @@ public class Buckets extends LinearOpMode {
                                         )
                                 ),
                                 claw.setClawPosition(0.4),
-                                new SleepAction(0.4),
+                                new SleepAction(0.8),
 
                                 new ParallelAction(
                                         claw.setClawYPosition(0.4),
@@ -205,7 +205,7 @@ public class Buckets extends LinearOpMode {
                                 slide.setSlidePosition(620, 1),
                                 new SleepAction(0.1),
                                 claw.setClawPosition(0.4),
-                                new SleepAction(0.4),
+                                new SleepAction(0.8),
 
                                 new ParallelAction(
                                         claw.setClawYPosition(0.4),
@@ -224,49 +224,51 @@ public class Buckets extends LinearOpMode {
                                 claw.setClawYPosition(0.4),
 
                                 new ParallelAction(
-                                        slide.setSlidePosition(15, 1),
-                                        submersible1.build(),
-                                        claw.setClawYPosition(0.807),
-                                        claw.setClawPosition(0.75)
-                                ),
-                                camera.rotation(),
-                                camera.distance(),
-                                axel.off()
+                                    slide.setSlidePosition(0, 1),
+                                    claw.setClawYPosition(0.807)
+                                )
+
+//                                new ParallelAction(
+//                                        slide.setSlidePosition(15, 1),
+//                                        submersible1.build(),
+//                                        claw.setClawYPosition(0.807),
+//                                        claw.setClawPosition(0.75)
+//                                )
                         )));
 
-        TrajectoryActionBuilder subScore = drive.actionBuilder(new Pose2d(-26, -10, Math.toRadians(targetRotation)))
-                .strafeToLinearHeading(new Vector2d(-34, -10), Math.toRadians(0))
-                .strafeToLinearHeading(new Vector2d(-54, -53.4), Math.toRadians(45));
-
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        axel.setAxelPosition(),
-                        new SequentialAction(
-                                axel.pickUp(),
-                                slide.setSlidePosition(slideDistanceTicksSample, 1),
-                                claw.setClawPosition(0.4),
-                                new SleepAction(0.4),
-                                new ParallelAction(
-                                        subScore.build(),
-                                        claw.setClawYPosition(0.267),
-                                        new SequentialAction(
-                                                new ParallelAction(
-                                                        axel.changeAxelPosition(750, 0.5),
-                                                    slide.setSlidePosition(0, 1)
-                                                ),
-                                                axel.score(),
-                                                slide.setSlidePosition(2240, 1)
-                                        )
-                                ),
-                                claw.setClawPosition(0.74),
-                                new SleepAction(0.1),
-                                claw.setClawYPosition(0.4),
-                                slide.setSlidePosition(15, 1)
-
-                        )
-                )
-        );
+//        TrajectoryActionBuilder subScore = drive.actionBuilder(new Pose2d(-26, -10, Math.toRadians(targetRotation)))
+//                .strafeToLinearHeading(new Vector2d(-34, -10), Math.toRadians(0))
+//                .strafeToLinearHeading(new Vector2d(-54, -53.4), Math.toRadians(45));
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        axel.setAxelPosition(),
+//                        new SequentialAction(
+//                                axel.pickUp(),
+//                                slide.setSlidePosition(slideDistanceTicksSample, 1),
+//                                claw.setClawPosition(0.4),
+//                                new SleepAction(0.4),
+//                                new ParallelAction(
+//                                        subScore.build(),
+//                                        claw.setClawYPosition(0.267),
+//                                        new SequentialAction(
+//                                                new ParallelAction(
+//                                                        axel.changeAxelPosition(750, 0.5),
+//                                                    slide.setSlidePosition(0, 1)
+//                                                ),
+//                                                axel.score(),
+//                                                slide.setSlidePosition(2240, 1)
+//                                        )
+//                                ),
+//                                claw.setClawPosition(0.74),
+//                                new SleepAction(0.1),
+//                                claw.setClawYPosition(0.4),
+//                                slide.setSlidePosition(15, 1)
+//
+//                        )
+//                )
+//        );
 
         telemetry.addData("ticks", slideDistanceTicksSample);
 
