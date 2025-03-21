@@ -34,17 +34,13 @@ public class MainTeleOp extends RobotCore
         super.init();
     }
 
-    public void start()
-    {
-    }
-
     public void loop() {
         //MOVING CONTROLS-----------------------------------------------------------------
         y = gamepad1.left_stick_y; // Remember, Y stick value is reversed
         x = -gamepad1.left_stick_x; // Counteract imperfect strafing
         rx = gamepad1.right_stick_x;
 
-//        denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        //denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         frontLeftPower = (y + x - rx);
         backLeftPower = (y - x - rx);
         frontRightPower = (y - x + rx);
@@ -108,7 +104,7 @@ public class MainTeleOp extends RobotCore
             if (gamepad1.y)
                 pivot.setPosition(0.6);
             if (gamepad1.x)
-                pivot.setPosition(0.3);
+                pivot.setPosition(0.2);
 
         //HANG CONTROLS----------------------------------------------------------------------------
         if(gamepad1.left_stick_button)

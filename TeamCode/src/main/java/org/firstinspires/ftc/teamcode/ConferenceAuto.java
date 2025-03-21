@@ -35,24 +35,12 @@ import org.firstinspires.ftc.teamcode.Other_RoadRunner_Classes.MecanumDrive;
 @Autonomous(name = "Conference Auto", group = "Autonomous")
 public class ConferenceAuto extends LinearOpMode {
 
-    public int readCamera()
-    {
-        HuskyLens camera = hardwareMap.get(HuskyLens.class, "camera");
-        if (camera.blocks(1).length > 0)
-            return 2200;
-        else if (camera.blocks(2).length > 0)
-            return 300;
-        else if (camera.blocks(3).length > 0)
-            return 3900;
-        else return 100;
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d startPose = new Pose2d(-12, -61, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-24, -61, Math.toRadians(90));
 
 
-        //MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0, Math.toRadians(0)));
         MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
 
 
@@ -61,83 +49,53 @@ public class ConferenceAuto extends LinearOpMode {
         Claw claw = new Claw(hardwareMap);
 
 
-        TrajectoryActionBuilder firstPickup = drive.actionBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                .splineToLinearHeading(new Pose2d(0, 15, Math.toRadians(90)), Math.toRadians(90));
-
-
-        TrajectoryActionBuilder toSpecimenBar = drive.actionBuilder(startPose)
-                .waitSeconds(0.3)
-                .lineToY(-32)
-                .waitSeconds(0.5);
-
-        Pose2d sampleOnePose = new Pose2d(-43,-30,Math.toRadians(120));
+        Pose2d sampleOnePose = new Pose2d(-35,-29,Math.toRadians(120));
         TrajectoryActionBuilder toSample1 = drive.actionBuilder(startPose)
-                .lineToY(-50)
+                .waitSeconds(0.3)
                 .splineToLinearHeading(sampleOnePose, Math.toRadians(90));
 
-        /** **************** **/
-        Pose2d bucketPose = new Pose2d(-51.5, -51.5, Math.toRadians(-135));
+        /** ************************************************************************* **/
+        Pose2d bucketPose = new Pose2d(-42, -52, Math.toRadians(-127));
         TrajectoryActionBuilder toBucket1 = drive.actionBuilder(sampleOnePose)
                 .waitSeconds(0.3)
-                .lineToX(-40)
-                .splineToLinearHeading(bucketPose, Math.toRadians(180));
+                .strafeTo(new Vector2d(-30,-30))
+                .splineToLinearHeading(bucketPose, Math.toRadians(180));0
 
-        double sampleTwoX = -57, sampleTwoY = -36;
+        double sampleTwoX = -47, sampleTwoY = -39;
         TrajectoryActionBuilder toSample2 = drive.actionBuilder(bucketPose)
-                .strafeTo(new Vector2d(-47, -45))
-                .splineToLinearHeading(new Pose2d(-50,-40, Math.toRadians(90)), -90)
-                .strafeTo(new Vector2d(sampleTwoX,sampleTwoY));
+                .strafeTo(new Vector2d(-38, -54))
+                .splineToLinearHeading(new Pose2d(sampleTwoX, sampleTwoY, Math.toRadians(82)), Math.toRadians(90));
 
-        bucketPose = new Pose2d(-49, -44, Math.toRadians(-135));
+
+        bucketPose = new Pose2d(-40, -52, Math.toRadians(-108));
         TrajectoryActionBuilder toBucket2 = drive.actionBuilder(new Pose2d(sampleTwoX, sampleTwoY, Math.toRadians(90)))
+                .waitSeconds(1)
                 .splineToLinearHeading(bucketPose, Math.toRadians(-90));
 
-        double sampleThreeX = -56, sampleThreeY = -23;
+        double sampleThreeX = -40, sampleThreeY = -25.8; // -64, -22.5
         TrajectoryActionBuilder toSample3 = drive.actionBuilder(bucketPose)
-                .strafeTo(new Vector2d(-47, -45))
-                .splineToLinearHeading(new Pose2d(-48,-30, Math.toRadians(180)), 0)
-                .strafeTo(new Vector2d(sampleThreeX,sampleThreeY));
-        bucketPose = new Pose2d(-51.5, -51.5, Math.toRadians(-135));
+                .strafeTo(new Vector2d(-36, -30))
+                .splineToLinearHeading(new Pose2d(sampleThreeX,sampleThreeY, Math.toRadians(180)), 0)
+                ;
+
+        bucketPose = new Pose2d(-40, -50, Math.toRadians(-135));
         TrajectoryActionBuilder toBucket3 = drive.actionBuilder(new Pose2d(sampleThreeX, sampleThreeY, Math.toRadians(180)))
-                .lineToX(-55)
-                .splineToLinearHeading(bucketPose, Math.toRadians(-90));
+                .lineToX(-40)
+                .splineToLinearHeading(bucketPose,  Math.toRadians(90));
 
 
         Actions.runBlocking(slides.setHorizontal(0));
-        Actions.runBlocking(claw.setPivot(0.3));
+        Actions.runBlocking(claw.setPivot(0.2));
         Actions.runBlocking(slides.resetEncoders());
         waitForStart();
         if(isStopRequested()) return;
 
-        //.3 is down
-        //.65 is out
-
         Actions.runBlocking(
                 new SequentialAction(
-//                        new ParallelAction(
-//                        firstPickup.build(),
-//                        slides.setSlidePositions(300)
-//                                ),
-//                        new SleepAction(1),
-//                        new ParallelAction(
-//                        claw.intake(),
-//                        slides.setSlidePositions(0)
-//                        ),
-//                        new SleepAction(2),
-//                        claw.off(),
-//                        slides.setSlidePositions(100)
-
-                        //Specimen
-//                        new ParallelAction(
-//                                slides.setHorizontal(0),
-//                                slides.setSlidePositions(2300),
-//                                claw.setPivot(0.6),
-//                                toSpecimenBar.build()
-//                        ),
                         new ParallelAction(
                                 toSample1.build(),
                                 slides.setSlidePositions(300),
-                                claw.setPivot(0.3),
+                                claw.setPivot(0.2),
                                 claw.intake()
                         ),
                         slides.setSlidePositions(17, 0.5),
@@ -147,36 +105,46 @@ public class ConferenceAuto extends LinearOpMode {
                                         new SleepAction(0.5),
                                         claw.off()
                                 ),
-                                slides.setHorizontal(0.2),
-                                claw.setPivot(0.05)
+                                slides.setHorizontal(0.14),
+                                claw.setPivot(0.04)
                         ),
                         new SleepAction(2),
 
                         slides.setSlidePositionsWithCamera(),
+
+
+                        //bucket 1
                         new ParallelAction(
                         toBucket1.build(),
                         slides.setHorizontal(0),
-                        claw.setPivot(0.65)
+                        claw.setPivot(0.6)
                         ),
                         new SleepAction(0.3),
                         claw.eject(1),
                         new ParallelAction(
-                                claw.setPivot(1),
+                                claw.setPivot(0.8),
                                 slides.setHorizontal(0)
                         ),
+
+
+
+                        //to sample 2
                         new SleepAction(0.2),
                         new ParallelAction(
                                 toSample2.build(),
-                                slides.setSlidePositions(700),
+                                new SequentialAction(
+                                        new SleepAction(0.6),
+                                        slides.setSlidePositions(700)
+                                ),
                                 claw.intake(),
                                 new SequentialAction(
-                                        new SleepAction(0.3),
-                                        slides.setHorizontal(0.2)
+                                        new SleepAction(0.9),
+                                        slides.setHorizontal(0.12)
                                 ),
-                                claw.setPivot(0.3)
+                                claw.setPivot(0.2)
                         ),
 
-                        //To sample 2
+
                         new SleepAction(0.1),
                         slides.setSlidePositions(17, 0.5),
                         new SleepAction(1),
@@ -185,10 +153,15 @@ public class ConferenceAuto extends LinearOpMode {
                                 slides.setHorizontal(0.2),
                                 claw.setPivot(0.05)
                         ),
+
+
+
+                        //bucket 2
                         new SleepAction(2),
                         new ParallelAction(
+                                slides.setHorizontal(0),
                                 slides.setSlidePositionsWithCamera(),
-                                claw.setPivot(0.65),
+                                claw.setPivot(0.6),
                                 toBucket2.build()
                         ),
                         new SleepAction(0.5),
@@ -197,16 +170,25 @@ public class ConferenceAuto extends LinearOpMode {
                                 claw.setPivot(1),
                                 slides.setHorizontal(0)
                         ),
+
+
+
+
+                        //to Sample 3
                         new ParallelAction(
                                 toSample3.build(),
-                                slides.setSlidePositions(700),
                                 new SequentialAction(
-                                        new SleepAction(0.5),
-                                        slides.setHorizontal(0.2)
+                                        new SleepAction(0.6),
+                                        claw.setPivot(0.2),
+                                        slides.setSlidePositions(900)
+
                                 ),
-                                claw.setPivot(0.3)
+                                new SequentialAction(
+                                        new SleepAction(2),
+                                        slides.setHorizontal(0.15)
+                                )
+
                         ),
-                        //to Sample 3
                         new ParallelAction(
 
                                 claw.intake()),
@@ -216,18 +198,24 @@ public class ConferenceAuto extends LinearOpMode {
                         new ParallelAction(
                                 new SequentialAction(
                                         new SleepAction(0.5),
-                                        claw.off()
-                                ),
-                                slides.setHorizontal(0.2),
-                                claw.setPivot(0.05)
+                                        claw.off(),
+                                        slides.setHorizontal(0.15),
+                                        claw.setPivot(0)
+                                )
+
                         ),
                         new SleepAction(2),
                         slides.setSlidePositionsWithCamera(),
+
+
+
+
+                        //bucket 3
                         new SleepAction(1),
                         new ParallelAction(
                                 toBucket3.build(),
                                 slides.setHorizontal(0),
-                                claw.setPivot(0.65)
+                                claw.setPivot(0.6)
                         ),
                         claw.eject(1),
                         new ParallelAction(
@@ -236,25 +224,18 @@ public class ConferenceAuto extends LinearOpMode {
                         ),
                         //Parking
                         new ParallelAction(
-                                claw.setPivot(0.3),
+                                claw.setPivot(0.2),
                                 slides.setHorizontal(0),
                                 slides.setSlidePositions(0)
                         )
 
-                        //Practice Park will hopefully put this close to the start pose to help reset
-                        //practicePark.build()
-                        //Replace with park.build for meets if needed
                 )
         );
 
     }
+
+
     //Accessory moving classes
-
-
-
-
-
-
     public class Slides{
         DcMotorEx leftSlide;
         DcMotorEx rightSlide;
@@ -295,36 +276,54 @@ public class ConferenceAuto extends LinearOpMode {
 
             int target = leftSlide.getCurrentPosition();
 
-
+            int[] highest = new int[] {0,0,0};
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 //                if(camera.blocks().length > 0) {
-                    if (camera.blocks(1).length > 0)
-                        target = 4350;
-
-                    else if (camera.blocks(3).length > 0)
-                        target = 300;
-
-                     else //if (camera.blocks(3).length > 0)
-                        target = 2500;
-            //}
-//                if(camera.blocks().length > 0) {
-//                    if (camera.blocks(1).length > camera.blocks(2).length && camera.blocks(1).length > camera.blocks(3).length)
-//                        target = 2200;
-//                    if (camera.blocks(2).length > camera.blocks(1).length && camera.blocks(1).length > camera.blocks(3).length)
+//                    if (camera.blocks(1).length > 0)
+//                        target = 4430;
+//
+//                    else if (camera.blocks(3).length > 0)
 //                        target = 300;
-//                    if (camera.blocks(3).length > camera.blocks(2).length && camera.blocks(1).length > camera.blocks(1).length)
-//                        target = 3900;
-//                }
-//                else return true;
+//
+//                     else //if (camera.blocks(3).length > 0)
+//                        target = 2600;
+
+                     //Red = 1, Blue = 2, yellow = 3
 
 
-                if(target == 2500)
+
+
+                HuskyLens.Block[] currentRedArray = camera.blocks(1);
+                HuskyLens.Block[] currentBlueArray = camera.blocks(2);
+                HuskyLens.Block[] currentYellowArray = camera.blocks(3);
+
+                HuskyLens.Block[][] colorArrays = new HuskyLens.Block[][] {currentRedArray, currentBlueArray, currentYellowArray};
+
+                for(int i = 0; i < colorArrays.length; i++) {
+                    if(colorArrays[i].length > 0) {
+                        for (int j = 0; j < colorArrays[i].length; j++) {
+                            if (colorArrays[i][j].height > highest[i])
+                                highest[i] = colorArrays[i][j].height;
+                        }
+                    }
+                }
+
+                if(highest[0] > highest[1] && highest[0] >highest[2])
+                    target = 4430;
+                else if(highest[1] > highest[0] && highest[1] > highest[2])
+                    target = 2600;
+                else if(highest[2] > highest[1] && highest[2] > highest[0])
+                    target = 300;
+
+
+                if(target == 2600)
                     telemetry.addLine("Color seen blue");
                 else if(target == 300)
                     telemetry.addLine("Color seen Yellow");
-                else if(target == 4200)
+                else
                     telemetry.addLine("Color seen red");
+
 
                 telemetry.update();
 
@@ -493,8 +492,8 @@ public class ConferenceAuto extends LinearOpMode {
                 }
                 else
                 {
-                    leftClaw.setPower(-0.5);
-                    rightClaw.setPower(0.5);
+                    leftClaw.setPower(-1);
+                    rightClaw.setPower(1);
                 }
                 return false;
             }
