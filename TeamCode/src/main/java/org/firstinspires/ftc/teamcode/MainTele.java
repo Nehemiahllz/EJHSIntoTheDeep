@@ -102,10 +102,10 @@ public class MainTele extends RobotCore {
         slideMotor.setPower(0);
         slideMotor2.setPower(0);
 
-//        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        axelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        axelMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

@@ -78,13 +78,10 @@ public class limelightTesting extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-9, 5), Math.toRadians(90));
 
 
-
-
-
         //Closes the claw onto the specimen
         Actions.runBlocking(
                 new SequentialAction(
-                     claw.setClawPosition(0.807),
+                        claw.setClawPosition(0.807),
                         camera.activate()
                 )
         );
@@ -99,12 +96,7 @@ public class limelightTesting extends LinearOpMode {
                 new ParallelAction(
                         axel.setAxelPosition(),
                         new SequentialAction(
-                                driveUp.build(),
-                                camera.rotation(),
-                                camera.distance(),
-                                axel.pickUp(),
-                                axel.changeAxelPosition(10000000),
-                                slide.setSlidePosition(slideDistanceTicksSample, 1)
+                                camera.rotation()
                         )
                 )
         );
@@ -120,12 +112,11 @@ public class limelightTesting extends LinearOpMode {
                 )
         );
 
-        for(int n = 0; n < 1000; n++){
+        for (int n = 0; n < 1000; n++) {
             telemetry.addData("finalTa", finalArea);
             telemetry.addData("finalTicks", slideDistanceTicksSample);
             telemetry.update();
         }
-
 
 
     }
@@ -392,7 +383,6 @@ public class limelightTesting extends LinearOpMode {
         }
 
 
-
         public class SetClawXPosition implements Action {
             double clawXPosition;
 
@@ -408,6 +398,7 @@ public class limelightTesting extends LinearOpMode {
             }
 
         }
+
         public Action setClawXPosition(double clawXPos) {
             return new SetClawXPosition(clawXPos);
         }
@@ -497,8 +488,8 @@ public class limelightTesting extends LinearOpMode {
 
         IMU imu;
 
-        public Cam(HardwareMap hardwareMap){
-            limelight = hardwareMap.get(Limelight3A .class, "limelight");
+        public Cam(HardwareMap hardwareMap) {
+            limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
             telemetry.setMsTransmissionInterval(11);
 
@@ -520,13 +511,13 @@ public class limelightTesting extends LinearOpMode {
 
         }
 
-        public class Activate implements Action{
+        public class Activate implements Action {
 
-            public Activate(){
+            public Activate() {
             }
 
             @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 limelight.start();
 
                 return false;
@@ -534,10 +525,9 @@ public class limelightTesting extends LinearOpMode {
 
         }
 
-        public Action activate(){
+        public Action activate() {
             return new Activate();
         }
-
 
 
         public class Distance implements Action {
@@ -596,13 +586,13 @@ public class limelightTesting extends LinearOpMode {
                         telemetry.addData("3", distance.get(3));
                         telemetry.addData("4", distance.get(4));
 
-                        for(int h = 0; h < 6; h++) {
+                        for (int h = 0; h < 6; h++) {
                             areaTotal += distance.get(h);
                         }
 
-                        finalArea = (areaTotal/6);
+                        finalArea = (areaTotal / 6);
 
-                        slideDistanceTicksSample = (int)(a * Math.exp(b * finalArea));
+                        slideDistanceTicksSample = (int) (a * Math.exp(b * finalArea));
 
                         slideDistanceTicksSample += 60;
 
@@ -629,83 +619,86 @@ public class limelightTesting extends LinearOpMode {
             }
         }
 
-            public Action distance() {return new Distance();}
+        public Action distance() {
+            return new Distance();
+        }
 
 
-            public class Rotation implements Action {
+        public class Rotation implements Action {
 
-                double speed = 0;
-                double angle = 0;
+            double speed = 0;
+            double angle = 0;
 
-                public Rotation() {
-                }
-
-                @Override
-                public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-                    LLResult result = limelight.getLatestResult();
-
-                    double tx = result.getTx(); // How far left or right the target is (degrees)
-                    double ty = result.getTy(); // How far up or down the target is (degrees)
-                    double ta = result.getTa();
-
-                    angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-                    robotAngle = angle;
-
-                    if (robotAngle >= 0) {
-                        targetRotation = 0 + robotAngle;
-                    } else {
-                        targetRotation = 360 + robotAngle;
-                    }
-
-                    telemetry.addData("robotAngle", angle);
-                    telemetry.addData("targetRotation", targetRotation);
-
-                    leftBack.setPower(speed);
-                    leftFront.setPower(speed);
-                    rightBack.setPower(-speed);
-                    rightFront.setPower(-speed);
-
-                    telemetry.addData("tx", tx);
-
-                    if (tx > -4 && tx < -2) {
-                        leftBack.setPower(0);
-                        leftFront.setPower(0);
-                        rightBack.setPower(0);
-                        rightFront.setPower(0);
-
-                        speed = 0;
-                        telemetry.addLine("Targeted Successfully");
-                        return false;
-                    } else {
-                        if (tx <= -4) {
-                            if (tx <= -20) {
-                                speed = -0.35;
-                            } else {
-                                speed = -0.2;
-                            }
-                        } else if (tx >= -2) {
-                            if (tx >= 14) {
-                                speed = 0.35;
-                            } else {
-                                speed = 0.2;
-                            }
-                        }
-                    }
-
-
-                    return true;
-                }
-
+            public Rotation() {
             }
 
-            //-1.5 to -4
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-            public Action rotation() {return new Rotation();}
+                LLResult result = limelight.getLatestResult();
 
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
+                double ta = result.getTa();
+
+                angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                robotAngle = angle;
+
+                if (robotAngle >= 0) {
+                    targetRotation = 0 + robotAngle;
+                } else {
+                    targetRotation = 360 + robotAngle;
+                }
+
+                telemetry.addData("robotAngle", angle);
+                telemetry.addData("targetRotation", targetRotation);
+
+                leftBack.setPower(speed);
+                leftFront.setPower(speed);
+                rightBack.setPower(-speed);
+                rightFront.setPower(-speed);
+
+                telemetry.addData("tx", tx);
+
+                if (tx > -4 && tx < -2) {
+                    leftBack.setPower(0);
+                    leftFront.setPower(0);
+                    rightBack.setPower(0);
+                    rightFront.setPower(0);
+
+                    speed = 0;
+                    telemetry.addLine("Targeted Successfully");
+                    return false;
+                } else {
+                    if (tx <= -4) {
+                        if (tx <= -20) {
+                            speed = -0.35;
+                        } else {
+                            speed = -0.2;
+                        }
+                    } else if (tx >= -2) {
+                        if (tx >= 14) {
+                            speed = 0.35;
+                        } else {
+                            speed = 0.2;
+                        }
+                    }
+                }
+
+
+                return true;
+            }
 
         }
 
+        //-1.5 to -4
+
+        public Action rotation() {
+            return new Rotation();
+        }
+
+
+    }
 
 
 }
